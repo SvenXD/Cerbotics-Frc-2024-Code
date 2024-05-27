@@ -14,7 +14,6 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.controller.LinearPlantInversionFeedforward;
 import edu.wpi.first.math.util.Units;
 import frc.Util.LoggedTunableNumber;
 
