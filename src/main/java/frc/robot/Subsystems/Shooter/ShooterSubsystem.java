@@ -1,12 +1,6 @@
 package frc.robot.Subsystems.Shooter;
 
-import static frc.robot.Constants.Shooter.LOWER_SHOOTER_AMP_RPM;
-import static frc.robot.Constants.Shooter.LOWER_SHOOTER_FEEDER_OVER_RPM;
-import static frc.robot.Constants.Shooter.LOWER_SHOOTER_IDLE_RPM;
-import static frc.robot.Constants.Shooter.UPPER_SHOOTER_AMP_RPM;
-import static frc.robot.Constants.Shooter.UPPER_SHOOTER_FEEDER_OVER_RPM;
-import static frc.robot.Constants.Shooter.UPPER_SHOOTER_FEEDER_UNDER_RPM;
-import static frc.robot.Constants.Shooter.UPPER_SHOOTER_IDLE_RPM;
+import static frc.robot.Constants.Shooter.*;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -30,11 +24,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
   /* Setpoints*/
 
-  private double desiredUpperRPM = 1000.0;
-  private double desiredLowerRPM = 1000.0;
+  private double desiredUpperRPM = 0.0;
+  private double desiredLowerRPM = 0.0;
 
-    LoggedTunableNumber ampSpeed = new LoggedTunableNumber("Amp/ShotVelocity", desiredLowerRPM);
-
+    LoggedTunableNumber ampUpperSpeed = new LoggedTunableNumber("Amp/ShotVelocity", UPPER_SHOOTER_AMP_RPM);
+        LoggedTunableNumber ampLowerSpeed = new LoggedTunableNumber("Amp/ShotVelocity", LOWER_SHOOTER_AMP_RPM);
 
 
      /* Shooter states */
@@ -114,33 +108,33 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public void requestSpeaker(double upperSpeed, double lowerSpeed){
     desiredUpperRPM = upperSpeed;
-    desiredUpperRPM = lowerSpeed;
+    desiredLowerRPM = lowerSpeed;
     unsetAllRequests();
     requestSpeaker = true;
   }
 
   public void requestAMP(){
-    desiredUpperRPM = UPPER_SHOOTER_AMP_RPM;
-    desiredUpperRPM = LOWER_SHOOTER_AMP_RPM;
+    desiredUpperRPM = ampUpperSpeed.get();
+    desiredLowerRPM = ampLowerSpeed.get();
     unsetAllRequests();
     requestAMP = true;
   }
 
   public void requestLow_pass(){
     desiredUpperRPM = UPPER_SHOOTER_FEEDER_UNDER_RPM;
-    desiredUpperRPM = UPPER_SHOOTER_FEEDER_UNDER_RPM;
+    desiredLowerRPM = UPPER_SHOOTER_FEEDER_UNDER_RPM;
     unsetAllRequests();
     requestLow_pass = true;
   }
 
   public void requestHigh_Pass(){
     desiredUpperRPM = UPPER_SHOOTER_FEEDER_OVER_RPM;
-    desiredUpperRPM = LOWER_SHOOTER_FEEDER_OVER_RPM;
+    desiredLowerRPM = LOWER_SHOOTER_FEEDER_OVER_RPM;
     unsetAllRequests();
     requestHigh_Pass = true;
   }
 
-  private void unsetAllRequests(){
+  public void unsetAllRequests(){
 
    requestSpeaker = false;
    requestAMP = false;
