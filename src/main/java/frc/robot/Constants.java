@@ -29,6 +29,9 @@ public class Constants {
         public static final int UPPER_SHOOTER_FEEDER_UNDER_RPM;
         public static final int LOWER_SHOOTER_FEEDER_UNDER_RPM;
 
+        public static final int UPPER_SHOOTER_SPEAKER_RPM;
+        public static final int LOWER_SHOOTER_SPEAKER_RPM;
+
         /*Physical Measurements */
 
         public static InvertedValue UPPER_SHOOTER_INVERSION;
@@ -45,6 +48,9 @@ public class Constants {
 
             UPPER_SHOOTER_AMP_RPM = 2000;
             LOWER_SHOOTER_AMP_RPM = 500;
+
+            UPPER_SHOOTER_SPEAKER_RPM = 3000;
+            LOWER_SHOOTER_SPEAKER_RPM = 3000;
 
             UPPER_SHOOTER_FEEDER_OVER_RPM = 4500;
             LOWER_SHOOTER_FEEDER_OVER_RPM = 4500;

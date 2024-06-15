@@ -7,7 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Commands.AmpShoot;
+import frc.robot.Commands.ShooterCommands.AmpShoot;
+import frc.robot.Commands.ShooterCommands.OverStageShoot;
+import frc.robot.Commands.ShooterCommands.SpeakerShoot;
+import frc.robot.Commands.ShooterCommands.UnderStageShoot;
 import frc.robot.Subsystems.Shooter.ShooterIO;
 import frc.robot.Subsystems.Shooter.ShooterIOTalon;
 import frc.robot.Subsystems.Shooter.ShooterSubsystem;
@@ -31,6 +34,15 @@ public class RobotContainer {
 
     subsystemsDriver.leftBumper()
     .whileTrue(new AmpShoot(m_shooter));
+
+    subsystemsDriver.x()
+    .whileTrue(new SpeakerShoot(m_shooter));
+
+    subsystemsDriver.povLeft()
+    .whileTrue(new UnderStageShoot(m_shooter));
+
+    subsystemsDriver.povRight()
+    .whileTrue(new OverStageShoot(m_shooter));
 
 
   }

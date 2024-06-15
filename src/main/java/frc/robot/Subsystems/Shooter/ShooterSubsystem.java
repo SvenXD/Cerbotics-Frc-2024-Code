@@ -23,6 +23,8 @@ public class ShooterSubsystem extends SubsystemBase {
   private boolean requestLow_pass = false;
   private boolean requestHigh_Pass = false;
 
+  private String shoterState = "IDLE";
+
   /* Setpoints*/
 
   private double desiredUpperRPM = 0.0;
@@ -51,30 +53,29 @@ public class ShooterSubsystem extends SubsystemBase {
     io.updateTunableNumbers();
     Logger.processInputs("Shooter", inputs);
 
-    Logger.recordOutput("Shooter/SystemState", systemState);
+    SmartDashboard.putString("Shooter State", shoterState);
 
-    ShooterState nextSystemState = systemState;
-   systemState = nextSystemState;
 
     if (systemState == ShooterState.IDLE){
       io.setVelocity(desiredUpperRPM, desiredLowerRPM);
+      shoterState = "IDLE";
     }
     if(requestSpeaker){
-      nextSystemState = ShooterState.SPEAKER;
-      systemState = ShooterState.SPEAKER;
+           systemState = ShooterState.SPEAKER;
+      shoterState = "SPEAKER";
     }
     else if(requestAMP){
-      nextSystemState = ShooterState.AMP;
             systemState = ShooterState.AMP;
+      shoterState = "AMP";
     }
     else if(requestHigh_Pass){
-      nextSystemState = ShooterState.HIGH_PASS;
-      systemState = ShooterState.HIGH_PASS;
+           systemState = ShooterState.HIGH_PASS;
+      shoterState = "HIGH PASS";
 
     }
     else if(requestLow_pass){
-      nextSystemState = ShooterState.LOW_PASS;
             systemState = ShooterState.LOW_PASS;
+      shoterState = "LOW PASS"; 
 
     }
 
@@ -82,28 +83,32 @@ public class ShooterSubsystem extends SubsystemBase {
       io.setVelocity(desiredUpperRPM, desiredLowerRPM);
 
       if(!requestSpeaker){
-        nextSystemState = ShooterState.IDLE;
+        systemState = ShooterState.IDLE;
+        shoterState = "IDLE";
       }
     }
     else if (systemState == ShooterState.AMP){
       io.setVelocity(desiredUpperRPM, desiredLowerRPM);
 
       if(!requestAMP){
-        nextSystemState = ShooterState.IDLE;
+        systemState = ShooterState.IDLE;
+        shoterState = "IDLE";
       }
     }
     else if (systemState == ShooterState.HIGH_PASS){
       io.setVelocity(desiredUpperRPM, desiredLowerRPM);
 
       if(!requestHigh_Pass){
-        nextSystemState = ShooterState.IDLE;
+        systemState = ShooterState.IDLE;
+        shoterState = "IDLE";
       }
     }
     else if (systemState == ShooterState.LOW_PASS){
       io.setVelocity(desiredUpperRPM, desiredLowerRPM);
 
       if(!requestLow_pass){
-        nextSystemState = ShooterState.IDLE;
+        systemState = ShooterState.IDLE;
+        shoterState = "IDLE";
       }
     }
   }
@@ -114,16 +119,16 @@ public class ShooterSubsystem extends SubsystemBase {
     unsetAllRequests();
   }
 
-  public void requestSpeaker(double upperSpeed, double lowerSpeed){
-    desiredUpperRPM = upperSpeed;
-    desiredLowerRPM = lowerSpeed;
+  public void requestSpeaker(){
+    desiredUpperRPM = UPPER_SHOOTER_SPEAKER_RPM;
+    desiredLowerRPM = LOWER_SHOOTER_SPEAKER_RPM;
     unsetAllRequests();
     requestSpeaker = true;
   }
 
   public void requestAMP(){
-    desiredUpperRPM = ampUpperSpeed.get();
-    desiredLowerRPM = ampLowerSpeed.get();
+    desiredUpperRPM = UPPER_SHOOTER_AMP_RPM;
+    desiredLowerRPM = LOWER_SHOOTER_AMP_RPM;
     unsetAllRequests();
     requestAMP = true;
   }

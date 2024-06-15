@@ -1,14 +1,13 @@
-package frc.robot.Commands;
+package frc.robot.Commands.ShooterCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Shooter.ShooterSubsystem;
-import frc.robot.Subsystems.Shooter.ShooterSubsystem.ShooterState;
 
-public class AmpShoot extends Command {
+public class OverStageShoot extends Command {
 
   ShooterSubsystem shooter;
 
-  public AmpShoot(ShooterSubsystem shooter) {
+  public OverStageShoot(ShooterSubsystem shooter) {
     this.shooter = shooter;
 
     addRequirements(shooter);
@@ -21,7 +20,7 @@ public class AmpShoot extends Command {
 
   @Override
   public void execute() {
-    shooter.requestAMP();
+    shooter.requestHigh_Pass();
   }
 
 
