@@ -4,6 +4,7 @@ import static frc.robot.Constants.Shooter.*;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Util.LoggedTunableNumber;
 
@@ -27,8 +28,8 @@ public class ShooterSubsystem extends SubsystemBase {
   private double desiredUpperRPM = 0.0;
   private double desiredLowerRPM = 0.0;
 
-    LoggedTunableNumber ampUpperSpeed = new LoggedTunableNumber("Amp/ShotVelocity", UPPER_SHOOTER_AMP_RPM);
-        LoggedTunableNumber ampLowerSpeed = new LoggedTunableNumber("Amp/ShotVelocity", LOWER_SHOOTER_AMP_RPM);
+    LoggedTunableNumber ampUpperSpeed = new LoggedTunableNumber("UpAmp/ShotVelocity", UPPER_SHOOTER_AMP_RPM);
+        LoggedTunableNumber ampLowerSpeed = new LoggedTunableNumber("LowAmp/ShotVelocity", LOWER_SHOOTER_AMP_RPM);
 
 
      /* Shooter states */
@@ -50,24 +51,31 @@ public class ShooterSubsystem extends SubsystemBase {
     io.updateTunableNumbers();
     Logger.processInputs("Shooter", inputs);
 
-   // Logger.recordOutput("Shooter State", null);
+    Logger.recordOutput("Shooter/SystemState", systemState);
 
-   ShooterState nextSystemState = systemState;
+    ShooterState nextSystemState = systemState;
+   systemState = nextSystemState;
 
     if (systemState == ShooterState.IDLE){
       io.setVelocity(desiredUpperRPM, desiredLowerRPM);
     }
     if(requestSpeaker){
       nextSystemState = ShooterState.SPEAKER;
+      systemState = ShooterState.SPEAKER;
     }
     else if(requestAMP){
       nextSystemState = ShooterState.AMP;
+            systemState = ShooterState.AMP;
     }
     else if(requestHigh_Pass){
       nextSystemState = ShooterState.HIGH_PASS;
+      systemState = ShooterState.HIGH_PASS;
+
     }
     else if(requestLow_pass){
       nextSystemState = ShooterState.LOW_PASS;
+            systemState = ShooterState.LOW_PASS;
+
     }
 
     else if (systemState == ShooterState.SPEAKER){
@@ -135,10 +143,10 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public void unsetAllRequests(){
-
    requestSpeaker = false;
    requestAMP = false;
    requestLow_pass = false;
    requestHigh_Pass = false;
+   systemState = ShooterState.IDLE;
   }
 }

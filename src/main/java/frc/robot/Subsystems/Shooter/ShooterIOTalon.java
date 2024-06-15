@@ -11,6 +11,7 @@ import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -32,6 +33,9 @@ public class ShooterIOTalon implements ShooterIO {
   private MotorOutputConfigs lowerMotorOutputConfigs;
   private Slot0Configs upperMotorSlot0Configs;
   private Slot0Configs lowerMotorSlot0Configs;
+
+  private final VelocityVoltage upperVelocity = new VelocityVoltage(0);
+  private final VelocityVoltage lowerVelocity = new VelocityVoltage(0);
 
   /* SetPoints */
   private double desiredUp = 0;
@@ -158,7 +162,7 @@ public class ShooterIOTalon implements ShooterIO {
       /* Upper inputs */
       inputs.upperShooterPosRad =
             Units.rotationsToRadians(positionUp.getValue());
-      inputs.upperShooterVelocityRpm = velocityUp.getValue() * 60;
+      inputs.upperShooterVelocityRpm = velocityUp.getValueAsDouble() * 60;
       inputs.upperShooterAppliedVolts = upperMotor.getMotorVoltage().getValue();
       inputs.upperShooterTempCelcius = upperMotor.getDeviceTemp().getValue();
       inputs.upperShooterSetPointRpm = desiredUp;
@@ -166,7 +170,7 @@ public class ShooterIOTalon implements ShooterIO {
       /* Lower inputs */
       inputs.lowerShooterPosRad =
             Units.rotationsToRadians(positionDown.getValue());
-      inputs.lowerShooterVelocityRpm = velocityDown.getValue()*60;
+      inputs.lowerShooterVelocityRpm = velocityDown.getValueAsDouble()*60;
       inputs.lowerShooterAppliedVolts = lowerMotor.getMotorVoltage().getValue();
       inputs.lowerShooterTempCelcius = lowerMotor.getDeviceTemp().getValue();
       inputs.lowerShooterSetPointRpm = desiredDown;
@@ -182,8 +186,11 @@ public class ShooterIOTalon implements ShooterIO {
 
   @Override
   public void setVelocity(double velocityUp, double velocityDown){
-    desiredUp = velocityUp;
-    desiredDown = velocityDown;
+    upperVelocity.Velocity = velocityUp / 60;
+    upperMotor.setControl(upperVelocity);
+
+    lowerVelocity.Velocity = velocityDown / 60;
+    lowerMotor.setControl(lowerVelocity);
   }
 
   @Override
