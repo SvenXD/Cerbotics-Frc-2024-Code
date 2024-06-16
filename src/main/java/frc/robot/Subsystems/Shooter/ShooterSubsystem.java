@@ -1,4 +1,4 @@
-package frc.robot.Subsystems.Shooter;
+package frc.robot.Subsystems.Shooter; 
 
 import static frc.robot.Constants.Shooter.*;
 
@@ -147,11 +147,11 @@ public class ShooterSubsystem extends SubsystemBase {
     requestHigh_Pass = true;
   }
 
-  public void unsetAllRequests(){
-   requestSpeaker = false;
-   requestAMP = false;
-   requestLow_pass = false;
-   requestHigh_Pass = false;
-   systemState = ShooterState.IDLE;
-  }
+    public void unsetAllRequests(){
+    requestSpeaker = false;
+    requestAMP = false;
+    requestLow_pass = false;
+    requestHigh_Pass = false;
+    systemState = ShooterState.IDLE;
+    }
 }

@@ -25,5 +25,6 @@ public interface IntakeIO {
   /** Set the limit of current to the moro */
   public default void setCurrentLimit(int currentLimit) {}
 
-  
+    /* Updates the tunable numbers. */
+    public default void updateTunableNumbers() {}
 }

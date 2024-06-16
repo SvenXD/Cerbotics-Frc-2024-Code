@@ -7,10 +7,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Commands.IntakeCommands.IntakeCommand;
 import frc.robot.Commands.ShooterCommands.AmpShoot;
 import frc.robot.Commands.ShooterCommands.OverStageShoot;
 import frc.robot.Commands.ShooterCommands.SpeakerShoot;
 import frc.robot.Commands.ShooterCommands.UnderStageShoot;
+import frc.robot.Subsystems.Intake.IntakeIO;
+import frc.robot.Subsystems.Intake.IntakeIOSparkMax;
+import frc.robot.Subsystems.Intake.IntakeSubsystem;
 import frc.robot.Subsystems.Shooter.ShooterIO;
 import frc.robot.Subsystems.Shooter.ShooterIOTalon;
 import frc.robot.Subsystems.Shooter.ShooterSubsystem;
@@ -23,8 +27,11 @@ public class RobotContainer {
 
   public static ShooterIO shooterIO = new ShooterIOTalon();
   public static ShooterSubsystem m_shooter = new ShooterSubsystem(shooterIO);
-  public RobotContainer() {
 
+  public static IntakeIO intakeIO = new IntakeIOSparkMax();
+  public static IntakeSubsystem m_intake = new IntakeSubsystem(intakeIO);
+
+  public RobotContainer() {
 
     configureBindings();
 
@@ -34,6 +41,9 @@ public class RobotContainer {
 
     subsystemsDriver.leftBumper()
     .whileTrue(new AmpShoot(m_shooter));
+
+    subsystemsDriver.rightBumper()
+    .whileTrue(new IntakeCommand(m_intake));
 
     subsystemsDriver.x()
     .whileTrue(new SpeakerShoot(m_shooter));
