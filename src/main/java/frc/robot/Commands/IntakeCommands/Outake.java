@@ -2,13 +2,16 @@ package frc.robot.Commands.IntakeCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
+import frc.robot.Subsystems.Shooter.ShooterSubsystem;
 
-public class IntakeCommand extends Command {
+public class Outake extends Command {
 
   IntakeSubsystem intake;
+  ShooterSubsystem shooter;
 
-  public IntakeCommand(IntakeSubsystem intake) {
+  public Outake(IntakeSubsystem intake, ShooterSubsystem shooter) {
     this.intake = intake;
+    this.shooter = shooter;
 
     addRequirements(intake);
   }
@@ -20,7 +23,8 @@ public class IntakeCommand extends Command {
 
   @Override
   public void execute() {
-    intake.requestIntake(1.0);
+    intake.requestIntake(-0.2);
+    shooter.requestCustom(-900, -500);
   }
 
 
@@ -28,6 +32,8 @@ public class IntakeCommand extends Command {
   public void end(boolean interrupted) {
     intake.requestIdle();
     intake.unsetAllRequests();
+    shooter.requestIdle();
+    shooter.unsetAllRequests();
   }
 
 

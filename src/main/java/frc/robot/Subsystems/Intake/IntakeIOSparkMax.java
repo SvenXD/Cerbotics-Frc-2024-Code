@@ -6,11 +6,10 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import frc.robot.Subsystems.Shooter.ShooterIO.ShooterIOInputs;
 
 public class IntakeIOSparkMax implements IntakeIO{
 
-    private boolean invert = true;
+    private boolean invert = false;
     private final CANSparkMax intakeMotor;
 
     public DigitalInput intakeSensor = new DigitalInput(0);

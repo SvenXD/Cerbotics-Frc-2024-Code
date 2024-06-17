@@ -1,17 +1,10 @@
 package frc.robot.Subsystems.Intake;
 
-import static frc.robot.Constants.Shooter.LOWER_SHOOTER_IDLE_RPM;
-import static frc.robot.Constants.Shooter.LOWER_SHOOTER_SPEAKER_RPM;
-import static frc.robot.Constants.Shooter.UPPER_SHOOTER_AMP_RPM;
-import static frc.robot.Constants.Shooter.UPPER_SHOOTER_IDLE_RPM;
-import static frc.robot.Constants.Shooter.UPPER_SHOOTER_SPEAKER_RPM;
-
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Util.LoggedTunableNumber;
-import frc.robot.Subsystems.Shooter.ShooterSubsystem.ShooterState;
 
 public class IntakeSubsystem extends SubsystemBase {
 
