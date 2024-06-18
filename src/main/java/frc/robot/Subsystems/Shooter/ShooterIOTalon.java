@@ -4,10 +4,8 @@ import static frc.robot.Constants.Shooter.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -109,29 +107,14 @@ public class ShooterIOTalon implements ShooterIO {
     lowerMotorSlot0Configs.kI = lowerShooterKi.get();
     lowerMotorSlot0Configs.kD = lowerShooterKd.get();
 
-    /* Ramp Configurations */
-    OpenLoopRampsConfigs openLoopRampsConfigs = new OpenLoopRampsConfigs();
-    openLoopRampsConfigs.DutyCycleOpenLoopRampPeriod = 0.02;
-    openLoopRampsConfigs.TorqueOpenLoopRampPeriod = 0.02;
-    openLoopRampsConfigs.VoltageOpenLoopRampPeriod = 0.02;
-
-    ClosedLoopRampsConfigs closedLoopRampsConfigs = new ClosedLoopRampsConfigs();
-    closedLoopRampsConfigs.DutyCycleClosedLoopRampPeriod = 0.02;
-    closedLoopRampsConfigs.TorqueClosedLoopRampPeriod = 0.02;
-    closedLoopRampsConfigs.VoltageClosedLoopRampPeriod = 0.02;
-
     /* Apply Configurations*/
     upperConfigurator.apply(shooterCurrentLimitsConfigs);
     upperConfigurator.apply(upperMotorOutputConfigs);
     upperConfigurator.apply(upperMotorSlot0Configs);
-    upperConfigurator.apply(openLoopRampsConfigs);
-    upperConfigurator.apply(closedLoopRampsConfigs);
 
     lowerConfigurator.apply(shooterCurrentLimitsConfigs);
     lowerConfigurator.apply(lowerMotorOutputConfigs);
     lowerConfigurator.apply(lowerMotorSlot0Configs);
-    lowerConfigurator.apply(openLoopRampsConfigs);
-    lowerConfigurator.apply(closedLoopRampsConfigs);
 
     /* Status Signals */
 
@@ -156,9 +139,18 @@ public class ShooterIOTalon implements ShooterIO {
       supplyDown);
 
     }
-        @Override
-    public void updateInputs(ShooterIOInputs inputs){
 
+    @Override
+    public void updateInputs(ShooterIOInputs inputs){
+      BaseStatusSignal.refreshAll(
+        velocityUp, 
+        velocityDown, 
+        positionUp, 
+        positionDown, 
+        statorUp, 
+        statorDown, 
+        supplyUp, 
+        supplyDown);
       /* Upper inputs */
       inputs.upperShooterPosRad =
             Units.rotationsToRadians(positionUp.getValue());
