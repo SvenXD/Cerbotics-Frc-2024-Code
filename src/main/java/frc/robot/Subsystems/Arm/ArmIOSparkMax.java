@@ -3,6 +3,7 @@ package frc.robot.Subsystems.Arm;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -37,6 +38,14 @@ public class ArmIOSparkMax implements ArmIO{
     
         rightMotor.setIdleMode(IdleMode.kBrake);
         leftMotor.setIdleMode(IdleMode.kBrake);
+
+         new ProfiledPIDController(
+           0,
+            0,
+            0,
+            new TrapezoidProfile.Constraints(
+                0.0,
+                0.0));
     }
 
   

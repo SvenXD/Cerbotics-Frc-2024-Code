@@ -16,8 +16,8 @@ public interface ArmIO {
   /** Updates the set of loggable inputs. */
   public default void updateInputs(IntakeIOInputs inputs) {}
 
-  /** Run the intake open loop at the specified voltage. */
-  public default void setPosition(int angle) {}
+  /** Set the position (angle) the arm will head to. */
+  public default void setPosition(int position) {}
 
   /** Enable or disable brake mode on the intake. */
   public default void setBrakeMode(boolean enable) {}
