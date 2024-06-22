@@ -16,7 +16,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   /* Variables */
 
-  private ShooterState systemState = ShooterState.SPEAKER;
+  private ShooterState systemState = ShooterState.IDLE;
 
   private boolean requestSpeaker = false;
   private boolean requestAMP = false;
@@ -24,17 +24,17 @@ public class ShooterSubsystem extends SubsystemBase {
   private boolean requestHigh_Pass = false;
   private boolean requestCustom = false;
 
-  private boolean requested = false;
+  private boolean test = false;
 
   private String shoterState = "IDLE";
 
   /* Setpoints*/
 
-  private double desiredUpperRPM = 0;
-  private double desiredLowerRPM = 0;
+  private double desiredUpperRPM = 0.0;
+  private double desiredLowerRPM = 0.0;
 
-    LoggedTunableNumber ampUpperSpeed = new LoggedTunableNumber("ShotUp/ShotVelocity", desiredUpperRPM);
-        LoggedTunableNumber ampLowerSpeed = new LoggedTunableNumber("ShotLow/ShotVelocity", desiredLowerRPM);
+    LoggedTunableNumber ampUpperSpeed = new LoggedTunableNumber("UpAmp/ShotVelocity", UPPER_SHOOTER_AMP_RPM);
+        LoggedTunableNumber ampLowerSpeed = new LoggedTunableNumber("LowAmp/ShotVelocity", LOWER_SHOOTER_AMP_RPM);
 
 
      /* Shooter states */
@@ -44,8 +44,7 @@ public class ShooterSubsystem extends SubsystemBase {
     AMP,
     LOW_PASS,
     HIGH_PASS,
-    CUSTOM,
-    test
+    CUSTOM
    }
 
   public ShooterSubsystem(ShooterIO io) {
@@ -59,11 +58,13 @@ public class ShooterSubsystem extends SubsystemBase {
     Logger.processInputs("Shooter", inputs);
 
     SmartDashboard.putString("Shooter State", shoterState);
-    SmartDashboard.putBoolean("oewn", requested);
+    SmartDashboard.putBoolean("test", test);
 
 
-
-
+    if (systemState == ShooterState.IDLE){
+      io.setVelocity(desiredUpperRPM, desiredLowerRPM);
+      shoterState = "IDLE";
+    }
     if(requestSpeaker){
            systemState = ShooterState.SPEAKER;
       shoterState = "SPEAKER";
@@ -92,50 +93,58 @@ public class ShooterSubsystem extends SubsystemBase {
       io.setVelocity(desiredUpperRPM, desiredLowerRPM);
 
       if(!requestSpeaker){
-        systemState = ShooterState.test;
-        shoterState = "plea34mise work";
+        systemState = ShooterState.IDLE;
+        shoterState = "IDLE";
       }
     }
     else if (systemState == ShooterState.AMP){
       io.setVelocity(desiredUpperRPM, desiredLowerRPM);
 
       if(!requestAMP){
-        systemState = ShooterState.test;
-        shoterState = "please work";
+        systemState = ShooterState.IDLE;
+        shoterState = "IDLE";
       }
     }
     else if (systemState == ShooterState.HIGH_PASS){
       io.setVelocity(desiredUpperRPM, desiredLowerRPM);
 
       if(!requestHigh_Pass){
-        systemState = ShooterState.test;
-        shoterState = "please work";
+        systemState = ShooterState.IDLE;
+        shoterState = "IDLE";
       }
     }
     else if (systemState == ShooterState.LOW_PASS){
       io.setVelocity(desiredUpperRPM, desiredLowerRPM);
 
       if(!requestLow_pass){
-        systemState = ShooterState.test;
-        shoterState = "please work";
+        systemState = ShooterState.IDLE;
+        shoterState = "IDLE";
       }
     }
     else if (systemState == ShooterState.CUSTOM){
       io.setVelocity(desiredUpperRPM, desiredLowerRPM);
 
       if(!requestCustom){
-        systemState = ShooterState.test;
-        shoterState = "please work";
+        systemState = ShooterState.IDLE;
+        shoterState = "IDLE";
       }
     }
-          
-
   }
 
   public void requestIdle(){
-    desiredUpperRPM = 0;
-    desiredLowerRPM = 0;
+    desiredUpperRPM = UPPER_SHOOTER_IDLE_RPM;
+    desiredLowerRPM = LOWER_SHOOTER_IDLE_RPM;
     unsetAllRequests();
+  }
+
+  public void test(double up, double down){
+    io.setVelocity(up, down);
+    test = true;
+  }
+
+  public void test2(){
+    io.stop();
+    test = false;
   }
 
   public void requestSpeaker(){
@@ -143,8 +152,6 @@ public class ShooterSubsystem extends SubsystemBase {
     desiredLowerRPM = LOWER_SHOOTER_SPEAKER_RPM;
     unsetAllRequests();
     requestSpeaker = true;
-        requested = true;
-
   }
 
   public void requestAMP(){
@@ -152,7 +159,6 @@ public class ShooterSubsystem extends SubsystemBase {
     desiredLowerRPM = LOWER_SHOOTER_AMP_RPM;
     unsetAllRequests();
     requestAMP = true;
-    requested = false;
   }
 
   public void requestLow_pass(){
@@ -183,5 +189,6 @@ public class ShooterSubsystem extends SubsystemBase {
     requestLow_pass = false;
     requestHigh_Pass = false;
     requestCustom = false;
+    systemState = ShooterState.IDLE;
     }
 }

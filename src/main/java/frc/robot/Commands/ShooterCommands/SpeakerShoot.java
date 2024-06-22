@@ -20,14 +20,13 @@ public class SpeakerShoot extends Command {
 
   @Override
   public void execute() {
-    shooter.requestSpeaker();
+    shooter.test(2400,2400);
   }
 
 
   @Override
   public void end(boolean interrupted) {
-    shooter.requestIdle();
-    shooter.unsetAllRequests();
+    shooter.test2();
   }
 
 

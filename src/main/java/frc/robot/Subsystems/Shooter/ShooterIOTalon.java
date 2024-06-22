@@ -172,9 +172,10 @@ public class ShooterIOTalon implements ShooterIO {
   }
 
   @Override
-  public void setVoltage(double voltUp, double voltDown){
-    upperMotor.set(voltUp);
-    lowerMotor.set(voltDown);
+  public void stop(){
+    upperMotor.set(0);
+    lowerMotor.set(0);
+  
   }
 
   @Override

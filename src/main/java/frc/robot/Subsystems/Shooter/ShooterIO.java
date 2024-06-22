@@ -29,7 +29,7 @@ public interface ShooterIO {
   /** Run the shooter closed loop at the specified velocity. */
   public default void setVelocity(double velocityRpmUpper, double velocityRpmLower  ) {}
 
-  public default void setVoltage(double voltUp, double voltDown){}
+  public default void stop(){}
 
   /* Sets current limit for the flywheel motors. */
   public default void setCurrentLimit(
