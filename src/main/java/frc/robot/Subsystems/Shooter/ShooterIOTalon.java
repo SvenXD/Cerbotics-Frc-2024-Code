@@ -49,19 +49,19 @@ public class ShooterIOTalon implements ShooterIO {
   private StatusSignal<Double> supplyUp;
   private StatusSignal<Double> supplyDown;
 
-  LoggedTunableNumber upperShooterKs = new LoggedTunableNumber("UpperShooter/ukS", 0.50189);
-  LoggedTunableNumber upperShooterKa = new LoggedTunableNumber("UpperShooter/ukA", 0.00059492);
-  LoggedTunableNumber upperShooterKv = new LoggedTunableNumber("UpperShooter/ukV", 0.0016926);
-  LoggedTunableNumber upperShooterKp = new LoggedTunableNumber("UpperShooter/ukP", 1.4);
+  LoggedTunableNumber upperShooterKs = new LoggedTunableNumber("UpperShooter/ukS", 0.0);
+  LoggedTunableNumber upperShooterKa = new LoggedTunableNumber("UpperShooter/ukA", 0.0);
+  LoggedTunableNumber upperShooterKv = new LoggedTunableNumber("UpperShooter/ukV", 0.0);
+  LoggedTunableNumber upperShooterKp = new LoggedTunableNumber("UpperShooter/ukP", 0.0);
   LoggedTunableNumber upperShooterKi = new LoggedTunableNumber("UpperShooter/ukI", 0.0);
-  LoggedTunableNumber upperShooterKd = new LoggedTunableNumber("UpperShooter/ukD", 0.025);
+  LoggedTunableNumber upperShooterKd = new LoggedTunableNumber("UpperShooter/ukD", 0.0);
 
-  LoggedTunableNumber lowerShooterKs = new LoggedTunableNumber("LowerShooter/lkS", 0.50189);
-  LoggedTunableNumber lowerShooterKa = new LoggedTunableNumber("LowerShooter/lkA", 0.00059492);
-  LoggedTunableNumber lowerShooterKv = new LoggedTunableNumber("LowerShooter/lkV", 0.0016926);
-  LoggedTunableNumber lowerShooterKp = new LoggedTunableNumber("LowerShooter/lkP", 1.4);
+  LoggedTunableNumber lowerShooterKs = new LoggedTunableNumber("LowerShooter/lkS", 0.0);
+  LoggedTunableNumber lowerShooterKa = new LoggedTunableNumber("LowerShooter/lkA", 0.0);
+  LoggedTunableNumber lowerShooterKv = new LoggedTunableNumber("LowerShooter/lkV", 0.0);
+  LoggedTunableNumber lowerShooterKp = new LoggedTunableNumber("LowerShooter/lkP", 0.0);
   LoggedTunableNumber lowerShooterKi = new LoggedTunableNumber("LowerShooter/lkI", 0.0);
-  LoggedTunableNumber lowerShooterKd = new LoggedTunableNumber("LowerShooter/lkD", 0.025);
+  LoggedTunableNumber lowerShooterKd = new LoggedTunableNumber("LowerShooter/lkD", 0.0);
 
   public ShooterIOTalon() {
 
@@ -175,7 +175,7 @@ public class ShooterIOTalon implements ShooterIO {
   public void stop(){
     upperMotor.set(0);
     lowerMotor.set(0);
-  
+
   }
 
   @Override

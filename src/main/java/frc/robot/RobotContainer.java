@@ -13,6 +13,9 @@ import frc.robot.Commands.ShooterCommands.AmpShoot;
 import frc.robot.Commands.ShooterCommands.OverStageShoot;
 import frc.robot.Commands.ShooterCommands.SpeakerShoot;
 import frc.robot.Commands.ShooterCommands.UnderStageShoot;
+import frc.robot.Subsystems.Arm.ArmIO;
+import frc.robot.Subsystems.Arm.ArmIOSparkMax;
+import frc.robot.Subsystems.Arm.ArmSubsystem;
 import frc.robot.Subsystems.Intake.IntakeIO;
 import frc.robot.Subsystems.Intake.IntakeIOSparkMax;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
@@ -31,6 +34,9 @@ public class RobotContainer {
 
   public static IntakeIO intakeIO = new IntakeIOSparkMax();
   public static IntakeSubsystem m_intake = new IntakeSubsystem(intakeIO);
+
+  public static ArmIO armIO = new ArmIOSparkMax();
+  public static ArmSubsystem m_arm = new ArmSubsystem(armIO);
 
   public RobotContainer() {
 

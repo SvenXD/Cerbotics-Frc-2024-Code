@@ -32,12 +32,10 @@ public class IntakeIOSparkMax implements IntakeIO{
     }
     @Override
     public void updateInputs(IntakeIOInputs inputs){
-
         inputs.positionRad = intakeEncoder.getPosition();
         inputs.appliedVolts = intakeMotor.getBusVoltage();
         inputs.velocityRadPerSec = intakeEncoder.getVelocity();
         inputs.tempCelcius = intakeMotor.getMotorTemperature();
-
     }
 
     @Override
