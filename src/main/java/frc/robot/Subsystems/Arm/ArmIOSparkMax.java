@@ -72,4 +72,11 @@ public class ArmIOSparkMax implements ArmIO{
   public double getArmAngle() {            
     return (m_encoder.getAbsolutePosition().getValueAsDouble() * 360)  + 51.6;
   }
+
+  public void setVoltage(){
+    double feedfoward =  m_feedforward.calculate(m_controller.getSetpoint().position, m_controller.getSetpoint().velocity);
+    rightMotor.setVoltage(getArmAngle() + feedfoward);
+    leftMotor.setVoltage(getArmAngle() + feedfoward);
+  }
+
 }

@@ -2,7 +2,6 @@ package frc.robot.Subsystems.Arm;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Util.LoggedTunableNumber;
 
@@ -14,7 +13,6 @@ public class ArmSubsystem extends SubsystemBase {
 
   /*Variables */
   private double desirableAngle = 0.0;
-  private boolean test = false;
   LoggedTunableNumber desiredArmAngle = new LoggedTunableNumber("Arm/ArmAngle", desirableAngle);
 
 
@@ -27,8 +25,6 @@ public class ArmSubsystem extends SubsystemBase {
     io.updateInputs(inputs);
     io.updateTunableNumbers();
     Logger.processInputs("Arm", inputs);
-    SmartDashboard.putNumber("ANGLE", inputs.currentAngle);
-    SmartDashboard.putBoolean("AAAAAA", test);
   }
 
 
