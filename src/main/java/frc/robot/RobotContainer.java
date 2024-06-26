@@ -4,10 +4,14 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.Util.LoggedDashboardChooser;
 import frc.robot.Commands.ArmCommands.ArmGoToPose;
+import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.IntakeCommands.Intake;
 import frc.robot.Commands.IntakeCommands.Outake;
 import frc.robot.Commands.ShooterCommands.AmpShoot;
@@ -29,6 +33,8 @@ public class RobotContainer {
     private final CommandXboxController chassisDriver = new CommandXboxController(0);
     private final CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
+  private static LoggedDashboardChooser<AutoCommand> autoChooser;
+  public static Field2d autoPreviewField = new Field2d();
 
   public static ShooterIO shooterIO = new ShooterIOTalon();
   public static ShooterSubsystem m_shooter = new ShooterSubsystem(shooterIO);
@@ -41,7 +47,16 @@ public class RobotContainer {
 
   public RobotContainer() {
 
+
+    SmartDashboard.putData("Auto Preview", autoPreviewField);
+
     configureBindings();
+
+    autoChooser = new LoggedDashboardChooser<>("Auto Mode");
+
+    autoChooser.onChange(
+        auto -> {
+          autoPreviewField.getObject("path").setPoses(auto.getAllPathPoses());});
 
   }
 
