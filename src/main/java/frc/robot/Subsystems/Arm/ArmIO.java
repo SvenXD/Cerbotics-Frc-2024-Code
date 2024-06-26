@@ -12,11 +12,25 @@ public interface ArmIO {
     public double leftTempCelcius = 0.0;
     public double rightAppliedVolts = 0.0;
     public double rightTempCelcius = 0.0;
+
     public double currentAngle = 0.0;
+    public double setPoint = 0.0;
+
+    public double leftEncoder = 0.0;
+    public double rightEncoder = 0.0;
   }
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ArmIoInputs inputs) {}
+
+  /* Put the arm setPoint */
+  public default void goToPosition(double position){}
+
+    /** Enable brake mode on the intake. */
+    public default void setBrakeMode() {}
+
+    /** Enable coast mode on the intake. */
+    public default void setCoastMode() {}
 
     /* Updates the tunable numbers. */
     public default void updateTunableNumbers() {}

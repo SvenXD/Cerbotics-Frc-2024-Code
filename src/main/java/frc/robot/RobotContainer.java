@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Commands.ArmCommands.ArmGoToPose;
 import frc.robot.Commands.IntakeCommands.Intake;
 import frc.robot.Commands.IntakeCommands.Outake;
 import frc.robot.Commands.ShooterCommands.AmpShoot;
@@ -63,6 +64,9 @@ public class RobotContainer {
 
     subsystemsDriver.b()
     .whileTrue(new Outake(m_intake, m_shooter));
+
+    subsystemsDriver.a()
+    .whileTrue(new ArmGoToPose(m_arm));
 
   }
 

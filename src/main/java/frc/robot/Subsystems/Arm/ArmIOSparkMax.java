@@ -3,7 +3,6 @@ package frc.robot.Subsystems.Arm;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -67,16 +66,42 @@ public class ArmIOSparkMax implements ArmIO{
     inputs.rightTempCelcius = rightMotor.getMotorTemperature();
 
     inputs.currentAngle = getArmAngle();
+    inputs.setPoint = getController().getSetpoint().position;
   }
 
   public double getArmAngle() {            
     return (m_encoder.getAbsolutePosition().getValueAsDouble() * 360)  + 51.6;
   }
 
-  public void setVoltage(){
-    double feedfoward =  m_feedforward.calculate(m_controller.getSetpoint().position, m_controller.getSetpoint().velocity);
-    rightMotor.setVoltage(getArmAngle() + feedfoward);
-    leftMotor.setVoltage(getArmAngle() + feedfoward);
+  public ProfiledPIDController getController() {
+    return m_controller;
   }
+
+  public void setVoltage(double position){
+    double  PIDout = m_controller.calculate(getArmAngle(),position);
+    double feedfoward =  m_feedforward.calculate(m_controller.getSetpoint().position, m_controller.getSetpoint().velocity);
+    rightMotor.setVoltage(PIDout + feedfoward);
+    leftMotor.setVoltage(PIDout + feedfoward);
+  }
+
+  @Override
+  public void setBrakeMode(){
+    rightMotor.setIdleMode(IdleMode.kBrake);
+    leftMotor.setIdleMode(IdleMode.kBrake);
+  }
+
+  @Override
+  public void setCoastMode(){
+    rightMotor.setIdleMode(IdleMode.kCoast);
+    leftMotor.setIdleMode(IdleMode.kCoast);
+  }
+
+  @Override
+  public void goToPosition(double position){
+    getController().reset(getArmAngle());
+    m_controller.setGoal(Units.degreesToRadians(position));
+    setVoltage(position);
+  }
+  
 
 }

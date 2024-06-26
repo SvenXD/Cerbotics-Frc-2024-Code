@@ -11,6 +11,8 @@ public interface IntakeIO {
     public double velocityRadPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double tempCelcius = 0.0;
+
+    public boolean sensor = false;
   }
 
   /** Updates the set of loggable inputs. */

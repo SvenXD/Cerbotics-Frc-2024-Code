@@ -44,6 +44,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     if (intakeState == IntakeStates.IDLE){
       io.setVoltage(desiredIntakeVel);
+      currentIntakeState = "IDLE";
     }
     if (requestIntake){
             intakeState = IntakeStates.INTAKING;
@@ -72,7 +73,8 @@ public class IntakeSubsystem extends SubsystemBase {
     requestIntake = true;
   }
 
-  public void unsetAllRequests(){
+  public void 
+  unsetAllRequests(){
    requestIntake = false;
    intakeState = IntakeStates.IDLE;
   }
