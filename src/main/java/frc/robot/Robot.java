@@ -102,4 +102,9 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testExit() {}
+
+  @Override
+  public void simulationPeriodic(){
+    
+  }
 }

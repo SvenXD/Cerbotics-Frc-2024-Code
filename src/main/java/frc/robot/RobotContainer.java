@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LoggedDashboardChooser;
 import frc.robot.Commands.ArmCommands.ArmGoToPose;
 import frc.robot.Commands.AutoCommands.AutoCommand;
+import frc.robot.Commands.AutoCommands.NoneAuto;
+import frc.robot.Commands.AutoCommands.Test1;
+import frc.robot.Commands.AutoCommands.Test2;
 import frc.robot.Commands.IntakeCommands.Intake;
 import frc.robot.Commands.IntakeCommands.Outake;
 import frc.robot.Commands.ShooterCommands.AmpShoot;
@@ -47,16 +50,21 @@ public class RobotContainer {
 
   public RobotContainer() {
 
-
-    SmartDashboard.putData("Auto Preview", autoPreviewField);
-
-    configureBindings();
-
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
 
     autoChooser.onChange(
         auto -> {
           autoPreviewField.getObject("path").setPoses(auto.getAllPathPoses());});
+
+           autoChooser.addDefaultOption("None", new NoneAuto());
+    autoChooser.addOption("Test1", new Test1());
+    autoChooser.addOption("Test2", new Test2());
+    
+    SmartDashboard.putData("Auto Preview", autoPreviewField);
+
+    configureBindings();
+
+
 
   }
 
