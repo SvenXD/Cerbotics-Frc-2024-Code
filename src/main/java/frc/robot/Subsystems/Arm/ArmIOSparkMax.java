@@ -2,12 +2,14 @@ package frc.robot.Subsystems.Arm;
 
 import com.revrobotics.CANSparkMax;
 
+import static frc.robot.Constants.Arm.*;
+
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-
-import javax.swing.text.Position;
+import frc.Util.LoggedTunableNumber;
+import frc.robot.Constants.Arm;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -18,18 +20,30 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class ArmIOSparkMax implements ArmIO{
 
-    private final CANSparkMax leftMotor = new CANSparkMax(9, MotorType.kBrushless);
-    private final CANSparkMax rightMotor = new CANSparkMax(10, MotorType.kBrushless);
- 
-    private final CANcoder m_encoder = new CANcoder(17, "Swerve_Canivore");
- 
+    /* Hardware */
+  private final CANSparkMax leftMotor = new CANSparkMax(LEFT_ARM_ID, MotorType.kBrushless);
+  private final CANSparkMax rightMotor = new CANSparkMax(RIGHT_ARM_ID, MotorType.kBrushless);
+
+  private final CANcoder m_encoder = new CANcoder(ABSOLUTE_ENCODER_ID, "Swerve_Canivore");
+
+  /* PID Gains */
+
+  LoggedTunableNumber armKg = new LoggedTunableNumber("ArmPID/kG", kG);
+  LoggedTunableNumber armKs = new LoggedTunableNumber("ArmPID/kS", kS);
+  LoggedTunableNumber armKa = new LoggedTunableNumber("ArmPID/kA", kA);
+  LoggedTunableNumber armKv = new LoggedTunableNumber("ArmPID/kV", kV);
+  LoggedTunableNumber armKp = new LoggedTunableNumber("ArmPID/kP", kP);
+  LoggedTunableNumber armKi = new LoggedTunableNumber("ArmPID/kI", kI);
+  LoggedTunableNumber armKd = new LoggedTunableNumber("ArmPID/kD", kD);
+
+
     private final TrapezoidProfile.Constraints m_constraints =
-    new TrapezoidProfile.Constraints(500, 500);
+    new TrapezoidProfile.Constraints(kMaxVelocityRadPerSecond, kMaxAccelerationMetersPerSecondSquared);
 
-    private final ProfiledPIDController m_controller =
-    new ProfiledPIDController(0.32, 0.42, 0.0055, m_constraints, 0.02);
+    private ProfiledPIDController m_controller =
+    new ProfiledPIDController(armKp.get(), armKi.get(), armKd.get(), m_constraints, kPeriod);
 
-    private final ArmFeedforward m_feedforward = new ArmFeedforward(0.013804, 0.93532, 0.00028699, 0.00052411);
+    private final ArmFeedforward m_feedforward = new ArmFeedforward(armKs.get(), armKg.get(), armKv.get(), armKa.get());
         
     private final CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
 
@@ -59,16 +73,6 @@ public class ArmIOSparkMax implements ArmIO{
 
     }
 
-  @Override
-  public void updateInputs(ArmIoInputs inputs){
-    inputs.leftAppliedVolts = leftMotor.getBusVoltage();
-    inputs.rightAppliedVolts = rightMotor.getBusVoltage();
-    inputs.leftTempCelcius = leftMotor.getMotorTemperature();
-    inputs.rightTempCelcius = rightMotor.getMotorTemperature();
-
-    inputs.currentAngle = getArmAngle();
-    inputs.setPoint = getController().getGoal().position;
-  }
 
   public double getArmAngle() {            
     return (m_encoder.getAbsolutePosition().getValueAsDouble() * 360)  + 51.6;
@@ -79,11 +83,20 @@ public class ArmIOSparkMax implements ArmIO{
   }
 
   public void setVoltage(double output, State setpoint){
-
     double feedfoward =  m_feedforward.calculate(setpoint.position, setpoint.velocity);
-
     rightMotor.setVoltage(output + feedfoward);
     leftMotor.setVoltage(output + feedfoward);
+  }
+  
+  @Override
+  public void updateInputs(ArmIoInputs inputs){
+    inputs.leftAppliedVolts = leftMotor.getBusVoltage();
+    inputs.rightAppliedVolts = rightMotor.getBusVoltage();
+    inputs.leftTempCelcius = leftMotor.getMotorTemperature();
+    inputs.rightTempCelcius = rightMotor.getMotorTemperature();
+
+    inputs.currentAngle = getArmAngle();
+    inputs.setPoint = getController().getGoal().position;
   }
 
   @Override
@@ -108,7 +121,19 @@ public class ArmIOSparkMax implements ArmIO{
     getController().reset(getArmAngle());
     m_controller.setGoal(position);
   }
-  
 
+  @Override
+  public void updateTunableNumbers(){
+    if (armKs.hasChanged(0)
+      || armKv.hasChanged(0)
+      || armKp.hasChanged(0)
+      || armKi.hasChanged(0)
+      || armKd.hasChanged(0)
+      || armKa.hasChanged(0)) {
+    
+        m_controller = new ProfiledPIDController(armKp.get(), armKi.get(), armKd.get(), m_constraints);
+  }
 }
+}
+
  

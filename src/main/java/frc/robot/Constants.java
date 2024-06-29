@@ -66,9 +66,35 @@ public class Constants {
 
       public static class Arm{
         /*ID */
-         public static final int LEFT_ARM_MOTOR_ID = 9 ;
-         public static final int RIGHT_ARM_MOTOR_ID = 10;
 
+        public static final byte LEFT_ARM_ID = 9;
+        public static final byte RIGHT_ARM_ID = 10;  
+    
+        public static final int ABSOLUTE_ENCODER_ID = 17;
+    
+        public static final double ARM_GEARBOX = 320.0 / 1.0;
+    
+        /* PID */
+        public static double kP = 0.32,
+                             kI = 0.42,
+                             kD = 0.0055,
+                             kFF = 0.0,
+                             kMaxVelocityRadPerSecond = 1000,
+                             kMaxAccelerationMetersPerSecondSquared = 1000,
+                             kS = 0.013804,
+                             kV = 0.00028699,
+                             kA = 0.00052411,
+                             kG = 0.93532,
+                             kPeriod = 0.02;
+                             
+        /* SetPoints and Threesholds */
+        public static double INTAKING_POSITION = 180.5;
+
+        public static double SPEAKER_SCORING_POSITION = 160.0;
+
+        public static double INIT_POSITION = 95.0;
+        
+        public static double IDLE_UNDER_STAGE = 170.0;
       }
 
   /*   _________                    

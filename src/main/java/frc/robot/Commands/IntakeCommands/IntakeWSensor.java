@@ -2,16 +2,13 @@ package frc.robot.Commands.IntakeCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
-import frc.robot.Subsystems.Shooter.ShooterSubsystem;
 
-public class Outake extends Command {
+public class IntakeWSensor extends Command {
 
   IntakeSubsystem intake;
-  ShooterSubsystem shooter;
 
-  public Outake(IntakeSubsystem intake, ShooterSubsystem shooter) {
+  public IntakeWSensor(IntakeSubsystem intake) {
     this.intake = intake;
-    this.shooter = shooter;
 
     addRequirements(intake);
   }
@@ -19,24 +16,21 @@ public class Outake extends Command {
   @Override
   public void initialize() {}
 
-
   @Override
   public void execute() {
-    intake.setIntake(-0.3);
-    shooter.requestCustom(-900, -500);
+    intake.setIntake(1);
   }
-
 
   @Override
   public void end(boolean interrupted) {
     intake.stopIntake();
-    shooter.requestIdle();
-    shooter.unsetAllRequests();
   }
-
 
   @Override
   public boolean isFinished() {
+    if(intake.getSensor()){
+      return true;
+    }
     return false;
   }
 }

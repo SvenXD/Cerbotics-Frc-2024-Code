@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.Arm.IDLE_UNDER_STAGE;
+import static frc.robot.Constants.Arm.INTAKING_POSITION;
+
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,6 +18,7 @@ import frc.robot.Commands.AutoCommands.NoneAuto;
 import frc.robot.Commands.AutoCommands.Test1;
 import frc.robot.Commands.AutoCommands.Test2;
 import frc.robot.Commands.IntakeCommands.Intake;
+import frc.robot.Commands.IntakeCommands.IntakeWSensor;
 import frc.robot.Commands.IntakeCommands.Outake;
 import frc.robot.Commands.ShooterCommands.AmpShoot;
 import frc.robot.Commands.ShooterCommands.OverStageShoot;
@@ -68,6 +72,11 @@ public class RobotContainer {
 
   private void configureBindings() {
 
+    chassisDriver.rightBumper()
+    .whileTrue(new IntakeWSensor(m_intake)
+    .alongWith(m_arm.goToPosition(INTAKING_POSITION)))
+    .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE));
+
     subsystemsDriver.leftBumper()
     .whileTrue(new AmpShoot(m_shooter));
 
@@ -96,5 +105,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
+  }
+
+  public ArmSubsystem getArmSubsystem(){
+    return m_arm;
   }
 }

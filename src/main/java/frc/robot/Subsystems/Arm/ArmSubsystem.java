@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.Util.LoggedTunableNumber;
 
 public class ArmSubsystem extends SubsystemBase {
 
@@ -17,14 +16,8 @@ public class ArmSubsystem extends SubsystemBase {
   private final ArmIoInputsAutoLogged inputs = new ArmIoInputsAutoLogged();
 
   /*Variables */
-  private double desirableAngle = 0.0;
-  private String currentArmState = "IDLE";
 
   private boolean m_enabled = false;
-
-
-  LoggedTunableNumber desiredArmAngle = new LoggedTunableNumber("Arm/ArmAngle", desirableAngle);
-
 
     private SendableChooser<String> armModeChooser = new SendableChooser<>();
     private String currentModeSelection;
@@ -33,6 +26,8 @@ public class ArmSubsystem extends SubsystemBase {
 
   public ArmSubsystem(ArmIO io) {
     this.io = io;
+    io.updateTunableNumbers();
+    Logger.processInputs("Arm", inputs);
 
     armModeChooser.setDefaultOption("Brake Mode", modeNames[0]);
     armModeChooser.addOption("Brake Mode", modeNames[0]);
@@ -45,11 +40,8 @@ public class ArmSubsystem extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     io.updateTunableNumbers();
-
     Logger.processInputs("Arm", inputs);
-    SmartDashboard.putString("Arm state", currentArmState);
-    SmartDashboard.putNumber("SetPoint", inputs.setPoint);
-    SmartDashboard.putNumber("Current Arm Angle",inputs.currentAngle);
+ 
 
     if (m_enabled) {
     io.putThisInPeriodicBecauseOtherwiseItWontWorkAndItsReallyImportant();
@@ -59,27 +51,18 @@ public class ArmSubsystem extends SubsystemBase {
         currentModeSelection = armModeChooser.getSelected();
         switch (currentModeSelection) {
           case "BRAKE":
-            armSetBrake();
+            io.setBrakeMode();
           break;
 
           case "COAST":
-            armSetCoast();
+            io.setCoastMode();
           break;
         }
       } else {
-        armSetBrake();
+       io.setBrakeMode();
       }
     
   }
-
-  public void armSetCoast(){
-   io.setCoastMode();
-  }
-
-  public void armSetBrake(){
-    io.setBrakeMode();
-  }
-
     public Command goToPosition(double position){
     Command ejecutable = Commands.runOnce(
                 () -> {

@@ -31,4 +31,8 @@ public class IntakeSubsystem extends SubsystemBase {
     io.setVoltage(0);
   }
 
+  public boolean getSensor(){
+    return inputs.sensor;
+  }
+
 }

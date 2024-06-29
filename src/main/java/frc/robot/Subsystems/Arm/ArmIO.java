@@ -15,9 +15,6 @@ public interface ArmIO {
 
     public double currentAngle = 0.0;
     public double setPoint = 0.0;
-
-    public double leftEncoder = 0.0;
-    public double rightEncoder = 0.0;
   }
 
   /** Updates the set of loggable inputs. */
@@ -35,6 +32,6 @@ public interface ArmIO {
     /** Enable coast mode on the intake. */
     public default void setCoastMode() {}
 
-    /* Updates the tunable numbers. */
-    public default void updateTunableNumbers() {}
+  /* Updates the tunable numbers. */
+  public default void updateTunableNumbers() {}
 }
