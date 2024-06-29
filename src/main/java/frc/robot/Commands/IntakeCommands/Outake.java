@@ -16,22 +16,20 @@ public class Outake extends Command {
     addRequirements(intake);
   }
 
-
   @Override
   public void initialize() {}
 
 
   @Override
   public void execute() {
-    intake.requestIntake(-0.2);
+    intake.setIntake(-0.3)
     shooter.requestCustom(-900, -500);
   }
 
 
   @Override
   public void end(boolean interrupted) {
-    intake.requestIdle();
-    intake.unsetAllRequests();
+    intake.stopIntake();
     shooter.requestIdle();
     shooter.unsetAllRequests();
   }

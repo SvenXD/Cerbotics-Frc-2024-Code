@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LoggedDashboardChooser;
-import frc.robot.Commands.ArmCommands.ArmGoToPose;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.AutoCommands.NoneAuto;
 import frc.robot.Commands.AutoCommands.Test1;
@@ -48,6 +47,7 @@ public class RobotContainer {
   public static ArmIO armIO = new ArmIOSparkMax();
   public static ArmSubsystem m_arm = new ArmSubsystem(armIO);
 
+
   public RobotContainer() {
 
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
@@ -63,8 +63,6 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Preview", autoPreviewField);
 
     configureBindings();
-
-
 
   }
 
@@ -89,7 +87,10 @@ public class RobotContainer {
     .whileTrue(new Outake(m_intake, m_shooter));
 
     subsystemsDriver.a()
-    .whileTrue(new ArmGoToPose(m_arm));
+    .onTrue(m_arm.goToPosition(150));
+
+    subsystemsDriver.y()
+    .onTrue(m_arm.goToPosition(110));
 
   }
 

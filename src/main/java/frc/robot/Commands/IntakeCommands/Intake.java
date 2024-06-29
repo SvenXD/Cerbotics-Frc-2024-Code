@@ -13,23 +13,18 @@ public class Intake extends Command {
     addRequirements(intake);
   }
 
-
   @Override
   public void initialize() {}
 
-
   @Override
   public void execute() {
-    intake.requestIntake(1.0);
+    intake.setIntake(1);
   }
-
 
   @Override
   public void end(boolean interrupted) {
-    intake.requestIdle();
-    intake.unsetAllRequests();
+    intake.stopIntake();
   }
-
 
   @Override
   public boolean isFinished() {

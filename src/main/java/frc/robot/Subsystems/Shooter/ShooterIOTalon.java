@@ -8,7 +8,6 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -49,19 +48,19 @@ public class ShooterIOTalon implements ShooterIO {
   private StatusSignal<Double> supplyUp;
   private StatusSignal<Double> supplyDown;
 
-  LoggedTunableNumber upperShooterKs = new LoggedTunableNumber("UpperShooter/ukS", 0.0);
-  LoggedTunableNumber upperShooterKa = new LoggedTunableNumber("UpperShooter/ukA", 0.0);
-  LoggedTunableNumber upperShooterKv = new LoggedTunableNumber("UpperShooter/ukV", 0.0);
-  LoggedTunableNumber upperShooterKp = new LoggedTunableNumber("UpperShooter/ukP", 0.0);
-  LoggedTunableNumber upperShooterKi = new LoggedTunableNumber("UpperShooter/ukI", 0.0);
-  LoggedTunableNumber upperShooterKd = new LoggedTunableNumber("UpperShooter/ukD", 0.0);
+  LoggedTunableNumber upperShooterKs = new LoggedTunableNumber("UpperShooter/ukS", ukS);
+  LoggedTunableNumber upperShooterKa = new LoggedTunableNumber("UpperShooter/ukA", ukA);
+  LoggedTunableNumber upperShooterKv = new LoggedTunableNumber("UpperShooter/ukV", ukV);
+  LoggedTunableNumber upperShooterKp = new LoggedTunableNumber("UpperShooter/ukP", ukP);
+  LoggedTunableNumber upperShooterKi = new LoggedTunableNumber("UpperShooter/ukI", ukI);
+  LoggedTunableNumber upperShooterKd = new LoggedTunableNumber("UpperShooter/ukD", ukD);
 
-  LoggedTunableNumber lowerShooterKs = new LoggedTunableNumber("LowerShooter/lkS", 0.0);
-  LoggedTunableNumber lowerShooterKa = new LoggedTunableNumber("LowerShooter/lkA", 0.0);
-  LoggedTunableNumber lowerShooterKv = new LoggedTunableNumber("LowerShooter/lkV", 0.0);
-  LoggedTunableNumber lowerShooterKp = new LoggedTunableNumber("LowerShooter/lkP", 0.0);
-  LoggedTunableNumber lowerShooterKi = new LoggedTunableNumber("LowerShooter/lkI", 0.0);
-  LoggedTunableNumber lowerShooterKd = new LoggedTunableNumber("LowerShooter/lkD", 0.0);
+  LoggedTunableNumber lowerShooterKs = new LoggedTunableNumber("LowerShooter/lkS", lkS);
+  LoggedTunableNumber lowerShooterKa = new LoggedTunableNumber("LowerShooter/lkA", lkA);
+  LoggedTunableNumber lowerShooterKv = new LoggedTunableNumber("LowerShooter/lkV", lkV);
+  LoggedTunableNumber lowerShooterKp = new LoggedTunableNumber("LowerShooter/lkP", lkP);
+  LoggedTunableNumber lowerShooterKi = new LoggedTunableNumber("LowerShooter/lkI", lkI);
+  LoggedTunableNumber lowerShooterKd = new LoggedTunableNumber("LowerShooter/lkD", lkD);
 
   public ShooterIOTalon() {
 
@@ -166,16 +165,9 @@ public class ShooterIOTalon implements ShooterIO {
   }
 
   @Override
-  public void setPercent(double percentUpper, double percentLower){
-    upperMotor.setControl(new DutyCycleOut(percentUpper));
-    lowerMotor.setControl(new DutyCycleOut(percentLower));
-  }
-
-  @Override
   public void stop(){
-    upperMotor.set(0);
+    upperMotor.stopMotor();
     lowerMotor.set(0);
-
   }
 
   @Override

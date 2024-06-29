@@ -1,5 +1,7 @@
 package frc.robot.Subsystems.Intake;
 
+import static frc.robot.Constants.Intake.*;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -9,32 +11,20 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 public class IntakeIOSparkMax implements IntakeIO{
 
-    private boolean invert = false;
-    private final CANSparkMax intakeMotor;
-
-    public DigitalInput intakeSensor = new DigitalInput(0);
-
+    private final CANSparkMax intakeMotor = new CANSparkMax(INTAKE_ID, MotorType.kBrushless);
+    public DigitalInput intakeSensor = new DigitalInput(INTAKE_SENSOR_ID);
     public RelativeEncoder intakeEncoder;
 
-
     public IntakeIOSparkMax(){
-
-        intakeMotor = new CANSparkMax(12, MotorType.kBrushless);
-
         intakeMotor.setIdleMode(IdleMode.kBrake);
-
-        intakeMotor.setInverted(invert);
-
+        intakeMotor.setInverted(INTAKE_INVERSION);
         intakeMotor.setSmartCurrentLimit(80);
-
         intakeEncoder = intakeMotor.getEncoder();
-
     }
 
     public boolean noteSensor(){
         return !intakeSensor.get();
-      }
-
+    }
 
     @Override
     public void updateInputs(IntakeIOInputs inputs){
@@ -50,13 +40,4 @@ public class IntakeIOSparkMax implements IntakeIO{
         intakeMotor.set(volts);
     }
 
-    @Override
-    public void setBrakeMode(boolean enable){
-        intakeMotor.setIdleMode(enable ?IdleMode.kBrake : IdleMode.kCoast);
-    }
-
-    @Override
-    public void setCurrentLimit(int currentLimit){
-        intakeMotor.setSmartCurrentLimit(currentLimit);
-    }
 }

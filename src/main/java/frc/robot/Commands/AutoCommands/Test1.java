@@ -27,12 +27,9 @@ public class Test1 extends AutoCommand {
 
 
   public Test1() {
-    String first = "";
-    String second = "";
 
     startToFirst = PathPlannerPath.fromPathFile("Path1");
     firstToFarShoot = PathPlannerPath.fromPathFile("Path2");
-
 
   }
 

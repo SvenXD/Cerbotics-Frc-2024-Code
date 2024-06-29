@@ -23,12 +23,11 @@ public interface ShooterIO {
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ShooterIOInputs inputs) {}
 
-  /* Run the shooter open loop at the specified percent. */
-  public default void setPercent(double percentUpper, double percentLower) {}
 
   /** Run the shooter closed loop at the specified velocity. */
   public default void setVelocity(double velocityRpmUpper, double velocityRpmLower  ) {}
 
+  /** Stops the shooter.  i mean what else do you expect */
   public default void stop(){}
 
   /* Sets current limit for the flywheel motors. */

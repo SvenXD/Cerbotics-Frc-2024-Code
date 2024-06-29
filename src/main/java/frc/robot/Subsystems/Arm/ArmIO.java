@@ -23,8 +23,11 @@ public interface ArmIO {
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ArmIoInputs inputs) {}
 
-  /* Put the arm setPoint */
-  public default void goToPosition(double position){}
+   /* Put this in periodic because its improtant*/
+   public default void putThisInPeriodicBecauseOtherwiseItWontWorkAndItsReallyImportant(){}
+
+  /*This keeps the stuff needed for the arm to move */
+   public default void positionFunction(double position){}
 
     /** Enable brake mode on the intake. */
     public default void setBrakeMode() {}

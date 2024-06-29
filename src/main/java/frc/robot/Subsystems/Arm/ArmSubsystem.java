@@ -2,15 +2,13 @@ package frc.robot.Subsystems.Arm;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.revrobotics.CANSparkBase.IdleMode;
-
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Util.LoggedTunableNumber;
-import frc.robot.Subsystems.Intake.IntakeSubsystem.IntakeStates;
 
 public class ArmSubsystem extends SubsystemBase {
 
@@ -20,15 +18,13 @@ public class ArmSubsystem extends SubsystemBase {
 
   /*Variables */
   private double desirableAngle = 0.0;
-  private ArmStates armState = ArmStates.IDLE;
   private String currentArmState = "IDLE";
+
+  private boolean m_enabled = false;
+
 
   LoggedTunableNumber desiredArmAngle = new LoggedTunableNumber("Arm/ArmAngle", desirableAngle);
 
-  public enum ArmStates{
-    IDLE,  
-    Test
-   }
 
     private SendableChooser<String> armModeChooser = new SendableChooser<>();
     private String currentModeSelection;
@@ -49,11 +45,15 @@ public class ArmSubsystem extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     io.updateTunableNumbers();
+
     Logger.processInputs("Arm", inputs);
     SmartDashboard.putString("Arm state", currentArmState);
-    SmartDashboard.putNumber("SetPointa", inputs.setPoint);
-    SmartDashboard.putNumber("Current Arm Angle", Units.radiansToDegrees(inputs.currentAngle));
+    SmartDashboard.putNumber("SetPoint", inputs.setPoint);
+    SmartDashboard.putNumber("Current Arm Angle",inputs.currentAngle);
 
+    if (m_enabled) {
+    io.putThisInPeriodicBecauseOtherwiseItWontWorkAndItsReallyImportant();
+    }
 
   if(DriverStation.isDisabled()){
         currentModeSelection = armModeChooser.getSelected();
@@ -73,15 +73,26 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void armSetCoast(){
- io.setCoastMode();
-  }
-
-  public void test(){
-    io.goToPosition(92);
+   io.setCoastMode();
   }
 
   public void armSetBrake(){
     io.setBrakeMode();
   }
 
+    public Command goToPosition(double position){
+    Command ejecutable = Commands.runOnce(
+                () -> {
+                io.positionFunction(position);  
+                enable();        
+                },
+                this);
+    return ejecutable;
+  }
+
+  public void enable() {
+    m_enabled = true;
+  }
+
+      
 }

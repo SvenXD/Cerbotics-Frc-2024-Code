@@ -5,7 +5,9 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+
+import javax.swing.text.Position;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -22,7 +24,7 @@ public class ArmIOSparkMax implements ArmIO{
     private final CANcoder m_encoder = new CANcoder(17, "Swerve_Canivore");
  
     private final TrapezoidProfile.Constraints m_constraints =
-    new TrapezoidProfile.Constraints(1, 1);
+    new TrapezoidProfile.Constraints(500, 500);
 
     private final ProfiledPIDController m_controller =
     new ProfiledPIDController(0.32, 0.42, 0.0055, m_constraints, 0.02);
@@ -40,7 +42,6 @@ public class ArmIOSparkMax implements ArmIO{
     m_encoder.getPosition().setUpdateFrequency(100);
     m_encoder.getConfigurator().apply(encoderConfig);
 
-
         leftMotor.restoreFactoryDefaults();
         rightMotor.restoreFactoryDefaults();
     
@@ -53,8 +54,8 @@ public class ArmIOSparkMax implements ArmIO{
         leftMotor.setCANTimeout(0);
         rightMotor.setCANTimeout(0);
     
-        rightMotor.setIdleMode(IdleMode.kCoast);
-        leftMotor.setIdleMode(IdleMode.kCoast);
+        rightMotor.setIdleMode(IdleMode.kBrake);
+        leftMotor.setIdleMode(IdleMode.kBrake);
 
     }
 
@@ -66,7 +67,7 @@ public class ArmIOSparkMax implements ArmIO{
     inputs.rightTempCelcius = rightMotor.getMotorTemperature();
 
     inputs.currentAngle = getArmAngle();
-    inputs.setPoint = getController().getSetpoint().position;
+    inputs.setPoint = getController().getGoal().position;
   }
 
   public double getArmAngle() {            
@@ -77,11 +78,17 @@ public class ArmIOSparkMax implements ArmIO{
     return m_controller;
   }
 
-  public void setVoltage(double position){
-    double  PIDout = m_controller.calculate(getArmAngle(),position);
-    double feedfoward =  m_feedforward.calculate(m_controller.getSetpoint().position, m_controller.getSetpoint().velocity);
-    rightMotor.setVoltage(PIDout + feedfoward);
-    leftMotor.setVoltage(PIDout + feedfoward);
+  public void setVoltage(double output, State setpoint){
+
+    double feedfoward =  m_feedforward.calculate(setpoint.position, setpoint.velocity);
+
+    rightMotor.setVoltage(output + feedfoward);
+    leftMotor.setVoltage(output + feedfoward);
+  }
+
+  @Override
+  public void putThisInPeriodicBecauseOtherwiseItWontWorkAndItsReallyImportant(){
+    setVoltage(m_controller.calculate(getArmAngle()),m_controller.getSetpoint());
   }
 
   @Override
@@ -97,11 +104,11 @@ public class ArmIOSparkMax implements ArmIO{
   }
 
   @Override
-  public void goToPosition(double position){
+  public void positionFunction(double position){
     getController().reset(getArmAngle());
-    m_controller.setGoal(Units.degreesToRadians(position));
-    setVoltage(position);
+    m_controller.setGoal(position);
   }
   
 
 }
+ 

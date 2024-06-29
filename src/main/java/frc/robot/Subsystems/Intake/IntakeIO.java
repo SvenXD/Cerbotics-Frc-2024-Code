@@ -21,12 +21,6 @@ public interface IntakeIO {
   /** Run the intake open loop at the specified voltage. */
   public default void setVoltage(double volts) {}
 
-  /** Enable or disable brake mode on the intake. */
-  public default void setBrakeMode(boolean enable) {}
-
-  /** Set the limit of current to the moro */
-  public default void setCurrentLimit(int currentLimit) {}
-
     /* Updates the tunable numbers. */
     public default void updateTunableNumbers() {}
 }

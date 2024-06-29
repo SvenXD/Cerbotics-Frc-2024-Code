@@ -27,13 +27,9 @@ public class Test2 extends AutoCommand {
 
 
   public Test2() {
-    String first = "";
-    String second = "";
-
 
     startToFirst = PathPlannerPath.fromPathFile("Copy of Path1");
     firstToFarShoot = PathPlannerPath.fromPathFile("Copy of Path2");
-
 
   }
 

@@ -7,10 +7,9 @@ public class Constants {
     public static final boolean tuningMode = true;
 
     public static class Shooter{
-
         /* IDs */
 
-        public static final int UPPER_SHOOTER_ID =13;
+        public static final int UPPER_SHOOTER_ID = 13;
         public static final int LOWER_SHOOTER_ID = 14;
 
         /* SetPoints and Threesholds */
@@ -37,15 +36,46 @@ public class Constants {
         public static InvertedValue UPPER_SHOOTER_INVERSION = InvertedValue.Clockwise_Positive;
         public static InvertedValue LOWER_SHOOTER_INVERSION = InvertedValue.Clockwise_Positive;
 
+        /* PID */
+
+        public static double
+        ukP = 1.4,     
+        ukI = 0,        
+        ukD = 0.025,    
+        ukS = 0.50189,
+        ukV = 0.0016926,
+        ukA = 0.00059492,    
+        lkP = 1.4,     
+        lkI = 0,        
+        lkD = 0.025,    
+        lkS = 0.50189,
+        lkV = 0.0016926,
+        lkA = 0.00059492;
+
     }
+
+      public static class Intake{
+       /*ID */
+        public static final int INTAKE_ID = 12;
+        public static final int INTAKE_SENSOR_ID = 0;
+
+       /*Physical Measurements */
+        public static final boolean INTAKE_INVERSION = false;
+
+    }
+
+      public static class Arm{
+        /*ID */
+         public static final int LEFT_ARM_MOTOR_ID = 9 ;
+         public static final int RIGHT_ARM_MOTOR_ID = 10;
+
+      }
 
   /*   _________                    
     /   _____/__  __ ____   ____  
     \_____  \\  \/ // __ \ /    \ 
-    /        \\   /\  ___/|   |  \
-   /_______  / \_/  \___  >___|  /
-           \/           \/     \/
-          
-          
+   /_______  /\   /\  ___/|   |  \
+           \/  \_/  \___  >___|  /
+                        \/     \/
            */
 }

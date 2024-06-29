@@ -20,7 +20,7 @@ public class SpeakerShoot extends Command {
 
   @Override
   public void execute() {
-    shooter.test(2400,2400);
+    shooter.test(3000,3000);
   }
 
 
