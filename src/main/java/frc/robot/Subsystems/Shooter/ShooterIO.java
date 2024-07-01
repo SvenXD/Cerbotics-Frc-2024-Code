@@ -20,7 +20,7 @@ public interface ShooterIO {
             public double[] shooterCurrentAmps = new double[] {}; // {upper, lower}
         }
         
-  /** Updates the set of loggable inputs. */
+    /** Updates the set of loggable inputs. */
   public default void updateInputs(ShooterIOInputs inputs) {}
 
 
