@@ -1,7 +1,7 @@
 package frc.robot.Subsystems.Swerve;
 
-import static frc.robot.Constants.Drive.CANBU_STRING;
-import static frc.robot.Constants.Drive.PIGEON_ID;
+import static frc.robot.Constants.DriveConstants.CANBU_STRING;
+import static frc.robot.Constants.DriveConstants.PIGEON_ID;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;

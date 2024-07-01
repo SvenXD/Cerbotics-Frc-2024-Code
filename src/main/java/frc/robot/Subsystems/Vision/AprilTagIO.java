@@ -11,6 +11,7 @@ public interface AprilTagIO {
         public double numOfTagsDetected = 0.0;
         public double tX = 0.0;
         public double tY = 0.0;
+        public boolean tV = false;
     }
 
    /** Updates the set of loggable inputs. */

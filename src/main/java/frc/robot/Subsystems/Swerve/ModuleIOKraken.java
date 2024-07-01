@@ -18,7 +18,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import frc.robot.Constants.Drive.ModuleConfig;
+import frc.robot.Constants.DriveConstants.ModuleConfig;
 
 public class ModuleIOKraken implements ModuleIO {
 
@@ -60,7 +60,7 @@ public class ModuleIOKraken implements ModuleIO {
 
     driveTalon = new TalonFX(config.driveID(), "*");
     turnTalon = new TalonFX(config.turnID(), "*");
-    m_cancoder = new CANcoder(0, "*");
+    m_cancoder = new CANcoder(config.absoluteEncoderChannel(), "*");
     absoluteEncoderOffset = config.absoluteEncoderOffset();
 
 
