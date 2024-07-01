@@ -9,6 +9,7 @@ public class AprilTagIOLimelight implements AprilTagIO{
   public AprilTagIOLimelight(){
      
   }
+  
   @Override
   public void updateInputs(AprilTagIOInputs inputs){
     inputs.distanceFromTarget = getDistanceToTarget();

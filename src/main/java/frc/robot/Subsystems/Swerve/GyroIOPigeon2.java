@@ -1,6 +1,5 @@
 package frc.robot.Subsystems.Swerve;
 
-import static frc.robot.Constants.*;
 import static frc.robot.Constants.Drive.CANBU_STRING;
 import static frc.robot.Constants.Drive.PIGEON_ID;
 
@@ -35,6 +34,7 @@ public class GyroIOPigeon2 implements GyroIO {
     inputs.connected = BaseStatusSignal.refreshAll(yaw, yawVelocity).isOK();
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
-
+    inputs.heading = Math.IEEEremainder(pigeon.getYaw().getValueAsDouble(), 360);
   }
+
 }

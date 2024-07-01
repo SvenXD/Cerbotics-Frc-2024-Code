@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
@@ -10,13 +11,20 @@ public class Constants {
 
     public static class Drive{
 
+        public record ModuleConfig(
+      int driveID,
+      int turnID,
+      int absoluteEncoderChannel,
+      Rotation2d absoluteEncoderOffset,
+      boolean turnMotorInverted) {}
+
       public static final String CANBU_STRING = "Swerve_Canivore";
     
       public static final int PIGEON_ID = 15;
 
-    //Distance between left and right wheels
+
       public static final double kTrackWidth = 0.6096;
-    //Distance between front and back wheels
+
       public static final double kWheelBase = 0.635;
   
       public static final SwerveDriveKinematics kSwerveKinematics = new SwerveDriveKinematics(
@@ -117,7 +125,7 @@ public class Constants {
         public static double IDLE_UNDER_STAGE = 170.0;
       }
 
-      
+
       public static final class VisionConstants {
 
         public static final String neuralLimelight = "limelight-neural";
