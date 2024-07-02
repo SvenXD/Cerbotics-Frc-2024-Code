@@ -32,8 +32,11 @@ public class Constants {
       new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
       new Translation2d(-kWheelBase / 2, -kTrackWidth / 2),
       new Translation2d(-kWheelBase / 2, kTrackWidth / 2 ));
+    }
 
-             public record ModuleConfig(
+  public static class Module{
+
+   public record ModuleConfig(
       int driveID,
       int turnID,
       int absoluteEncoderChannel,
@@ -50,7 +53,15 @@ public class Constants {
                              mkG = 0.0,
                              tkP = 0.0,
                              tkD = 0.0;
-    }
+
+     public static final ModuleConfig[] moduleConfigs =
+                                   new ModuleConfig[] {
+                                     new ModuleConfig(1, 2, 3, new Rotation2d(0.343017578125), true),
+                                     new ModuleConfig(4, 5, 6, new Rotation2d(-0.039306640625), true),
+                                     new ModuleConfig(10, 11, 12, new Rotation2d(-0.283203125), true),
+                                     new ModuleConfig(7, 8, 9, new Rotation2d(-0.167236328125), true)
+                                   };
+  }
 
     public static class Shooter{
         /* IDs */

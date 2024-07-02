@@ -17,7 +17,7 @@ public class GyroIOPigeon2 implements GyroIO {
   private final StatusSignal<Double> yaw;
   private final StatusSignal<Double> yawVelocity;
 
-  public GyroIOPigeon2(boolean phoenixDrive) {
+  public GyroIOPigeon2() {
     pigeon = new Pigeon2(PIGEON_ID, CANBU_STRING);
     yaw = pigeon.getYaw();
     yawVelocity = pigeon.getAngularVelocityZWorld();
@@ -35,6 +35,10 @@ public class GyroIOPigeon2 implements GyroIO {
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
     inputs.heading = Math.IEEEremainder(pigeon.getYaw().getValueAsDouble(), 360);
+  }
+
+  public Rotation2d getYaw(){
+    return Rotation2d.fromDegrees(yaw.getValueAsDouble());
   }
 
 }

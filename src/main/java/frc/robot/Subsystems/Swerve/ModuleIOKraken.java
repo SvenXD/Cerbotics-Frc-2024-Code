@@ -1,5 +1,6 @@
 package frc.robot.Subsystems.Swerve;
 
+import java.util.Queue;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -20,7 +21,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.DriveConstants.ModuleConfig;
+import frc.robot.Constants.Module.ModuleConfig;
 
 public class ModuleIOKraken implements ModuleIO {
 
@@ -45,26 +46,29 @@ public class ModuleIOKraken implements ModuleIO {
     private final StatusSignal<Double> turnSupplyCurrent;
     private final StatusSignal<Double> turnTorqueCurrent;
 
+      // Odometry Queues
+  private final Queue<Double> drivePositionQueue;
+  private final Queue<Double> turnPositionQueue;
+
 
       /*  Controller Configs */
     private final TalonFXConfiguration driveTalonConfig = new TalonFXConfiguration();
     private final TalonFXConfiguration turnTalonConfig = new TalonFXConfiguration();
 
       /*  Control */
-    private final VoltageOut voltageControl = new VoltageOut(0).withUpdateFreqHz(0);
+    private final VoltageOut voltageControl = new VoltageOut(0).withUpdateFreqHz(0).withEnableFOC(true);
     private final TorqueCurrentFOC currentControl = new TorqueCurrentFOC(0).withUpdateFreqHz(0);
     private final VelocityTorqueCurrentFOC velocityTorqueCurrentFOC = new VelocityTorqueCurrentFOC(0).withUpdateFreqHz(0);
     private final PositionTorqueCurrentFOC positionControl = new PositionTorqueCurrentFOC(0).withUpdateFreqHz(0);
     private final NeutralOut neutralControl = new NeutralOut().withUpdateFreqHz(0);
 
      public ModuleIOKraken(ModuleConfig config) {
-    /*  Init controllers and encoders from config constants */
+    /*  Init controllers and encoders from config constants ModuleConfig config*/
 
-    driveTalon = new TalonFX(config.driveID(), "*");
-    turnTalon = new TalonFX(config.turnID(), "*");
-    m_cancoder = new CANcoder(config.absoluteEncoderChannel(), "*");
-    absoluteEncoderOffset = config.absoluteEncoderOffset();
-
+    driveTalon = new TalonFX(config.driveID(), "Swerve_Canivore");
+    turnTalon = new TalonFX(config.turnID(), "Swerve_Canivore");
+    m_cancoder = new CANcoder(config.absoluteEncoderChannel(), "Swerve_Canivore");
+    absoluteEncoderOffset = new Rotation2d();
 
     /* Config motors */
     driveTalonConfig.TorqueCurrent.PeakForwardTorqueCurrent = 50.0;
@@ -74,10 +78,7 @@ public class ModuleIOKraken implements ModuleIO {
 
     turnTalonConfig.TorqueCurrent.PeakForwardTorqueCurrent = 40.0;
     turnTalonConfig.TorqueCurrent.PeakReverseTorqueCurrent = -40.0;
-        turnTalonConfig.MotorOutput.Inverted =
-        config.turnMotorInverted()
-            ? InvertedValue.Clockwise_Positive
-            : InvertedValue.CounterClockwise_Positive;
+        turnTalonConfig.MotorOutput.Inverted =InvertedValue.CounterClockwise_Positive;
     turnTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     /*
@@ -96,6 +97,10 @@ public class ModuleIOKraken implements ModuleIO {
     drivePosition = driveTalon.getPosition();
     turnPosition = turnTalon.getPosition();
     BaseStatusSignal.setUpdateFrequencyForAll(250, drivePosition, turnPosition);
+
+    drivePositionQueue =
+    PhoenixOdometryThread.getInstance().registerSignal(driveTalon, drivePosition);
+turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turnTalon, turnPosition);
 
     /* 100 hz signals */
 
@@ -165,6 +170,16 @@ public class ModuleIOKraken implements ModuleIO {
         inputs.turnAppliedVolts = turnAppliedVolts.getValueAsDouble();
         inputs.turnSupplyCurrentAmps = turnSupplyCurrent.getValueAsDouble();
         inputs.turnTorqueCurrentAmps = turnTorqueCurrent.getValueAsDouble();
+
+        inputs.odometryDrivePositionsMeters =
+        drivePositionQueue.stream()
+            .mapToDouble(
+                signalValue -> Units.rotationsToRadians(signalValue) * Units.inchesToMeters(2))
+            .toArray();
+    inputs.odometryTurnPositions =
+        turnPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[]::new);
+    drivePositionQueue.clear();
+    turnPositionQueue.clear();
      }
 
   @Override
