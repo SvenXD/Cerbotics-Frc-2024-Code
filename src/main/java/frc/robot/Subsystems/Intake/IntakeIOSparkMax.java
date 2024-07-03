@@ -10,20 +10,26 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class IntakeIOSparkMax implements IntakeIO{
-
-    private final CANSparkMax intakeMotor = new CANSparkMax(INTAKE_ID, MotorType.kBrushless);
-    public DigitalInput intakeSensor = new DigitalInput(INTAKE_SENSOR_ID);
+    /* Hardware */
+    private final CANSparkMax intakeMotor;
+    public DigitalInput intakeSensor;
     public RelativeEncoder intakeEncoder;
 
     public IntakeIOSparkMax(){
-        intakeMotor.setIdleMode(IdleMode.kBrake);
-        intakeMotor.setInverted(INTAKE_INVERSION);
-        intakeMotor.setSmartCurrentLimit(80);
-        intakeEncoder = intakeMotor.getEncoder();
-    }
 
-    public boolean noteSensor(){
-        return !intakeSensor.get();
+        intakeMotor = new CANSparkMax(INTAKE_ID, MotorType.kBrushless);
+        intakeSensor = new DigitalInput(INTAKE_SENSOR_ID);
+
+        intakeMotor.restoreFactoryDefaults();
+        intakeMotor.setCANTimeout(250);
+
+        intakeMotor.setIdleMode(IdleMode.kBrake);
+        intakeMotor.setSmartCurrentLimit(40);
+
+        intakeMotor.setInverted(INTAKE_INVERSION);
+        intakeMotor.setCANTimeout(0);
+
+        intakeEncoder = intakeMotor.getEncoder();
     }
 
     @Override
@@ -32,12 +38,11 @@ public class IntakeIOSparkMax implements IntakeIO{
         inputs.appliedVolts = intakeMotor.getBusVoltage();
         inputs.velocityRadPerSec = intakeEncoder.getVelocity();
         inputs.tempCelcius = intakeMotor.getMotorTemperature();
-        inputs.sensor = noteSensor();
+        inputs.sensor = !intakeSensor.get();
     }
 
     @Override
     public void setVoltage(double volts){
         intakeMotor.set(volts);
     }
-
 }

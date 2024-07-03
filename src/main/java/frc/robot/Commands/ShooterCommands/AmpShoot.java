@@ -2,6 +2,7 @@ package frc.robot.Commands.ShooterCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Shooter.ShooterSubsystem;
+import static frc.robot.Constants.Shooter.*;
 
 public class AmpShoot extends Command {
 
@@ -20,15 +21,14 @@ public class AmpShoot extends Command {
 
   @Override
   public void execute() {
-    shooter.requestAMP();
+    shooter.velocity(UPPER_SHOOTER_AMP_RPM,LOWER_SHOOTER_AMP_RPM);
   }
 
 
   @Override
   public void end(boolean interrupted) {
-    shooter.requestIdle();
-    shooter.unsetAllRequests();
-  }
+    shooter.stopMotors();
+ }
 
 
   @Override

@@ -167,7 +167,7 @@ public class ShooterIOTalon implements ShooterIO {
   @Override
   public void stop(){
     upperMotor.stopMotor();
-    lowerMotor.set(0);
+    lowerMotor.stopMotor();
   }
 
   @Override

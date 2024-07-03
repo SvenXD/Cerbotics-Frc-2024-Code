@@ -18,8 +18,7 @@ public class AprilTagLocalizer extends SubsystemBase {
   private final AprilTagIO io;
   private final AprilTagIOInputsAutoLogged inputs = new AprilTagIOInputsAutoLogged();
 
-      Field2d m_field = new Field2d();
-
+  Field2d m_field = new Field2d();
 
   private final CommandSwerveDrivetrain m_drive;
   public AprilTagLocalizer(CommandSwerveDrivetrain m_drive,AprilTagIO io) {
@@ -31,6 +30,7 @@ public class AprilTagLocalizer extends SubsystemBase {
   @Override
   public void periodic() {
     odometryWithVision();
+    io.changeSmartPipeline();
     io.updateInputs(inputs);
     Logger.processInputs("Vision", inputs);
 

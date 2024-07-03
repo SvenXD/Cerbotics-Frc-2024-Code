@@ -20,7 +20,4 @@ public interface IntakeIO {
 
   /** Run the intake open loop at the specified voltage. */
   public default void setVoltage(double volts) {}
-
-    /* Updates the tunable numbers. */
-    public default void updateTunableNumbers() {}
 }

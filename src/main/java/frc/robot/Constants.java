@@ -2,9 +2,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.robot.Subsystems.Swerve.TunerConstants;
 
 public class Constants {
@@ -34,33 +31,7 @@ public class Constants {
     public static final String CANBU_STRING = "Swerve_Canivore";
     public static final int PIGEON_ID = 15;
     
-    public static final double kTrackWidth = 0.6096;
-
-    public static final double kWheelBase = 0.635;
   
-    public static final SwerveDriveKinematics kSwerveKinematics = new SwerveDriveKinematics(
-      new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-      new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-      new Translation2d(-kWheelBase / 2, -kTrackWidth / 2),
-      new Translation2d(-kWheelBase / 2, kTrackWidth / 2 ));
-
-             public record ModuleConfig(
-      int driveID,
-      int turnID,
-      int absoluteEncoderChannel,
-      Rotation2d absoluteEncoderOffset,
-      boolean turnMotorInverted) {}
-
-        public static double mkP = 0.0,
-                             mkI = 0.0,
-                             mkD = 0.0,
-                             mkFF = 0.0,
-                             mkS = 0.0,
-                             mkV = 0.0,
-                             mkA = 0.0,
-                             mkG = 0.0,
-                             tkP = 0.0,
-                             tkD = 0.0;
     }
 
     public static class Shooter{
@@ -73,8 +44,8 @@ public class Constants {
 
         public static final int SHOOTER_THREESHOLD = 300;
         
-        public static final int UPPER_SHOOTER_IDLE_RPM = 0;
-        public static final int LOWER_SHOOTER_IDLE_RPM = 0;
+        public static final int UPPER_SHOOTER_CUSTOM_RPM = 0;
+        public static final int LOWER_SHOOTER_CUSTOM_RPM = 0;
 
         public static final int UPPER_SHOOTER_AMP_RPM = 2000;
         public static final int LOWER_SHOOTER_AMP_RPM = 500;
@@ -161,8 +132,9 @@ public class Constants {
         public static final String tagLimelightName = "limelight-tags";
     
         public static final int main_Pipeline = 0,
-                                far_Pipeline = 1,
-                                close_Pipeline = 2;
+                                upper_Pipeline = 1,
+                                medium_Pipeline = 2,
+                                lower_Pipeline = 3;
       }
 
   /*   _________                    

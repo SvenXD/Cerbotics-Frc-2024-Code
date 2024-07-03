@@ -2,7 +2,6 @@ package frc.robot.Subsystems.Intake;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -18,9 +17,7 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    io.updateTunableNumbers();
     Logger.processInputs("Intake", inputs);
-    SmartDashboard.putBoolean("Note detected", inputs.sensor);
   }
 
   public void setIntake(double vel){

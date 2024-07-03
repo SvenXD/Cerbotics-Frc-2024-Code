@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
@@ -23,13 +26,16 @@ public class Robot extends LoggedRobot {
 
   private RobotContainer m_robotContainer;
 
+  StructArrayPublisher<SwerveModuleState> measuredStates;
+  StructArrayPublisher<SwerveModuleState> targetStates;
+
   @Override
   public void robotInit() {
      m_robotContainer = new RobotContainer();
     Logger.recordMetadata("ProjectName", "2024-Beta"); // Set a metadata value
 
 
-    //TODO remove the comment of this part if you are testing in a real robot
+    //TODO: remove the comment of this part if you are testing in a real robot or change the current mode constant
     
    /*  if (isReal()) {
       Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
@@ -68,6 +74,13 @@ public class Robot extends LoggedRobot {
       Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
       break;
   }
+    measuredStates = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("Measured Swerve States", SwerveModuleState.struct).publish();
+
+    targetStates = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("Target Swerve States", SwerveModuleState.struct).publish();
+
+
   
   Logger.start();
   Logger.disableDeterministicTimestamps();
@@ -77,6 +90,9 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+
+    measuredStates.set(m_robotContainer.getskibid().getState().ModuleStates);
+    targetStates.set(m_robotContainer.getskibid().getState().ModuleTargets);
   }
 
   @Override

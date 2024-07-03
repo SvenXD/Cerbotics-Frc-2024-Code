@@ -23,15 +23,14 @@ public class Outake extends Command {
   @Override
   public void execute() {
     intake.setIntake(-0.3);
-    shooter.requestCustom(-900, -500);
+    shooter.velocity(-900, -500);
   }
 
 
   @Override
   public void end(boolean interrupted) {
     intake.stopIntake();
-    shooter.requestIdle();
-    shooter.unsetAllRequests();
+    shooter.stopMotors();
   }
 
 
