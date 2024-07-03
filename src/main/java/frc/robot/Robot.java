@@ -28,7 +28,10 @@ public class Robot extends LoggedRobot {
      m_robotContainer = new RobotContainer();
     Logger.recordMetadata("ProjectName", "2024-Beta"); // Set a metadata value
 
-    if (isReal()) {
+
+    //TODO remove the comment of this part if you are testing in a real robot
+    
+   /*  if (isReal()) {
       Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
       Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
       new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
@@ -43,6 +46,27 @@ public class Robot extends LoggedRobot {
               LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
       RobotController.setBrownoutVoltage(5.75);
       
+  }*/
+
+  switch (Constants.currentMode) {
+    case REAL:
+      // Running on a real robot, log to a USB stick ("/U/logs")
+      Logger.addDataReceiver(new WPILOGWriter());
+      Logger.addDataReceiver(new NT4Publisher());
+      break;
+
+    case SIM:
+      // Running a physics simulator, log to NT
+      Logger.addDataReceiver(new NT4Publisher());
+      break;
+
+    case REPLAY:
+      // Replaying a log, set up replay source
+      setUseTiming(false); // Run as fast as possible
+      String logPath = LogFileUtil.findReplayLog();
+      Logger.setReplaySource(new WPILOGReader(logPath));
+      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+      break;
   }
   
   Logger.start();

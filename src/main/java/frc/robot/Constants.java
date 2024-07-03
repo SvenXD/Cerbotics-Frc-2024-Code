@@ -9,7 +9,18 @@ import frc.robot.Subsystems.Swerve.TunerConstants;
 
 public class Constants {
 
+  public static final Mode currentMode = Mode.SIM;
 
+  public static enum Mode {
+    /** Running on a real robot. */
+    REAL,
+
+    /** Running a physics simulator. */
+    SIM,
+
+    /** Replaying from a log file. */
+    REPLAY
+  }
     public static class DriveConstants{
 
     public static final double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps;
@@ -162,4 +173,3 @@ public class Constants {
                         \/     \/
            */
   }
-

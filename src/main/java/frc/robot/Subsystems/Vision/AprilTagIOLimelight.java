@@ -13,7 +13,7 @@ public class AprilTagIOLimelight implements AprilTagIO{
   @Override
   public void updateInputs(AprilTagIOInputs inputs){
     inputs.distanceFromTarget = getDistanceToTarget();
-    inputs.numOfTagsDetected = getDistanceToTarget();
+    inputs.numOfTagsDetected = getNumofDetectedTargets();
     inputs.tX = getTx();
     inputs.tY = getTy();
     inputs.tV = getTv();
@@ -25,7 +25,7 @@ public class AprilTagIOLimelight implements AprilTagIO{
     return distance;
   }
     
-    public int getNumofDetectedTargets(){
+    public double getNumofDetectedTargets(){
     return LimelightHelpers.getTargetCount(tagLimelightName);
   }
 
