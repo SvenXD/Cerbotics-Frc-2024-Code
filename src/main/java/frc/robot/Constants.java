@@ -2,7 +2,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 
-import frc.robot.Subsystems.Swerve.TunerConstants;
 
 public class Constants {
 
@@ -20,7 +19,14 @@ public class Constants {
   }
     public static class DriveConstants{
 
-    public static final double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps;
+    public static final double kDriveGearRatio = 5.5;
+    public static final double kTurnGearRatio = 10.29;  
+
+    //Distance between left and right wheels
+    public static final double kTrackWidth = 0.6096;
+    //Distance between front and back wheels
+    public static final double kWheelBase = 0.635;
+
     public static final double MaxAngularRate = 1.5 * Math.PI;
 
     public static final double traslationP = 5.0,
@@ -28,10 +34,53 @@ public class Constants {
                                rotationP = 5.0, 
                                rotationD = 0.0;
 
-    public static final String CANBU_STRING = "Swerve_Canivore";
+    public static final String CANBUS_STRING = "Swerve_Canivore";
     public static final int PIGEON_ID = 15;
     
-  
+    }
+
+    public static class ModuleConstants{
+    /*    
+     *                   F             
+     *   ┌───────┬─────────────────┬───────┐
+     *   │       │                 │       │
+     *   │ Mod 0 │                 │ Mod 1 │
+     *   │       │                 │       │
+     *   ├───────┘                 └───────┤
+     *   │                                 │
+     *   │            Modules              │
+     * L │            Diagram              │ R
+     *   │                                 │
+     *   │                                 │
+     *   │                                 │
+     *   ├───────┐                 ┌───────┤
+     *   │       │                 │       │
+     *   │ Mod 3 │                 │ Mod 2 │
+     *   │       │                 │       │
+     *   └───────┴─────────────────┴───────┘
+     *                  B         
+     */
+
+     /** Front Left module **/
+      public static final byte kFrontLeftDriveMotorId = 1; 
+      public static final byte kFrontLeftSteerMotorId = 2; 
+      public static final byte kFrontLeftEncoderId = 3;
+      public static final double kFrontLeftEncoderOffset = -2.1;
+
+      public static final byte kFrontRightDriveMotorId = 4; 
+      public static final byte kFrontRightSteerMotorId = 5; 
+      public static final byte kFrontRightEncoderId = 6;
+      public static final double kFrontRightEncoderOffset = -2.9;
+
+      public static final byte kBackLeftDriveMotorId = 10; 
+      public static final byte kBackLeftSteerMotorId = 11; 
+      public static final byte kBackLeftEncoderId = 12;
+      public static final double kBackLeftEncoderOffset = 2.0;
+      
+      public static final byte kBackRightDriveMotorId = 7; 
+      public static final byte kBackRightSteerMotorId = 8; 
+      public static final byte kBackRightEncoderId = 9;
+      public static final double kBackRightEncoderOffset = -2.0;      
     }
 
     public static class Shooter{

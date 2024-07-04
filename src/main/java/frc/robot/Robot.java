@@ -4,12 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -25,9 +19,6 @@ public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-
-  StructArrayPublisher<SwerveModuleState> measuredStates;
-  StructArrayPublisher<SwerveModuleState> targetStates;
 
   @Override
   public void robotInit() {
@@ -74,11 +65,7 @@ public class Robot extends LoggedRobot {
       Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
       break;
   }
-    measuredStates = NetworkTableInstance.getDefault()
-    .getStructArrayTopic("Measured Swerve States", SwerveModuleState.struct).publish();
 
-    targetStates = NetworkTableInstance.getDefault()
-    .getStructArrayTopic("Target Swerve States", SwerveModuleState.struct).publish();
 
 
   
@@ -91,8 +78,6 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
 
-    measuredStates.set(m_robotContainer.getskibid().getState().ModuleStates);
-    targetStates.set(m_robotContainer.getskibid().getState().ModuleTargets);
   }
 
   @Override

@@ -4,23 +4,16 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.Arm.IDLE_UNDER_STAGE;
-import static frc.robot.Constants.Arm.INTAKING_POSITION;
+import static frc.robot.Constants.Arm.*;
 
-import org.ejml.dense.block.MatrixOps_DDRB;
-
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.ForwardReference;
-
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LoggedDashboardChooser;
-import frc.Util.Telemetry;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.AutoCommands.NoneAuto;
 import frc.robot.Commands.AutoCommands.Test1;
@@ -32,7 +25,7 @@ import frc.robot.Commands.ShooterCommands.AmpShoot;
 import frc.robot.Commands.ShooterCommands.OverStageShoot;
 import frc.robot.Commands.ShooterCommands.SpeakerShoot;
 import frc.robot.Commands.ShooterCommands.UnderStageShoot;
-import frc.robot.Commands.SwerveCommands.FieldCentricDrive;
+import frc.robot.Commands.SwerveCommands.DriveCommands;
 import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOSparkMax;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
@@ -42,8 +35,12 @@ import frc.robot.Subsystems.Intake.IntakeSubsystem;
 import frc.robot.Subsystems.Shooter.ShooterIO;
 import frc.robot.Subsystems.Shooter.ShooterIOTalon;
 import frc.robot.Subsystems.Shooter.ShooterSubsystem;
-import frc.robot.Subsystems.Swerve.CommandSwerveDrivetrain;
-import frc.robot.Subsystems.Swerve.TunerConstants;
+import frc.robot.Subsystems.Swerve.Drive;
+import frc.robot.Subsystems.Swerve.GyroIO;
+import frc.robot.Subsystems.Swerve.GyroIOPigeon2;
+import frc.robot.Subsystems.Swerve.ModuleIO;
+import frc.robot.Subsystems.Swerve.ModuleIOSim;
+import frc.robot.Subsystems.Swerve.ModuleIOTalonFX;
 import frc.robot.Subsystems.Vision.AprilTagIO;
 import frc.robot.Subsystems.Vision.AprilTagIOLimelight;
 import frc.robot.Subsystems.Vision.AprilTagLocalizer;
@@ -56,7 +53,7 @@ public class RobotContainer {
   private static LoggedDashboardChooser<AutoCommand> autoChooser;
   public static Field2d autoPreviewField = new Field2d();
 
-  public static CommandSwerveDrivetrain m_drive = TunerConstants.DriveTrain;
+  public static Drive drive;
 
   public static ShooterIO shooterIO = new ShooterIOTalon();
   public static ShooterSubsystem m_shooter = new ShooterSubsystem(shooterIO);
@@ -68,20 +65,46 @@ public class RobotContainer {
   public static ArmSubsystem m_arm = new ArmSubsystem(armIO);
 
   public static AprilTagIO visionIO = new AprilTagIOLimelight();
-  public static AprilTagLocalizer m_vision = new AprilTagLocalizer(m_drive, visionIO);
-
-  private final Telemetry logger = new Telemetry(DriveConstants.MaxSpeed);
-
-
-
-    SwerveRequest.FieldCentricFacingAngle m_head = new SwerveRequest.FieldCentricFacingAngle()
-  .withDriveRequestType(DriveRequestType.Velocity);
+  public static AprilTagLocalizer m_vision = new AprilTagLocalizer(drive, visionIO);
 
   public RobotContainer() {
 
-    m_head.ForwardReference = ForwardReference.RedAlliance;
-    m_head.HeadingController.setPID(8, 0, 0);
-    m_head.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
+     switch (Constants.currentMode) {
+      case REAL:
+        // Real robot, instantiate hardware IO implementations
+        drive =
+            new Drive(
+                new GyroIOPigeon2(true),
+                new ModuleIOTalonFX(0),
+                new ModuleIOTalonFX(1),
+                new ModuleIOTalonFX(2),
+                new ModuleIOTalonFX(3));
+      
+        break;
+
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim());
+        break;
+
+      default:
+        // Replayed robot, disable IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
+        break;
+    }
+
 
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
 
@@ -101,19 +124,33 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-        m_drive.setDefaultCommand(new FieldCentricDrive(
-      m_drive,
-      () -> -chassisDriver.getLeftY(),
-      () -> -chassisDriver.getLeftX(),
-      () -> -chassisDriver.getRightX()));
-
-      chassisDriver.a().onTrue(m_drive.runOnce(() -> m_drive.seedFieldRelative()));
+  /* Control 1 commands */
+    //Chassis commands
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -chassisDriver.getLeftY(),
+            () -> -chassisDriver.getLeftX(),
+            () -> -chassisDriver.getRightX()));
+      //Lock modules
+    chassisDriver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+      //Set field centric
+    chassisDriver
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
 
     chassisDriver.rightBumper()
     .whileTrue(new IntakeWSensor(m_intake)
     .alongWith(m_arm.goToPosition(INTAKING_POSITION)))
     .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE));
 
+    /* Control 2 commands */
     subsystemsDriver.leftBumper()
     .whileTrue(new AmpShoot(m_shooter));
 
@@ -133,12 +170,7 @@ public class RobotContainer {
     .whileTrue(new Outake(m_intake, m_shooter));
 
     subsystemsDriver.a()
-    .onTrue(m_arm.goToPosition(150));
-
-    subsystemsDriver.y()
-    .onTrue(m_arm.goToPosition(110));
-
-    m_drive.registerTelemetry(logger::telemeterize);
+    .onTrue(m_arm.goToPosition(93));
 
   }
 
@@ -150,7 +182,4 @@ public class RobotContainer {
     return m_arm;
   }
 
-  public CommandSwerveDrivetrain getskibid(){
-    return m_drive;
-  }
 }
