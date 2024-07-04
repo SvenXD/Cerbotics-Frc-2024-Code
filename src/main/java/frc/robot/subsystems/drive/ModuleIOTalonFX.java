@@ -61,8 +61,8 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final StatusSignal<Double> turnCurrent;
 
   // Gear ratios for SDS MK4i L2, adjust as necessary
-  private final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
-  private final double TURN_GEAR_RATIO = 150.0 / 7.0;
+  private final double DRIVE_GEAR_RATIO = 5.5;
+  private final double TURN_GEAR_RATIO = 10.29;
 
   private final boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
@@ -73,26 +73,26 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveTalon = new TalonFX(1,"Swerve_Canivore");
         turnTalon = new TalonFX(2,"Swerve_Canivore");
         cancoder = new CANcoder(3,"Swerve_Canivore");
-        absoluteEncoderOffset = new Rotation2d(0.343017578125); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(-2.1); // MUST BE CALIBRATED
         
         break;
       case 1:
         driveTalon = new TalonFX(4,"Swerve_Canivore");
         turnTalon = new TalonFX(5,"Swerve_Canivore");
         cancoder = new CANcoder(6,"Swerve_Canivore");
-        absoluteEncoderOffset = new Rotation2d(-0.039306640625); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(-2.9); // MUST BE CALIBRATED
         break;
       case 2:
         driveTalon = new TalonFX(10,"Swerve_Canivore");
         turnTalon = new TalonFX(11,"Swerve_Canivore");
         cancoder = new CANcoder(12,"Swerve_Canivore");
-        absoluteEncoderOffset = new Rotation2d(-0.283203125); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(2.0); // MUST BE CALIBRATED
         break;
       case 3:
         driveTalon = new TalonFX(7,"Swerve_Canivore");
         turnTalon = new TalonFX(8,"Swerve_Canivore");
         cancoder = new CANcoder(9,"Swerve_Canivore");
-        absoluteEncoderOffset = new Rotation2d(-0.167236328125); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(-2); // MUST BE CALIBRATED
         break;
       default:
         throw new RuntimeException("Invalid module index");
