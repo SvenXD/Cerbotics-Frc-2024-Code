@@ -74,7 +74,7 @@ public class ArmIOSparkMax implements ArmIO{
 
 
   public double getArmAngle() {            
-    return (m_encoder.getAbsolutePosition().getValueAsDouble() * 360)  + 51.6;
+    return (m_encoder.getAbsolutePosition().getValueAsDouble() * 360)  + 50.6;
   }
 
   public ProfiledPIDController getController() {
@@ -96,6 +96,7 @@ public class ArmIOSparkMax implements ArmIO{
 
     inputs.currentAngle = getArmAngle();
     inputs.setPoint = getController().getGoal().position;
+    inputs.error = Math.abs(getArmAngle()-getController().getGoal().position);
   }
 
   @Override

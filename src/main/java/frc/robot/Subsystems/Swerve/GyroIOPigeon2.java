@@ -64,4 +64,9 @@ public class GyroIOPigeon2 implements GyroIO {
 
     inputs.pigeonRotation = pigeon.getAngle();
 }
+
+@Override
+public void zeroHeading(){
+  pigeon.setYaw(0);
+}
 }

@@ -15,6 +15,7 @@ public interface ArmIO {
 
     public double currentAngle = 0.0;
     public double setPoint = 0.0;
+    public double error = 0.0;
   }
 
   /** Updates the set of loggable inputs. */

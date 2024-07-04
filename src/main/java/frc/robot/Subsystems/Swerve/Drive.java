@@ -271,6 +271,8 @@ public class Drive extends SubsystemBase {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
+
+
   /**
    * Adds a vision measurement to the pose estimator.
    *
@@ -306,5 +308,19 @@ public class Drive extends SubsystemBase {
   }
       public double getangle() {
         return gyroInputs.pigeonRotation;
+    }
+
+    public void updatePoseEstimator(){
+      poseEstimator.update(
+       getRotation(),
+       getModulePositions());
+    }
+
+    public SwerveDrivePoseEstimator getSwerveDrivePoseEstimator(){
+      return poseEstimator; 
+    }
+
+    public void zeroHeading(){
+      gyroIO.zeroHeading();
     }
 }

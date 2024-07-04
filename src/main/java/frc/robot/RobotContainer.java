@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.Util.LoggedDashboardChooser;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.AutoCommands.NoneAuto;
@@ -53,7 +55,13 @@ public class RobotContainer {
   private static LoggedDashboardChooser<AutoCommand> autoChooser;
   public static Field2d autoPreviewField = new Field2d();
 
-  public static Drive drive;
+  public static Drive drive =  new Drive(
+                new GyroIOPigeon2(true),
+                new ModuleIOTalonFX(0),
+                new ModuleIOTalonFX(1),
+                new ModuleIOTalonFX(2),
+                new ModuleIOTalonFX(3));
+   
 
   public static ShooterIO shooterIO = new ShooterIOTalon();
   public static ShooterSubsystem m_shooter = new ShooterSubsystem(shooterIO);
@@ -64,22 +72,17 @@ public class RobotContainer {
   public static ArmIO armIO = new ArmIOSparkMax();
   public static ArmSubsystem m_arm = new ArmSubsystem(armIO);
 
-  public static AprilTagIO visionIO = new AprilTagIOLimelight();
-  public static AprilTagLocalizer m_vision = new AprilTagLocalizer(drive, visionIO);
+  public static AprilTagIO visionIO = new AprilTagIOLimelight();        
+
+  public static AprilTagLocalizer  m_vision =  new AprilTagLocalizer(drive, visionIO);  
 
   public RobotContainer() {
 
      switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(true),
-                new ModuleIOTalonFX(0),
-                new ModuleIOTalonFX(1),
-                new ModuleIOTalonFX(2),
-                new ModuleIOTalonFX(3));
-      
+           
+        
         break;
 
       case SIM:
@@ -135,7 +138,9 @@ public class RobotContainer {
       //Lock modules
     chassisDriver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
       //Set field centric
-    chassisDriver
+      chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
+
+    /*chassisDriver
         .b()
         .onTrue(
             Commands.runOnce(
@@ -143,7 +148,7 @@ public class RobotContainer {
                         drive.setPose(
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
-                .ignoringDisable(true));
+                .ignoringDisable(true));*/
 
     chassisDriver.rightBumper()
     .whileTrue(new IntakeWSensor(m_intake)
@@ -152,16 +157,20 @@ public class RobotContainer {
 
     /* Control 2 commands */
     subsystemsDriver.leftBumper()
-    .whileTrue(new AmpShoot(m_shooter));
+    .whileTrue(new AmpShoot(m_shooter,m_intake))
+    .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE));
 
     subsystemsDriver.rightBumper()
     .whileTrue(new Intake(m_intake));
 
     subsystemsDriver.x()
-    .whileTrue(new SpeakerShoot(m_shooter));
+    .whileTrue(new SpeakerShoot(m_shooter)
+    .alongWith(m_arm.goToPosition(SPEAKER_SCORING_POSITION)))
+    .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE));
 
     subsystemsDriver.povLeft()
-    .whileTrue(new UnderStageShoot(m_shooter));
+    .whileTrue(new UnderStageShoot(m_shooter))
+    .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE));
 
     subsystemsDriver.povRight()
     .whileTrue(new OverStageShoot(m_shooter));

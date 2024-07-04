@@ -5,7 +5,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 
 public class Constants {
 
-  public static final Mode currentMode = Mode.SIM;
+  public static final Mode currentMode = Mode.REAL;
 
   public static enum Mode {
     /** Running on a real robot. */
