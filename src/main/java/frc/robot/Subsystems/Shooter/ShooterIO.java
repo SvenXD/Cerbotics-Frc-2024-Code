@@ -23,19 +23,14 @@ public interface ShooterIO {
     /** Updates the set of loggable inputs. */
   public default void updateInputs(ShooterIOInputs inputs) {}
 
-
   /** Run the shooter closed loop at the specified velocity. */
-  public default void setVelocity(double velocityRpmUpper, double velocityRpmLower  ) {}
+  public default void setVelocity(double velocityRpmUpper, double velocityRpmLower) {}
 
-  /** Stops the shooter.  i mean what else do you expect */
+  /** Run open loop at the specified voltage. */
+  public default void setVoltage(double volts) {}
+  
+  /** Stops the shooter.*/
   public default void stop(){}
-
-  /* Sets current limit for the flywheel motors. */
-  public default void setCurrentLimit(
-      double currentLimit, double supplyCurrentThreshold, double supplyTimeThreshold) {}
-
-  /* Enables or disables flywheel brake mode. */
-  public default void enableBrakeMode(boolean enable) {}
 
   /* Updates the tunable numbers. */
   public default void updateTunableNumbers() {}

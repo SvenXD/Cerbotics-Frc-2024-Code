@@ -22,8 +22,8 @@ public class ArmIOSparkMax implements ArmIO{
     /* Hardware */
   private final CANSparkMax leftMotor = new CANSparkMax(LEFT_ARM_ID, MotorType.kBrushless);
   private final CANSparkMax rightMotor = new CANSparkMax(RIGHT_ARM_ID, MotorType.kBrushless);
-
   private final CANcoder m_encoder = new CANcoder(ABSOLUTE_ENCODER_ID, "Swerve_Canivore");
+  private final CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
 
   /* PID Gains */
 
@@ -35,17 +35,25 @@ public class ArmIOSparkMax implements ArmIO{
   LoggedTunableNumber armKi = new LoggedTunableNumber("ArmPID/kI", kI);
   LoggedTunableNumber armKd = new LoggedTunableNumber("ArmPID/kD", kD);
 
-
     private final TrapezoidProfile.Constraints m_constraints =
-    new TrapezoidProfile.Constraints(kMaxVelocityRadPerSecond, kMaxAccelerationMetersPerSecondSquared);
+    new TrapezoidProfile.Constraints(
+      kMaxVelocityRadPerSecond,
+      kMaxAccelerationMetersPerSecondSquared);
 
     private ProfiledPIDController m_controller =
-    new ProfiledPIDController(armKp.get(), armKi.get(), armKd.get(), m_constraints, kPeriod);
+    new ProfiledPIDController(
+      armKp.get(),
+      armKi.get(),
+      armKd.get(),
+      m_constraints,
+      kPeriod);
 
-    private final ArmFeedforward m_feedforward = new ArmFeedforward(armKs.get(), armKg.get(), armKv.get(), armKa.get());
+    private final ArmFeedforward m_feedforward = new ArmFeedforward(
+      armKs.get(), 
+      armKg.get(), 
+      armKv.get(), 
+      armKa.get());
         
-    private final CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
-
     public ArmIOSparkMax(){
 
     encoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
@@ -55,37 +63,21 @@ public class ArmIOSparkMax implements ArmIO{
     m_encoder.getPosition().setUpdateFrequency(100);
     m_encoder.getConfigurator().apply(encoderConfig);
 
-        leftMotor.restoreFactoryDefaults();
-        rightMotor.restoreFactoryDefaults();
+    leftMotor.restoreFactoryDefaults();
+    rightMotor.restoreFactoryDefaults();
     
-        leftMotor.setInverted(true);
-        rightMotor.setInverted(false);
+    leftMotor.setInverted(true);
+    rightMotor.setInverted(false);
     
-        leftMotor.setSmartCurrentLimit(40);
-        rightMotor.setSmartCurrentLimit(40);
+    leftMotor.setSmartCurrentLimit(40);
+    rightMotor.setSmartCurrentLimit(40);
     
-        leftMotor.setCANTimeout(0);
-        rightMotor.setCANTimeout(0);
+    leftMotor.setCANTimeout(0);
+    rightMotor.setCANTimeout(0);
     
-        rightMotor.setIdleMode(IdleMode.kBrake);
-        leftMotor.setIdleMode(IdleMode.kBrake);
-
+    rightMotor.setIdleMode(IdleMode.kBrake);
+    leftMotor.setIdleMode(IdleMode.kBrake);
     }
-
-
-  public double getArmAngle() {            
-    return (m_encoder.getAbsolutePosition().getValueAsDouble() * 360)  + 50.6;
-  }
-
-  public ProfiledPIDController getController() {
-    return m_controller;
-  }
-
-  public void setVoltage(double output, State setpoint){
-    double feedfoward =  m_feedforward.calculate(setpoint.position, setpoint.velocity);
-    rightMotor.setVoltage(output + feedfoward);
-    leftMotor.setVoltage(output + feedfoward);
-  }
   
   @Override
   public void updateInputs(ArmIoInputs inputs){
@@ -131,9 +123,28 @@ public class ArmIOSparkMax implements ArmIO{
       || armKd.hasChanged(0)
       || armKa.hasChanged(0)) {
     
-        m_controller = new ProfiledPIDController(armKp.get(), armKi.get(), armKd.get(), m_constraints);
+        m_controller = new ProfiledPIDController(
+        armKp.get(), 
+        armKi.get(), 
+        armKd.get(), 
+        m_constraints);
+    }
   }
-}
+    
+  public double getArmAngle() {            
+    return (m_encoder.getAbsolutePosition().getValueAsDouble() * 360)  + 50.6;
+  }
+
+  public void setVoltage(double output, State setpoint){
+    double feedfoward =  m_feedforward.calculate(setpoint.position, setpoint.velocity);
+    rightMotor.setVoltage(output + feedfoward);
+    leftMotor.setVoltage(output + feedfoward);
+  }
+
+    public ProfiledPIDController getController() {
+    return m_controller;
+  }
+
 }
 
  

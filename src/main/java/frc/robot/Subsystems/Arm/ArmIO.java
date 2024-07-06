@@ -21,17 +21,17 @@ public interface ArmIO {
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ArmIoInputs inputs) {}
 
-   /* Put this in periodic because its improtant*/
+   /** Put this in periodic because its improtant*/
    public default void putThisInPeriodicBecauseOtherwiseItWontWorkAndItsReallyImportant(){}
 
-  /*This keeps the stuff needed for the arm to move */
+   /** This keeps the stuff needed for the arm to move */
    public default void positionFunction(double position){}
 
-    /** Enable brake mode on the intake. */
-    public default void setBrakeMode() {}
+   /** Enable brake mode on the intake. */
+   public default void setBrakeMode() {}
 
-    /** Enable coast mode on the intake. */
-    public default void setCoastMode() {}
+   /** Enable coast mode on the intake. */
+   public default void setCoastMode() {}
 
   /* Updates the tunable numbers. */
   public default void updateTunableNumbers() {}

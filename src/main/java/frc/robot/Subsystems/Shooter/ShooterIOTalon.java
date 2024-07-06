@@ -9,6 +9,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
   
@@ -177,29 +178,13 @@ public class ShooterIOTalon implements ShooterIO {
 
     lowerVelocity.Velocity = velocityDown / 60;
     lowerMotor.setControl(lowerVelocity);
-  
   }
-
+  
   @Override
-  public void setCurrentLimit(  
-    double currentLimit, double supplyCurrentThreshold, double supplyTimeThreshold){
-      shooterCurrentLimitsConfigs.StatorCurrentLimitEnable = true;
-      shooterCurrentLimitsConfigs.StatorCurrentLimit = currentLimit;
-      shooterCurrentLimitsConfigs.SupplyCurrentThreshold = supplyCurrentThreshold;
-      shooterCurrentLimitsConfigs.SupplyTimeThreshold = supplyTimeThreshold;
-
-      upperConfigurator.apply(shooterCurrentLimitsConfigs);
-      lowerConfigurator.apply(shooterCurrentLimitsConfigs);
-    }
-
-    @Override
-    public void enableBrakeMode(boolean enable){
-      upperMotorOutputConfigs.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-      lowerMotorOutputConfigs.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-
-      upperConfigurator.apply(upperMotorOutputConfigs);
-      lowerConfigurator.apply(lowerMotorOutputConfigs);
-    }
+  public void setVoltage(double volts) {
+    upperMotor.setControl(new VoltageOut(volts).withEnableFOC(true));
+    lowerMotor.setControl(new VelocityVoltage(volts).withEnableFOC(true));
+  }
 
     @Override
     public void updateTunableNumbers(){

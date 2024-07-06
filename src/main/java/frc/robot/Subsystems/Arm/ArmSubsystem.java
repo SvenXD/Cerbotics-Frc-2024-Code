@@ -11,18 +11,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ArmSubsystem extends SubsystemBase {
 
-    /*Io and inputs */
+  /*Io and inputs */
   private final ArmIO io;
   private final ArmIoInputsAutoLogged inputs = new ArmIoInputsAutoLogged();
 
   /*Variables */
-
-  private boolean m_enabled = false;
-
     private SendableChooser<String> armModeChooser = new SendableChooser<>();
     private String currentModeSelection;
     private final String[] modeNames = {"BRAKE", "COAST"};
-
 
   public ArmSubsystem(ArmIO io) {
     this.io = io;
@@ -42,12 +38,9 @@ public class ArmSubsystem extends SubsystemBase {
     io.updateTunableNumbers();
     Logger.processInputs("Arm", inputs);
  
-
-    if (m_enabled) {
     io.putThisInPeriodicBecauseOtherwiseItWontWorkAndItsReallyImportant();
-    }
-
-  if(DriverStation.isDisabled()){
+  
+     if(DriverStation.isDisabled()){
         currentModeSelection = armModeChooser.getSelected();
         switch (currentModeSelection) {
           case "BRAKE":
@@ -67,15 +60,9 @@ public class ArmSubsystem extends SubsystemBase {
     Command ejecutable = Commands.runOnce(
                 () -> {
                 io.positionFunction(position);  
-                enable();        
                 },
                 this);
     return ejecutable;
   }
-
-  public void enable() {
-    m_enabled = true;
-  }
-
       
 }

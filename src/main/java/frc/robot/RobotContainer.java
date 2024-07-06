@@ -35,6 +35,7 @@ import frc.robot.Subsystems.Intake.IntakeIO;
 import frc.robot.Subsystems.Intake.IntakeIOSparkMax;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
 import frc.robot.Subsystems.Shooter.ShooterIO;
+import frc.robot.Subsystems.Shooter.ShooterIOSim;
 import frc.robot.Subsystems.Shooter.ShooterIOTalon;
 import frc.robot.Subsystems.Shooter.ShooterSubsystem;
 import frc.robot.Subsystems.Swerve.Drive;
@@ -55,16 +56,10 @@ public class RobotContainer {
   private static LoggedDashboardChooser<AutoCommand> autoChooser;
   public static Field2d autoPreviewField = new Field2d();
 
-  public static Drive drive =  new Drive(
-                new GyroIOPigeon2(true),
-                new ModuleIOTalonFX(0),
-                new ModuleIOTalonFX(1),
-                new ModuleIOTalonFX(2),
-                new ModuleIOTalonFX(3));
-   
-
+  public static Drive drive;
+  
   public static ShooterIO shooterIO = new ShooterIOTalon();
-  public static ShooterSubsystem m_shooter = new ShooterSubsystem(shooterIO);
+  public static ShooterSubsystem m_shooter;
 
   public static IntakeIO intakeIO = new IntakeIOSparkMax();
   public static IntakeSubsystem m_intake = new IntakeSubsystem(intakeIO);
@@ -73,16 +68,20 @@ public class RobotContainer {
   public static ArmSubsystem m_arm = new ArmSubsystem(armIO);
 
   public static AprilTagIO visionIO = new AprilTagIOLimelight();        
-
-  public static AprilTagLocalizer  m_vision =  new AprilTagLocalizer(drive, visionIO);  
+  public static AprilTagLocalizer m_vision;
 
   public RobotContainer() {
 
      switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-           
-        
+      drive = new Drive(
+                new GyroIOPigeon2(true),
+                new ModuleIOTalonFX(0),
+                new ModuleIOTalonFX(1),
+                new ModuleIOTalonFX(2),
+                new ModuleIOTalonFX(3));   
+      m_shooter = new ShooterSubsystem(shooterIO);          
         break;
 
       case SIM:
@@ -94,6 +93,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim());
+        m_shooter = new ShooterSubsystem(new ShooterIOSim());
         break;
 
       default:
@@ -108,6 +108,7 @@ public class RobotContainer {
         break;
     }
 
+    m_vision = new AprilTagLocalizer(drive, visionIO);  
 
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
 

@@ -4,7 +4,6 @@ import static frc.robot.Constants.Shooter.*;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Util.LoggedTunableNumber;
 
@@ -13,10 +12,6 @@ public class ShooterSubsystem extends SubsystemBase {
   /*Io and inputs */
   private final ShooterIO io;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
-
-    LoggedTunableNumber ampUpperSpeed = new LoggedTunableNumber("UpAmp/ShotVelocity", UPPER_SHOOTER_AMP_RPM);
-    LoggedTunableNumber ampLowerSpeed = new LoggedTunableNumber("LowAmp/ShotVelocity", LOWER_SHOOTER_AMP_RPM);
-
 
   public ShooterSubsystem(ShooterIO io) {
     this.io = io;

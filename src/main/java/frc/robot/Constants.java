@@ -5,7 +5,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 
 public class Constants {
 
-  public static final Mode currentMode = Mode.REAL;
+  public static final Mode currentMode = Mode.SIM;
+  public static final boolean needToLog = true;
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -28,6 +29,7 @@ public class Constants {
     public static final double kWheelBase = 0.635;
 
     public static final double MaxAngularRate = 1.5 * Math.PI;
+    public static final double MaxLinearSpeed = 18.01;
 
     public static final double traslationP = 5.0,
                                traslationD = 0.0,
@@ -56,31 +58,35 @@ public class Constants {
      *   ├───────┐                 ┌───────┤
      *   │       │                 │       │
      *   │ Mod 3 │                 │ Mod 2 │
-     *   │       │                 │       │
+     *   │       │      arm        │       │
      *   └───────┴─────────────────┴───────┘
      *                  B         
      */
 
-     /** Front Left module **/
+     /** Front Left module 0 **/
       public static final byte kFrontLeftDriveMotorId = 1; 
       public static final byte kFrontLeftSteerMotorId = 2; 
       public static final byte kFrontLeftEncoderId = 3;
-      public static final double kFrontLeftEncoderOffset = -2.1;
-
+      public static final double kFrontLeftEncoderOffset = -2.15;
+      /**Front Right module 1 **/
       public static final byte kFrontRightDriveMotorId = 4; 
       public static final byte kFrontRightSteerMotorId = 5; 
       public static final byte kFrontRightEncoderId = 6;
       public static final double kFrontRightEncoderOffset = -2.9;
-
+      /**Back Left module 2 **/
       public static final byte kBackLeftDriveMotorId = 10; 
       public static final byte kBackLeftSteerMotorId = 11; 
       public static final byte kBackLeftEncoderId = 12;
-      public static final double kBackLeftEncoderOffset = 2.0;
-      
+      public static final double kBackLeftEncoderOffset = 1.82;
+      /**Back Right module 3 **/
       public static final byte kBackRightDriveMotorId = 7; 
       public static final byte kBackRightSteerMotorId = 8; 
       public static final byte kBackRightEncoderId = 9;
-      public static final double kBackRightEncoderOffset = -2.0;      
+      public static final double kBackRightEncoderOffset = -2.085;      
+
+      /** To change offsets easily **/
+      // Minus  = Counterclockwise
+      // Plus = Clockwise
     }
 
     public static class Shooter{
