@@ -24,7 +24,6 @@ public class AprilTagLocalizer extends SubsystemBase {
   Field2d m_field = new Field2d();
 
   private final Drive drive;
-  private boolean test = false;
 
   public AprilTagLocalizer(Drive drive ,AprilTagIO io) {
     this.io = io;

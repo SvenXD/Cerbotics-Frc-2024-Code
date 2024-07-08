@@ -2,6 +2,16 @@ package frc.robot;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+
 
 public class Constants {
 
@@ -185,11 +195,62 @@ public class Constants {
 
         public static final String neuralLimelight = "limelight-neural";
         public static final String tagLimelightName = "limelight-tags";
-    
+
         public static final int main_Pipeline = 0,
                                 upper_Pipeline = 1,
                                 medium_Pipeline = 2,
                                 lower_Pipeline = 3;
+
+        public static final String photonCam1 = "Placeholder0";
+        public static final String photonCam2 = "Placeholder1";
+        public static final String photonCam3 = "Placeholder2";
+        public static final String photonCam4 = "Placeholder3";
+    
+        public static final AprilTagFieldLayout kTagLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+          // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
+        public static final Transform3d kRobotToCam1 =
+                new Transform3d(
+                new Translation3d(
+                  0.5, 
+                  0.0, 
+                  0.5), 
+                  new Rotation3d(
+                    0, 
+                    0, 
+                    0));
+        public static final Transform3d kRobotToCam2 =
+                new Transform3d(
+                new Translation3d(
+                  0.5, 
+                  0.0, 
+                  0.5), 
+                  new Rotation3d(
+                    0, 
+                    0, 
+                    0));
+        public static final Transform3d kRobotToCam3 =
+                new Transform3d(
+                new Translation3d(
+                  0.5, 
+                  0.0, 
+                  0.5), 
+                  new Rotation3d(
+                    0, 
+                    0, 
+                    0));
+        public static final Transform3d kRobotToCam4 =
+                new Transform3d(
+                new Translation3d(
+                  0.5, 
+                  0.0, 
+                  0.5), 
+                  new Rotation3d(
+                    0, 
+                    0, 
+                    0));
+        // (Fake values. Experiment and determine estimation noise on an actual robot.)
+        public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+        public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);            
       }
 
   /*   _________                    

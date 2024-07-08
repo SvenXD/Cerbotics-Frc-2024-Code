@@ -1,11 +1,7 @@
 package frc.robot.Subsystems.Shooter; 
 
-import static frc.robot.Constants.Shooter.*;
-
 import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.Util.LoggedTunableNumber;
 
 public class ShooterSubsystem extends SubsystemBase {
 
