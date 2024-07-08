@@ -15,7 +15,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import frc.robot.Robot;
 
 public class ApriltagIOPhotonvision implements AprilTagIO {
     private final PhotonCamera camera;

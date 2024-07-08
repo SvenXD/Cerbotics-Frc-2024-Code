@@ -53,7 +53,8 @@ public class RobotContainer {
     private final CommandXboxController chassisDriver = new CommandXboxController(0);
     private final CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
-  private static LoggedDashboardChooser<AutoCommand> autoChooser;
+  private static LoggedDashboardChooser<AutoCommand> autoChooser = new LoggedDashboardChooser<>("Auto Mode");
+
   public static Field2d autoPreviewField = new Field2d();
 
   public static Drive drive;
@@ -71,7 +72,7 @@ public class RobotContainer {
   public static AprilTagLocalizer m_vision;
 
   public RobotContainer() {
-
+  /** Options for the current mode of the robot */
      switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -81,9 +82,10 @@ public class RobotContainer {
                 new ModuleIOTalonFX(1),
                 new ModuleIOTalonFX(2),
                 new ModuleIOTalonFX(3));   
-      m_shooter = new ShooterSubsystem(shooterIO);          
+      m_shooter = new ShooterSubsystem(shooterIO);  
+      m_vision = new AprilTagLocalizer(drive, visionIO);  
         break;
-
+        //--------------------------------------------
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         drive =
@@ -95,7 +97,7 @@ public class RobotContainer {
                 new ModuleIOSim());
         m_shooter = new ShooterSubsystem(new ShooterIOSim());
         break;
-
+        //--------------------------------------------
       default:
         // Replayed robot, disable IO implementations
         drive =
@@ -106,24 +108,21 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         break;
+        //--------------------------------------------
     }
-
-    m_vision = new AprilTagLocalizer(drive, visionIO);  
-
-    autoChooser = new LoggedDashboardChooser<>("Auto Mode");
-
+    /** Visualisation of the current auto selected **/
     autoChooser.onChange(
         auto -> {
           autoPreviewField.getObject("path").setPoses(auto.getAllPathPoses());});
 
-           autoChooser.addDefaultOption("None", new NoneAuto());
+    /**Auto options */      
+    autoChooser.addDefaultOption("None", new NoneAuto());
     autoChooser.addOption("Test1", new Test1());
     autoChooser.addOption("Test2", new Test2());
     
     SmartDashboard.putData("Auto Preview", autoPreviewField);
 
     configureBindings();
-
   }
 
   private void configureBindings() {
@@ -136,20 +135,13 @@ public class RobotContainer {
             () -> -chassisDriver.getLeftY(),
             () -> -chassisDriver.getLeftX(),
             () -> -chassisDriver.getRightX()));
+
       //Lock modules
     chassisDriver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    
       //Set field centric
-      chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
+    chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
 
-    /*chassisDriver
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));*/
 
     chassisDriver.rightBumper()
     .whileTrue(new IntakeWSensor(m_intake)
