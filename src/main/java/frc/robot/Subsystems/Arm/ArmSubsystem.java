@@ -19,6 +19,7 @@ public class ArmSubsystem extends SubsystemBase {
     private SendableChooser<String> armModeChooser = new SendableChooser<>();
     private String currentModeSelection;
     private final String[] modeNames = {"BRAKE", "COAST"};
+    private Boolean enable = false;
 
   public ArmSubsystem(ArmIO io) {
     this.io = io;
@@ -38,7 +39,9 @@ public class ArmSubsystem extends SubsystemBase {
     io.updateTunableNumbers();
     Logger.processInputs("Arm", inputs);
  
+    if(enable){
     io.putThisInPeriodicBecauseOtherwiseItWontWorkAndItsReallyImportant();
+    }
   
      if(DriverStation.isDisabled()){
         currentModeSelection = armModeChooser.getSelected();
@@ -60,6 +63,7 @@ public class ArmSubsystem extends SubsystemBase {
     Command ejecutable = Commands.runOnce(
                 () -> {
                 io.positionFunction(position);  
+                enable = true;
                 },
                 this);
     return ejecutable;

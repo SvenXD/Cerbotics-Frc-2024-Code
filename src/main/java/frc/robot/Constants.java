@@ -17,7 +17,6 @@ public class Constants {
 
   public static final Mode currentMode = Mode.REAL;
   public static final boolean needToLog = true;
-
   public static enum Mode {
     /** Running on a real robot. */
     REAL,

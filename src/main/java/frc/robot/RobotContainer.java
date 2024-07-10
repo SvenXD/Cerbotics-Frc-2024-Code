@@ -6,6 +6,13 @@ package frc.robot;
 
 import static frc.robot.Constants.Arm.*;
 
+import org.littletonrobotics.junction.Logger;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.PathPlannerLogging;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -53,7 +60,7 @@ public class RobotContainer {
     private final CommandXboxController chassisDriver = new CommandXboxController(0);
     private final CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
-  private static LoggedDashboardChooser<AutoCommand> autoChooser = new LoggedDashboardChooser<>("Auto Mode");
+  private static LoggedDashboardChooser<AutoCommand> autoChooser;
 
   public static Field2d autoPreviewField = new Field2d();
 
@@ -111,6 +118,8 @@ public class RobotContainer {
         //--------------------------------------------
     }
     /** Visualisation of the current auto selected **/
+    autoChooser = new LoggedDashboardChooser<>("Auto Mode");
+
     autoChooser.onChange(
         auto -> {
           autoPreviewField.getObject("path").setPoses(auto.getAllPathPoses());});
@@ -119,7 +128,13 @@ public class RobotContainer {
     autoChooser.addDefaultOption("None", new NoneAuto());
     autoChooser.addOption("Test1", new Test1());
     autoChooser.addOption("Test2", new Test2());
-    
+
+
+    PathPlannerLogging.setLogActivePathCallback(
+      (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));
+  PathPlannerLogging.setLogTargetPoseCallback(
+      pose -> Logger.recordOutput("Swerve/TargetPathPose", pose));
+      
     SmartDashboard.putData("Auto Preview", autoPreviewField);
 
     configureBindings();
@@ -177,7 +192,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return autoChooser.get();
   }
 
   public ArmSubsystem getArmSubsystem(){
