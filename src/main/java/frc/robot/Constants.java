@@ -50,6 +50,10 @@ public class Constants {
     
     }
 
+    public static class AutoConstants{
+      public static String autoValue = "2";
+    }
+
     public static class ModuleConstants{
     /*    
      *                   F             
@@ -251,6 +255,8 @@ public class Constants {
         public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
         public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);            
       }
+
+  
 
   /*   _________                    
     /   _____/__  __ ____   ____  

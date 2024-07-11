@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants.AutoConstants;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,10 +16,11 @@ import java.util.stream.Stream;
 
 public class Test3 extends AutoCommand {
 
+  private String priority = "1";
   private final PathPlannerPath startToFirst;
 
-  public Test3() {
-    startToFirst = PathPlannerPath.fromPathFile("Straight line");
+  public Test3(String test) {
+    startToFirst = PathPlannerPath.fromPathFile("Main" + test);
 
     addCommands(
         Commands.deadline(
@@ -26,6 +28,10 @@ public class Test3 extends AutoCommand {
                 new PathPlannerAuto("Starting pose 1"),
                 AutoBuilder.followPath(startToFirst))));
 
+  }
+
+  public void periodic(){
+    priority = AutoConstants.autoValue;
   }
 
 

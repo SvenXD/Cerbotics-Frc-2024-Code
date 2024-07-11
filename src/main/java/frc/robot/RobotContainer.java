@@ -12,6 +12,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -30,6 +31,7 @@ import frc.robot.Commands.ShooterCommands.OverStageShoot;
 import frc.robot.Commands.ShooterCommands.SpeakerShoot;
 import frc.robot.Commands.ShooterCommands.UnderStageShoot;
 import frc.robot.Commands.SwerveCommands.DriveCommands;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOSparkMax;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
@@ -56,6 +58,7 @@ public class RobotContainer {
   private final CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
   private static LoggedDashboardChooser<AutoCommand> autoChooser;
+  public static SendableChooser<String> autoSelector;
 
   public static Field2d autoPreviewField = new Field2d();
 
@@ -114,6 +117,7 @@ public class RobotContainer {
     }
     /** Visualisation of the current auto selected **/
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
+    autoSelector = new SendableChooser<>();
 
     autoChooser.onChange(
         auto -> {
@@ -123,7 +127,13 @@ public class RobotContainer {
     autoChooser.addDefaultOption("None", new NoneAuto());
     autoChooser.addOption("Test1", new Test1());
     autoChooser.addOption("Test2", new Test2());
-    autoChooser.addOption("Test3", new Test3());
+    autoChooser.addOption("Test3", new Test3(AutoConstants.autoValue));
+
+    autoSelector.setDefaultOption("None", "1");
+    autoSelector.addOption("Center note", "1");
+    autoSelector.addOption("Amp side note", "2");
+    autoSelector.addOption("Stage side note", "3");
+    SmartDashboard.putData("Auto Selector", autoSelector);
 
 
     PathPlannerLogging.setLogActivePathCallback(
@@ -134,6 +144,7 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Preview", autoPreviewField);
 
     SmartDashboard.putString("Current Robot mode", Constants.currentMode.toString());
+    SmartDashboard.putString("Test", getAutoSelector());
 
     configureBindings();
   }
@@ -196,6 +207,10 @@ public class RobotContainer {
 
   public ArmSubsystem getArmSubsystem(){
     return m_arm;
+  }
+
+  public String getAutoSelector(){
+    return autoSelector.getSelected();
   }
 
 }
