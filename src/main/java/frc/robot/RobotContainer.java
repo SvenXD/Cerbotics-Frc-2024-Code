@@ -8,25 +8,20 @@ import static frc.robot.Constants.Arm.*;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.Util.LoggedDashboardChooser;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.AutoCommands.NoneAuto;
 import frc.robot.Commands.AutoCommands.Test1;
 import frc.robot.Commands.AutoCommands.Test2;
+import frc.robot.Commands.AutoCommands.Test3;
 import frc.robot.Commands.IntakeCommands.Intake;
 import frc.robot.Commands.IntakeCommands.IntakeWSensor;
 import frc.robot.Commands.IntakeCommands.Outake;
@@ -57,8 +52,8 @@ import frc.robot.Subsystems.Vision.AprilTagLocalizer;
 
 public class RobotContainer {
 
-    private final CommandXboxController chassisDriver = new CommandXboxController(0);
-    private final CommandXboxController subsystemsDriver = new CommandXboxController(1);
+  private final CommandXboxController chassisDriver = new CommandXboxController(0);
+  private final CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
   private static LoggedDashboardChooser<AutoCommand> autoChooser;
 
@@ -128,14 +123,17 @@ public class RobotContainer {
     autoChooser.addDefaultOption("None", new NoneAuto());
     autoChooser.addOption("Test1", new Test1());
     autoChooser.addOption("Test2", new Test2());
+    autoChooser.addOption("Test3", new Test3());
 
 
     PathPlannerLogging.setLogActivePathCallback(
       (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));
-  PathPlannerLogging.setLogTargetPoseCallback(
+    PathPlannerLogging.setLogTargetPoseCallback(
       pose -> Logger.recordOutput("Swerve/TargetPathPose", pose));
       
     SmartDashboard.putData("Auto Preview", autoPreviewField);
+
+    SmartDashboard.putString("Current Robot mode", Constants.currentMode.toString());
 
     configureBindings();
   }
@@ -193,6 +191,7 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
+
   }
 
   public ArmSubsystem getArmSubsystem(){
