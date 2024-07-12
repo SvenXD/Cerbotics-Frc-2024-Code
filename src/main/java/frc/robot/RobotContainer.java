@@ -11,6 +11,7 @@ import org.littletonrobotics.junction.Logger;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -156,11 +157,15 @@ public class RobotContainer {
       //Set field centric
     chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
 
-
     chassisDriver.rightBumper()
     .whileTrue(new IntakeWSensor(m_intake)
     .alongWith(m_arm.goToPosition(INTAKING_POSITION)))
     .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE));
+
+    //Control rumbles when game piece is detected
+    chassisDriver.rightBumper()
+    .and(() -> m_intake.getSensor())
+    .onTrue(controllerRumbleCommand().withTimeout(1));
 
     /* Control 2 commands */
     subsystemsDriver.leftBumper()
@@ -188,6 +193,18 @@ public class RobotContainer {
     subsystemsDriver.a()
     .onTrue(m_arm.goToPosition(93));
 
+  }
+
+
+    /** Creates a controller rumble command with specified rumble and controllers */
+  private Command controllerRumbleCommand() {
+    return Commands.startEnd(
+        () -> {
+          chassisDriver.getHID().setRumble(RumbleType.kBothRumble, 1.0);
+        },
+        () -> {
+          chassisDriver.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+        });
   }
 
   public Command getAutonomousCommand() {
