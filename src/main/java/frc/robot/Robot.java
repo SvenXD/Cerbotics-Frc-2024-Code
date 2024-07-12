@@ -23,8 +23,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
-  private String autoVal;
-
   private RobotContainer m_robotContainer;
 
   @Override
@@ -72,13 +70,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-
-
-    autoVal = m_robotContainer.getAutoSelector();
-    SmartDashboard.putString("autoVal", autoVal);
-    AutoConstants.autoValue = autoVal;
-        SmartDashboard.putString("Constant", AutoConstants.autoValue);
-
   }
 
   @Override

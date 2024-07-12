@@ -1,6 +1,7 @@
 package frc.robot.Commands.AutoCommands;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,27 +13,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Test1 extends AutoCommand {
+public class ComplementPath extends AutoCommand {
 
   private final PathPlannerPath startToFirst;
-  private final PathPlannerPath firstToFarShoot;
 
-  public Test1() {
-    startToFirst = PathPlannerPath.fromPathFile("Path1");
-    firstToFarShoot = PathPlannerPath.fromPathFile("Path2");
+  public ComplementPath() {
+    startToFirst = PathPlannerPath.fromChoreoTrajectory("SamirPath");
 
     addCommands(
         Commands.deadline(
             Commands.sequence(
-                AutoBuilder.followPath(startToFirst),
+                new PathPlannerAuto("Starting pose 1"),
                 AutoBuilder.followPath(startToFirst))));
   }
 
   @Override
   public List<Pose2d> getAllPathPoses() {
     return Stream.of(
-            startToFirst.getPathPoses(),
-            firstToFarShoot.getPathPoses()
+            startToFirst.getPathPoses()
     )
         .flatMap(Collection::stream)
         .collect(Collectors.toList());

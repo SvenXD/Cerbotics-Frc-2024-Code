@@ -12,15 +12,15 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.Util.LoggedDashboardChooser;
+import frc.Util.Logging.LoggedDashboardChooser;
 import frc.robot.Commands.AutoCommands.AutoCommand;
+import frc.robot.Commands.AutoCommands.ComplementPath;
 import frc.robot.Commands.AutoCommands.NoneAuto;
-import frc.robot.Commands.AutoCommands.Test1;
+import frc.robot.Commands.AutoCommands.ComplementPath;
 import frc.robot.Commands.AutoCommands.Test2;
 import frc.robot.Commands.AutoCommands.Test3;
 import frc.robot.Commands.IntakeCommands.Intake;
@@ -58,7 +58,6 @@ public class RobotContainer {
   private final CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
   private static LoggedDashboardChooser<AutoCommand> autoChooser;
-  public static SendableChooser<String> autoSelector;
 
   public static Field2d autoPreviewField = new Field2d();
 
@@ -117,7 +116,6 @@ public class RobotContainer {
     }
     /** Visualisation of the current auto selected **/
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
-    autoSelector = new SendableChooser<>();
 
     autoChooser.onChange(
         auto -> {
@@ -125,16 +123,9 @@ public class RobotContainer {
 
     /**Auto options */      
     autoChooser.addDefaultOption("None", new NoneAuto());
-    autoChooser.addOption("Test1", new Test1());
+    autoChooser.addOption("Test1", new ComplementPath());
     autoChooser.addOption("Test2", new Test2());
     autoChooser.addOption("Test3", new Test3(AutoConstants.autoValue));
-
-    autoSelector.setDefaultOption("None", "1");
-    autoSelector.addOption("Center note", "1");
-    autoSelector.addOption("Amp side note", "2");
-    autoSelector.addOption("Stage side note", "3");
-    SmartDashboard.putData("Auto Selector", autoSelector);
-
 
     PathPlannerLogging.setLogActivePathCallback(
       (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));
@@ -144,7 +135,6 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Preview", autoPreviewField);
 
     SmartDashboard.putString("Current Robot mode", Constants.currentMode.toString());
-    SmartDashboard.putString("Test", getAutoSelector());
 
     configureBindings();
   }
@@ -208,9 +198,4 @@ public class RobotContainer {
   public ArmSubsystem getArmSubsystem(){
     return m_arm;
   }
-
-  public String getAutoSelector(){
-    return autoSelector.getSelected();
-  }
-
 }

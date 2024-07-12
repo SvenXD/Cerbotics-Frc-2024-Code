@@ -30,10 +30,6 @@ public class Test3 extends AutoCommand {
 
   }
 
-  public void periodic(){
-    priority = AutoConstants.autoValue;
-  }
-
 
   @Override
   public List<Pose2d> getAllPathPoses() {

@@ -14,7 +14,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
   
 import edu.wpi.first.math.util.Units;
-import frc.Util.LoggedTunableNumber;
+import frc.Util.Logging.LoggedTunableNumber;
 
 public class ShooterIOTalon implements ShooterIO {
 
