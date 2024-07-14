@@ -40,6 +40,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.Util.LocalADStarAK;
+import frc.robot.Constants;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
+
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -313,6 +317,11 @@ public class Drive extends SubsystemBase {
       new Translation2d(-TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0)
     };
   }
+
+  public Command goToPose(Pose2d target_pose) {
+    return AutoBuilder.pathfindToPose(target_pose, AutoConstants.kPathConstraints, 0.0, 1);
+  }
+
       public double getangle() {
         return gyroInputs.pigeonRotation;
     }

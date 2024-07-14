@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.Util.LocalADStarAK;
 import frc.robot.Constants.AutoConstants;
 
 import org.littletonrobotics.junction.LogFileUtil;
@@ -19,6 +21,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.pathplanner.lib.pathfinding.Pathfinding;
+
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
@@ -27,16 +31,16 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {
+
      m_robotContainer = new RobotContainer();
     Logger.recordMetadata("ProjectName", "2024-Beta"); // Set a metadata value
-
+    Pathfinding.setPathfinder(new LocalADStarAK());
     DataLog log = DataLogManager.getLog();
 
       if(Constants.needToLog){
       DataLogManager.start();
       DriverStation.startDataLog(log);
     }
-
 
   switch (Constants.currentMode) {
     case REAL:
@@ -59,17 +63,18 @@ public class Robot extends LoggedRobot {
       break;
   }
 
-
-
-  
   Logger.start();
   Logger.disableDeterministicTimestamps();
   Logger.disableConsoleCapture();
+
+
 }
 
   @Override
   public void robotPeriodic() {
+
     CommandScheduler.getInstance().run();
+
   }
 
   @Override

@@ -6,13 +6,19 @@ package frc.robot;
 
 import static frc.robot.Constants.Arm.*;
 
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.FieldCentric;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -21,7 +27,6 @@ import frc.Util.Logging.LoggedDashboardChooser;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.AutoCommands.ComplementPath;
 import frc.robot.Commands.AutoCommands.NoneAuto;
-import frc.robot.Commands.AutoCommands.ComplementPath;
 import frc.robot.Commands.AutoCommands.Test2;
 import frc.robot.Commands.AutoCommands.Test3;
 import frc.robot.Commands.IntakeCommands.Intake;
@@ -33,6 +38,7 @@ import frc.robot.Commands.ShooterCommands.SpeakerShoot;
 import frc.robot.Commands.ShooterCommands.UnderStageShoot;
 import frc.robot.Commands.SwerveCommands.DriveCommands;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOSparkMax;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
@@ -59,6 +65,8 @@ public class RobotContainer {
   private final CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
   private static LoggedDashboardChooser<AutoCommand> autoChooser;
+  private static LoggedDashboardChooser <Command> alignColor;
+  private String m_colorSelected;
 
   public static Field2d autoPreviewField = new Field2d();
 
@@ -117,6 +125,7 @@ public class RobotContainer {
     }
     /** Visualisation of the current auto selected **/
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
+    alignColor = new LoggedDashboardChooser<>("Color Mode");
 
     autoChooser.onChange(
         auto -> {
@@ -128,6 +137,9 @@ public class RobotContainer {
     autoChooser.addOption("Test2", new Test2());
     autoChooser.addOption("Test3", new Test3(AutoConstants.autoValue));
 
+    alignColor.addDefaultOption("Blue", drive.goToPose(FieldConstants.blueAmpPose));
+    alignColor.addOption("Red", drive.goToPose(FieldConstants.redAmpPose));
+
     PathPlannerLogging.setLogActivePathCallback(
       (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));
     PathPlannerLogging.setLogTargetPoseCallback(
@@ -137,7 +149,9 @@ public class RobotContainer {
 
     SmartDashboard.putString("Current Robot mode", Constants.currentMode.toString());
 
+
     configureBindings();
+
   }
 
   private void configureBindings() {
@@ -156,6 +170,10 @@ public class RobotContainer {
     
       //Set field centric
     chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
+
+  
+      chassisDriver.b().toggleOnTrue(shootAmpTrajectory());
+
 
     chassisDriver.rightBumper()
     .whileTrue(new IntakeWSensor(m_intake)
@@ -205,6 +223,10 @@ public class RobotContainer {
         () -> {
           chassisDriver.getHID().setRumble(RumbleType.kBothRumble, 0.0);
         });
+  }
+
+  public Command shootAmpTrajectory() {
+    return alignColor.get();
   }
 
   public Command getAutonomousCommand() {
