@@ -74,6 +74,8 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
 
     CommandScheduler.getInstance().run();
+    SmartDashboard.putBoolean("IsRedAlliance", isRedAlliance());
+    SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
 
   }
 
@@ -128,7 +130,11 @@ public class Robot extends LoggedRobot {
   public void testExit() {}
 
   @Override
-  public void simulationPeriodic(){
-    
+  public void simulationPeriodic(){}
+
+  public static boolean isRedAlliance() {
+    return DriverStation.getAlliance()
+        .filter(value -> value == DriverStation.Alliance.Red)
+        .isPresent();
   }
 }

@@ -6,19 +6,14 @@ package frc.robot;
 
 import static frc.robot.Constants.Arm.*;
 
-import java.util.function.BooleanSupplier;
-
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.FieldCentric;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -65,8 +60,6 @@ public class RobotContainer {
   private final CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
   private static LoggedDashboardChooser<AutoCommand> autoChooser;
-  private static LoggedDashboardChooser <Command> alignColor;
-  private String m_colorSelected;
 
   public static Field2d autoPreviewField = new Field2d();
 
@@ -125,7 +118,6 @@ public class RobotContainer {
     }
     /** Visualisation of the current auto selected **/
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
-    alignColor = new LoggedDashboardChooser<>("Color Mode");
 
     autoChooser.onChange(
         auto -> {
@@ -137,9 +129,6 @@ public class RobotContainer {
     autoChooser.addOption("Test2", new Test2());
     autoChooser.addOption("Test3", new Test3(AutoConstants.autoValue));
 
-    alignColor.addDefaultOption("Blue", drive.goToPose(FieldConstants.blueAmpPose));
-    alignColor.addOption("Red", drive.goToPose(FieldConstants.redAmpPose));
-
     PathPlannerLogging.setLogActivePathCallback(
       (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));
     PathPlannerLogging.setLogTargetPoseCallback(
@@ -148,7 +137,6 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Preview", autoPreviewField);
 
     SmartDashboard.putString("Current Robot mode", Constants.currentMode.toString());
-
 
     configureBindings();
 
@@ -171,9 +159,7 @@ public class RobotContainer {
       //Set field centric
     chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
 
-  
-      chassisDriver.b().toggleOnTrue(shootAmpTrajectory());
-
+    chassisDriver.b().toggleOnTrue(pathfindAndAlignAmp());
 
     chassisDriver.rightBumper()
     .whileTrue(new IntakeWSensor(m_intake)
@@ -213,8 +199,6 @@ public class RobotContainer {
 
   }
 
-
-    /** Creates a controller rumble command with specified rumble and controllers */
   private Command controllerRumbleCommand() {
     return Commands.startEnd(
         () -> {
@@ -225,9 +209,28 @@ public class RobotContainer {
         });
   }
 
-  public Command shootAmpTrajectory() {
-    return alignColor.get();
-  }
+   public static Command pathfindAndAlignAmp() {
+    return Commands.either(
+            drive.goToPose(
+              FieldConstants.redAmpPose)
+            .until(
+              () ->
+              drive
+                  .getPose()
+                  .getTranslation()
+                  .getDistance(FieldConstants.redAmpPose.getTranslation())
+               <= 0),       //This value controls at what the distance the robot should stop in reference to the amp
+
+            drive.goToPose(FieldConstants.blueAmpPose)
+            .until(
+              () ->
+              drive
+                  .getPose()
+                  .getTranslation()
+                  .getDistance(FieldConstants.blueAmpPose.getTranslation())
+               <= 0),       //This value controls at what the distance the robot should stop in reference to the amp
+            Robot::isRedAlliance);
+          }
 
   public Command getAutonomousCommand() {
     return autoChooser.get();

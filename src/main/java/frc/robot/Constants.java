@@ -8,6 +8,7 @@ import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.util.GeometryUtil;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -90,8 +91,9 @@ public class Constants {
 
       private static Translation2d redAmpCenter =
         new Translation2d(Units.inchesToMeters(582.5), Units.inchesToMeters(322.996 - 5));
-      public static Pose2d blueAmpPose = new Pose2d(blueAmpCenter, Rotation2d.fromDegrees(-90));
-      public static Pose2d redAmpPose = new Pose2d(redAmpCenter, Rotation2d.fromDegrees(90));
+
+      public static Pose2d blueAmpPose = new Pose2d(2.0, 7.62, Rotation2d.fromDegrees(90));
+      public static Pose2d redAmpPose = GeometryUtil.flipFieldPose(new Pose2d(1.8, 7.62, Rotation2d.fromDegrees(90)));
       public static Pose2d pickupPose = new Pose2d(15.331, 1, Rotation2d.fromDegrees(-60));
     }
     public static class ModuleConstants{
