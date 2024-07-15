@@ -6,6 +6,8 @@ package frc.robot;
 
 import static frc.robot.Constants.Arm.*;
 
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.Logging.LoggedDashboardChooser;
 import frc.robot.Commands.AutoCommands.AutoCommand;
@@ -56,7 +59,7 @@ import frc.robot.Subsystems.Vision.AprilTagLocalizer;
 
 public class RobotContainer {
 
-  private final CommandXboxController chassisDriver = new CommandXboxController(0);
+  private final static CommandXboxController chassisDriver = new CommandXboxController(0);
   private final CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
   private static LoggedDashboardChooser<AutoCommand> autoChooser;
@@ -159,7 +162,8 @@ public class RobotContainer {
       //Set field centric
     chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
 
-    chassisDriver.b().toggleOnTrue(pathfindAndAlignAmp());
+    chassisDriver.povUp().toggleOnTrue(pathfindAndAlignAmp());
+    chassisDriver.povLeft().toggleOnTrue(pathfindAndAlignSource());
 
     chassisDriver.rightBumper()
     .whileTrue(new IntakeWSensor(m_intake)
@@ -199,7 +203,7 @@ public class RobotContainer {
 
   }
 
-  private Command controllerRumbleCommand() {
+   private Command controllerRumbleCommand() {
     return Commands.startEnd(
         () -> {
           chassisDriver.getHID().setRumble(RumbleType.kBothRumble, 1.0);
@@ -207,7 +211,7 @@ public class RobotContainer {
         () -> {
           chassisDriver.getHID().setRumble(RumbleType.kBothRumble, 0.0);
         });
-  }
+     }
 
    public static Command pathfindAndAlignAmp() {
     return Commands.either(
@@ -215,23 +219,29 @@ public class RobotContainer {
               FieldConstants.redAmpPose)
             .until(
               () ->
-              drive
-                  .getPose()
-                  .getTranslation()
-                  .getDistance(FieldConstants.redAmpPose.getTranslation())
-               <= 0),       //This value controls at what the distance the robot should stop in reference to the amp
+              Math.abs(chassisDriver.getRawAxis(1)) > 0.1),       //This value controls at what the distance the robot should stop in reference to the amp
 
             drive.goToPose(FieldConstants.blueAmpPose)
             .until(
               () ->
-              drive
-                  .getPose()
-                  .getTranslation()
-                  .getDistance(FieldConstants.blueAmpPose.getTranslation())
-               <= 0),       //This value controls at what the distance the robot should stop in reference to the amp
+            Math.abs(chassisDriver.getRawAxis(1)) > 0.1),       //This value controls at what the distance the robot should stop in reference to the amp
             Robot::isRedAlliance);
           }
 
+   public static Command pathfindAndAlignSource() {
+    return Commands.either(
+            drive.goToPose(
+              FieldConstants.redPickupPose)
+            .until(
+              () ->
+              Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
+            drive.goToPose(FieldConstants.bluePickupPose)
+            .until(
+              () ->
+               Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
+            Robot::isRedAlliance);
+          }               
+          
   public Command getAutonomousCommand() {
     return autoChooser.get();
 

@@ -24,7 +24,7 @@ public interface ArmIO {
    /** Put this in periodic because its improtant*/
    public default void putThisInPeriodicBecauseOtherwiseItWontWorkAndItsReallyImportant(){}
 
-   /** This keeps the stuff needed for the arm to move */
+   /** This keeps the feedfoward needed for the arm to move */
    public default void positionFunction(double position){}
 
    /** Enable brake mode on the intake. */

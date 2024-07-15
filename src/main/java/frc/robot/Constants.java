@@ -86,15 +86,10 @@ public class Constants {
       public static double podiumX = Units.inchesToMeters(126.75);
       public static double startingLineX = Units.inchesToMeters(74.111);
 
-      private static Translation2d blueAmpCenter =
-        new Translation2d(Units.inchesToMeters(72.455), Units.inchesToMeters(322.996 - 5));
-
-      private static Translation2d redAmpCenter =
-        new Translation2d(Units.inchesToMeters(582.5), Units.inchesToMeters(322.996 - 5));
-
       public static Pose2d blueAmpPose = new Pose2d(2.0, 7.62, Rotation2d.fromDegrees(90));
       public static Pose2d redAmpPose = GeometryUtil.flipFieldPose(new Pose2d(1.8, 7.62, Rotation2d.fromDegrees(90)));
-      public static Pose2d pickupPose = new Pose2d(15.331, 1, Rotation2d.fromDegrees(-60));
+      public static Pose2d bluePickupPose = new Pose2d(15.331, 1, Rotation2d.fromDegrees(-60));
+      public static Pose2d redPickupPose = GeometryUtil.flipFieldPose(new Pose2d(15.331,1,Rotation2d.fromDegrees(-60)));
     }
     public static class ModuleConstants{
     /*    

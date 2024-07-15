@@ -27,7 +27,6 @@ public class IntakeIOSparkMax implements IntakeIO{
         intakeMotor.setSmartCurrentLimit(40);
 
         intakeMotor.setInverted(INTAKE_INVERSION);
-        intakeMotor.setCANTimeout(0);
 
         intakeEncoder = intakeMotor.getEncoder();
     }
