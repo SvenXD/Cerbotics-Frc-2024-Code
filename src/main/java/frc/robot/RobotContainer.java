@@ -6,21 +6,17 @@ package frc.robot;
 
 import static frc.robot.Constants.Arm.*;
 
-import java.util.function.BooleanSupplier;
-
 import org.littletonrobotics.junction.Logger;
-
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
-
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.Util.NoteVisualizer;
 import frc.Util.Logging.LoggedDashboardChooser;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.AutoCommands.ComplementPath;
@@ -141,6 +137,9 @@ public class RobotContainer {
 
     SmartDashboard.putString("Current Robot mode", Constants.currentMode.toString());
 
+    // Set up note visualizer
+    NoteVisualizer.setRobotPoseSupplier(drive::getPose);
+
     configureBindings();
 
   }
@@ -177,7 +176,8 @@ public class RobotContainer {
 
     /* Control 2 commands */
     subsystemsDriver.leftBumper()
-    .whileTrue(new AmpShoot(m_shooter,m_intake))
+    .whileTrue(new AmpShoot(m_shooter,m_intake)
+    .alongWith(NoteVisualizer.ampShoot()))
     .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE));
 
     subsystemsDriver.rightBumper()
@@ -185,7 +185,8 @@ public class RobotContainer {
 
     subsystemsDriver.x()
     .whileTrue(new SpeakerShoot(m_shooter)
-    .alongWith(m_arm.goToPosition(SPEAKER_SCORING_POSITION)))
+    .alongWith(m_arm.goToPosition(SPEAKER_SCORING_POSITION))
+    .alongWith(NoteVisualizer.speakerShoot()))
     .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE));
 
     subsystemsDriver.povLeft()
@@ -247,7 +248,11 @@ public class RobotContainer {
 
   }
 
-  public ArmSubsystem getArmSubsystem(){
+  public static ArmSubsystem getArmSubsystem(){
     return m_arm;
+  }
+
+  public static Drive getSwerveSubsystem(){
+    return drive;
   }
 }

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
+import frc.Util.NoteVisualizer;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -76,6 +77,7 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putBoolean("IsRedAlliance", isRedAlliance());
     SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
     SmartDashboard.putNumber("test", chassisDriver.getRawAxis(1));
+    NoteVisualizer.showIntakedNotes();
   }
 
   @Override

@@ -4,8 +4,6 @@ import static frc.robot.Constants.DriveConstants.MaxLinearSpeed;
 import static frc.robot.Constants.DriveConstants.kPhysicalMaxAngularSpeedRadiansPerSecond;
 import static frc.robot.Constants.DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;
 
-import java.util.function.BooleanSupplier;
-
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.GeometryUtil;
@@ -18,7 +16,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
