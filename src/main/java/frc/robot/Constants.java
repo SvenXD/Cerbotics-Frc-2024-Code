@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -83,10 +84,45 @@ public class Constants {
       public static double podiumX = Units.inchesToMeters(126.75);
       public static double startingLineX = Units.inchesToMeters(74.111);
 
+      /* For auto aligning */
       public static Pose2d blueAmpPose = new Pose2d(2.0, 7.62, Rotation2d.fromDegrees(90));
-      public static Pose2d redAmpPose = GeometryUtil.flipFieldPose(new Pose2d(1.8, 7.62, Rotation2d.fromDegrees(90)));
       public static Pose2d bluePickupPose = new Pose2d(15.331, 1, Rotation2d.fromDegrees(-60));
       public static Pose2d redPickupPose = GeometryUtil.flipFieldPose(new Pose2d(15.331,1,Rotation2d.fromDegrees(-60)));
+      public static Pose2d redAmpPose = GeometryUtil.flipFieldPose(new Pose2d(1.8, 7.62, Rotation2d.fromDegrees(90)));
+      
+      /*For note simulation */
+      public static final Translation3d blueSpeaker = new Translation3d(0.225, 5.55, 2.1);
+      public static final Translation3d redSpeaker = new Translation3d(16.317, 5.55, 2.1);
+      public static final Translation3d blueAmp = new Translation3d(1.85, 8.25, 0.8);
+      public static final Translation3d redAmp = new Translation3d(15.333, 8.25, 0.8);
+
+       /** Staging locations for each note */
+      public static final class StagingLocations {
+      public static final double centerlineX = fieldLength / 2.0;
+
+      public static final double centerlineFirstY = Units.inchesToMeters(29.638);
+      public static final double centerlineSeparationY = Units.inchesToMeters(66);
+      public static final double spikeX = Units.inchesToMeters(114);
+    
+      public static final double spikeFirstY = Units.inchesToMeters(161.638);
+      public static final double spikeSeparationY = Units.inchesToMeters(57);
+
+      public static final Translation2d[] centerlineTranslations = new Translation2d[5];
+      public static final Translation2d[] spikeTranslations = new Translation2d[3];
+
+    static {
+      for (int i = 0; i < centerlineTranslations.length; i++) {
+        centerlineTranslations[i] =
+            new Translation2d(centerlineX, centerlineFirstY + (i * centerlineSeparationY));
+      }
+    }
+
+    static {
+      for (int i = 0; i < spikeTranslations.length; i++) {
+        spikeTranslations[i] = new Translation2d(spikeX, spikeFirstY + (i * spikeSeparationY));
+      }
+    }
+  }
     }
     public static class ModuleConstants{
     /*    

@@ -7,6 +7,8 @@ package frc.robot;
 import static frc.robot.Constants.Arm.*;
 
 import org.littletonrobotics.junction.Logger;
+
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -115,6 +117,9 @@ public class RobotContainer {
         break;
         //--------------------------------------------
     }
+
+    NamedCommands.registerCommand("ShootSim", NoteVisualizer.speakerShoot());
+
     /** Visualisation of the current auto selected **/
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
 

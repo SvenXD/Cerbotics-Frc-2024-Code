@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 2.309440738710292,
-        "y": 7.003080254377342
+        "x": 4.827270596053316,
+        "y": 7.29585116802188
       },
       "prevControl": {
-        "x": 1.3725738150477713,
-        "y": 6.651755158003897
+        "x": 2.9418259121824937,
+        "y": 7.729152120215796
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,7 +30,25 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.85,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ShootSim"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,

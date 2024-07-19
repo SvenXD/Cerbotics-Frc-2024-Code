@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
 import frc.Util.NoteVisualizer;
 
@@ -27,7 +26,9 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
-  private final CommandXboxController chassisDriver = new CommandXboxController(0);
+  private double[] xNotes = new double[7];
+  private double[] yNotes = new double[7];
+  private double[] robotCords = new double[2];
 
   @Override
   public void robotInit() {
@@ -75,9 +76,17 @@ public class Robot extends LoggedRobot {
 
     CommandScheduler.getInstance().run();
     SmartDashboard.putBoolean("IsRedAlliance", isRedAlliance());
-    SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
-    SmartDashboard.putNumber("test", chassisDriver.getRawAxis(1));
-    NoteVisualizer.showIntakedNotes();
+
+    NoteVisualizer.showAutoNotes();
+
+    robotCords[0] = RobotContainer.getSwerveSubsystem().getPose().getX();
+    robotCords[1] = RobotContainer.getSwerveSubsystem().getPose().getY();
+
+    SmartDashboard.putNumber("Xnote", xNotes[0]);
+    SmartDashboard.putNumber("Ynote", yNotes[0]);
+    SmartDashboard.putBoolean("HasNoteInSim", NoteVisualizer.hasSimNote());
+
+    SmartDashboard.putNumberArray("Robot Coords", robotCords);
   }
 
   @Override
@@ -94,15 +103,31 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+    NoteVisualizer.resetAutoNotes();
+
+    for(int i = 0; i < 7; i++){
+      xNotes[i] = NoteVisualizer.getAutoNote(i).getX();
+      yNotes[i] = NoteVisualizer.getAutoNote(i).getY();
+    }
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    for(int i = 0; i < 7; i++){
+      if(Math.abs(xNotes[i] - robotCords[0]) < 0.5 && Math.abs(yNotes[i] - robotCords[1]) < 0.5){
+        NoteVisualizer.takeAutoNote(i);
+        NoteVisualizer.showIntakedNotes();
+
+      }
+    }
+
+  }
 
   @Override
   public void autonomousExit() {}
@@ -115,7 +140,9 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+        SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
+  }
 
   @Override
   public void teleopExit() {}
