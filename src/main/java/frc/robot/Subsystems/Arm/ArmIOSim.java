@@ -31,7 +31,7 @@ public class ArmIOSim implements ArmIO{
     private boolean wasNotAuto = false;
 
     public ArmIOSim(){
-      controller = new PIDController(0.0, 0.0, 0.0);
+      controller = new PIDController(0.32, 0.42, 0.0055);
         sim.setState(0.0, 0.0);
         setPosition(0.0);
 
@@ -72,7 +72,7 @@ public class ArmIOSim implements ArmIO{
       controller.reset();
       controllerNeedsReset = false;
     }
-    runVolts(controller.calculate(sim.getAngleRads()) + feedforward);
+    runVolts(controller.calculate(sim.getAngleRads(), output + positionOffset) + feedforward);
   }
 
   @Override
