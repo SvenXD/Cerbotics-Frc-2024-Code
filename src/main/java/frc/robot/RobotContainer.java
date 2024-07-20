@@ -36,6 +36,7 @@ import frc.robot.Commands.SwerveCommands.DriveCommands;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Subsystems.Arm.ArmIO;
+import frc.robot.Subsystems.Arm.ArmIOSim;
 import frc.robot.Subsystems.Arm.ArmIOSparkMax;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
 import frc.robot.Subsystems.Intake.IntakeIO;
@@ -73,7 +74,7 @@ public class RobotContainer {
   public static IntakeSubsystem m_intake = new IntakeSubsystem(intakeIO);
 
   public static ArmIO armIO = new ArmIOSparkMax();
-  public static ArmSubsystem m_arm = new ArmSubsystem(armIO);
+  public static ArmSubsystem m_arm;
 
   public static AprilTagIO visionIO = new AprilTagIOLimelight();        
   public static AprilTagLocalizer m_vision;
@@ -89,7 +90,8 @@ public class RobotContainer {
                 new ModuleIOTalonFX(1),
                 new ModuleIOTalonFX(2),
                 new ModuleIOTalonFX(3));   
-      m_shooter = new ShooterSubsystem(shooterIO);  
+      m_shooter = new ShooterSubsystem(shooterIO); 
+      m_arm = new ArmSubsystem(armIO);
       m_vision = new AprilTagLocalizer(drive, visionIO);  
         break;
         //--------------------------------------------
@@ -103,6 +105,8 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
         m_shooter = new ShooterSubsystem(new ShooterIOSim());
+        m_arm = new ArmSubsystem(new ArmIOSim()); 
+
         break;
         //--------------------------------------------
       default:

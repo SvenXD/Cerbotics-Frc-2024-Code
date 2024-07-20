@@ -4,12 +4,6 @@ import com.revrobotics.CANSparkMax;
 
 import static frc.robot.Constants.Arm.*;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import frc.Util.Logging.LoggedTunableNumber;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
@@ -24,35 +18,6 @@ public class ArmIOSparkMax implements ArmIO{
   private final CANSparkMax rightMotor = new CANSparkMax(RIGHT_ARM_ID, MotorType.kBrushless);
   private final CANcoder m_encoder = new CANcoder(ABSOLUTE_ENCODER_ID, "Swerve_Canivore");
   private final CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
-
-  /* PID Gains */
-
-  LoggedTunableNumber armKg = new LoggedTunableNumber("ArmPID/kG", kG);
-  LoggedTunableNumber armKs = new LoggedTunableNumber("ArmPID/kS", kS);
-  LoggedTunableNumber armKa = new LoggedTunableNumber("ArmPID/kA", kA);
-  LoggedTunableNumber armKv = new LoggedTunableNumber("ArmPID/kV", kV);
-  LoggedTunableNumber armKp = new LoggedTunableNumber("ArmPID/kP", kP);
-  LoggedTunableNumber armKi = new LoggedTunableNumber("ArmPID/kI", kI);
-  LoggedTunableNumber armKd = new LoggedTunableNumber("ArmPID/kD", kD);
-
-    private final TrapezoidProfile.Constraints m_constraints =
-    new TrapezoidProfile.Constraints(
-      kMaxVelocityRadPerSecond,
-      kMaxAccelerationMetersPerSecondSquared);
-
-    private ProfiledPIDController m_controller =
-    new ProfiledPIDController(
-      armKp.get(),
-      armKi.get(),
-      armKd.get(),
-      m_constraints,
-      kPeriod);
-
-    private final ArmFeedforward m_feedforward = new ArmFeedforward(
-      armKs.get(), 
-      armKg.get(), 
-      armKv.get(), 
-      armKa.get());
         
     public ArmIOSparkMax(){
 
@@ -81,20 +46,14 @@ public class ArmIOSparkMax implements ArmIO{
   
   @Override
   public void updateInputs(ArmIoInputs inputs){
-    inputs.leftAppliedVolts = leftMotor.getBusVoltage();
-    inputs.rightAppliedVolts = rightMotor.getBusVoltage();
+    inputs.leftAppliedVolts = leftMotor.getAppliedOutput();
+    inputs.rightAppliedVolts = rightMotor.getAppliedOutput();
     inputs.leftTempCelcius = leftMotor.getMotorTemperature();
     inputs.rightTempCelcius = rightMotor.getMotorTemperature();
 
     inputs.currentAngle = getArmAngle();
-    inputs.setPoint = getController().getGoal().position;
-    inputs.error = Math.abs(getArmAngle()-getController().getGoal().position);
   }
 
-  @Override
-  public void putThisInPeriodicBecauseOtherwiseItWontWorkAndItsReallyImportant(){
-    setVoltage(m_controller.calculate(getArmAngle()),m_controller.getSetpoint());
-  }
 
   @Override
   public void setBrakeMode(){
@@ -107,44 +66,16 @@ public class ArmIOSparkMax implements ArmIO{
     rightMotor.setIdleMode(IdleMode.kCoast);
     leftMotor.setIdleMode(IdleMode.kCoast);
   }
-
-  @Override
-  public void positionFunction(double position){
-    getController().reset(getArmAngle());
-    m_controller.setGoal(position);
-  }
-
-  @Override
-  public void updateTunableNumbers(){
-    if (armKs.hasChanged(0)
-      || armKv.hasChanged(0)
-      || armKp.hasChanged(0)
-      || armKi.hasChanged(0)
-      || armKd.hasChanged(0)
-      || armKa.hasChanged(0)) {
-    
-        m_controller = new ProfiledPIDController(
-        armKp.get(), 
-        armKi.get(), 
-        armKd.get(), 
-        m_constraints);
-    }
-  }
     
   public double getArmAngle() {            
     return (m_encoder.getAbsolutePosition().getValueAsDouble() * 360)  + 50.6;
   }
 
-  public void setVoltage(double output, State setpoint){
-    double feedfoward =  m_feedforward.calculate(setpoint.position, setpoint.velocity);
+  @Override
+  public void setVoltage(double output, double feedfoward){
     rightMotor.setVoltage(output + feedfoward);
     leftMotor.setVoltage(output + feedfoward);
   }
-
-    public ProfiledPIDController getController() {
-    return m_controller;
-  }
-
 }
 
  
