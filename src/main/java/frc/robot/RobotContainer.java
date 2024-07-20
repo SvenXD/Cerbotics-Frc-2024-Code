@@ -58,6 +58,8 @@ import frc.robot.Subsystems.Vision.AprilTagLocalizer;
 
 public class RobotContainer {
 
+  public static SimDefenseBot defenseBot = new SimDefenseBot(2);
+
   private final static CommandXboxController chassisDriver = new CommandXboxController(0);
   private final CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
