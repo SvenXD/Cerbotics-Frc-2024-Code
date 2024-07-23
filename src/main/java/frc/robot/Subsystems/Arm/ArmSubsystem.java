@@ -5,7 +5,6 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -51,6 +50,16 @@ public class ArmSubsystem extends SubsystemBase {
     private final String[] modeNames = {"BRAKE", "COAST"};
     private Boolean enable = false;
 
+    public static enum ArmStates{
+      INTAKING,
+      FEEDING,
+      STANDING,
+      SHOOTING,
+      IDLE
+    }
+
+    private ArmStates systemStates = ArmStates.IDLE;
+
   public ArmSubsystem(ArmIO io) {
     this.io = io;
     io.updateTunableNumbers();
@@ -77,7 +86,8 @@ public class ArmSubsystem extends SubsystemBase {
     updatePID();
 
     Logger.processInputs("Arm", inputs);
- 
+    Logger.recordOutput("Arm/Current State", systemStates.toString());
+
     if(enable){
      io.setVoltage(m_controller.calculate(inputs.currentAngle), 
      m_feedforward.calculate(m_controller.getSetpoint().position, m_controller.getSetpoint().velocity));
@@ -101,16 +111,17 @@ public class ArmSubsystem extends SubsystemBase {
     goalVisualizer.update(getController().getGoal().position);
     Logger.recordOutput("Arm/GoalAngle", getController().getGoal().position);
 
-    measuredVisualizer.update(Units.degreesToRadians(inputs.currentAngle));
+    measuredVisualizer.update(getAngleRadiants());
     setpointVisualizer.update(m_controller.getSetpoint().position);
     Logger.recordOutput("Arm/SetpointAngle", m_controller.getSetpoint().position);
     Logger.recordOutput("Arm/SetpointVelocity", m_controller.getSetpoint().velocity);
   }
 
   
-    public Command goToPosition(double position){
+    public Command goToPosition(double position, ArmStates state){
     Command ejecutable = Commands.runOnce(
                 () -> {
+                systemStates = state;
                 getController().reset(inputs.currentAngle);
                 m_controller.setGoal(position);
                 enable = true;
@@ -137,6 +148,19 @@ public class ArmSubsystem extends SubsystemBase {
         armKd.get(), 
         m_constraints);
     }
-}
+  }
+  
+  public double getAngleRadiants(){
+   return Units.degreesToRadians(inputs.currentAngle);
+  }
+
+  public ArmStates getState(){
+    return systemStates;
+  }
+
+  public ArmStates changeState(ArmStates state){
+    systemStates = state;
+    return systemStates;
+  }
 }
 

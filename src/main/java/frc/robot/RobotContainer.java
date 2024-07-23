@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
 import frc.Util.NoteVisualizer;
@@ -42,6 +41,7 @@ import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOSim;
 import frc.robot.Subsystems.Arm.ArmIOSparkMax;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
+import frc.robot.Subsystems.Arm.ArmSubsystem.ArmStates;
 import frc.robot.Subsystems.Intake.IntakeIO;
 import frc.robot.Subsystems.Intake.IntakeIOSparkMax;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
@@ -64,7 +64,7 @@ public class RobotContainer {
   //nopublic static SimDefenseBot defenseBot = new SimDefenseBot(2);
 
   private final static CommandXboxController chassisDriver = new CommandXboxController(0);
-  private final CommandXboxController subsystemsDriver = new CommandXboxController(1);
+  private final static CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
   private static LoggedDashboardChooser<AutoCommand> autoChooser;
 
@@ -180,31 +180,14 @@ public class RobotContainer {
       //AutoRoutines
     chassisDriver
         .povUp()
-        .toggleOnTrue(pathfindAndAlignAmp()
-        .alongWith(
-          Commands.sequence(
-            Commands.waitUntil(
-              ()->       
-                 drive.getPose()
-                 .getTranslation()
-                 .getDistance(
-                      Robot.isRedAlliance() 
-
-                        ? 
-                          FieldConstants.redAmpPose.getTranslation() 
-                           : 
-                              FieldConstants.blueAmpPose.getTranslation())
-                                  <= 1.5),
-                                            Commands.parallel(
-                                              (m_arm.goToPosition(93).raceWith(new WaitCommand(1.5))), new WaitCommand(1).andThen(new AmpShoot(m_shooter, m_intake).raceWith(new WaitCommand(1.5))))
-                         )));
+        .toggleOnTrue(pathfindAndAlignAmp());
 
     chassisDriver.povLeft().toggleOnTrue(pathfindAndAlignSource());
 
     chassisDriver.rightBumper()
     .whileTrue(new IntakeWSensor(m_intake)
-    .alongWith(m_arm.goToPosition(INTAKING_POSITION)))
-    .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE));
+    .alongWith(m_arm.goToPosition(INTAKING_POSITION, m_arm.changeState(ArmStates.INTAKING))))
+    .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE, m_arm.changeState(ArmStates.IDLE)));
 
     //Control rumbles when game piece is detected
     chassisDriver.rightBumper()
@@ -215,20 +198,20 @@ public class RobotContainer {
     subsystemsDriver.leftBumper()
     .whileTrue(new AmpShoot(m_shooter,m_intake)
     .alongWith(NoteVisualizer.ampShoot()))
-    .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE));
+    .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE, m_arm.changeState(ArmStates.IDLE)));
 
     subsystemsDriver.rightBumper()
-    .whileTrue(new Intake(m_intake));
+    .whileTrue(new Intake(m_intake)
+    .alongWith(NoteVisualizer.speakerShoot().onlyIf(()-> m_arm.getState() == ArmStates.SHOOTING)));
 
     subsystemsDriver.x()
     .whileTrue(new SpeakerShoot(m_shooter)
-    .alongWith(m_arm.goToPosition(SPEAKER_SCORING_POSITION))
-    .alongWith(NoteVisualizer.speakerShoot()))
-    .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE));
+    .alongWith(m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING))))
+    .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE, m_arm.changeState(ArmStates.IDLE)));
 
     subsystemsDriver.povLeft()
     .whileTrue(new UnderStageShoot(m_shooter))
-    .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE));
+    .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE, m_arm.changeState(ArmStates.IDLE)));
 
     subsystemsDriver.povRight()
     .whileTrue(new OverStageShoot(m_shooter));
@@ -237,7 +220,7 @@ public class RobotContainer {
     .whileTrue(new Outake(m_intake, m_shooter));
 
     subsystemsDriver.a()
-    .onTrue(m_arm.goToPosition(90));
+    .onTrue(m_arm.goToPosition(AMP_POSITION, m_arm.changeState(ArmStates.STANDING)));
 
   }
 

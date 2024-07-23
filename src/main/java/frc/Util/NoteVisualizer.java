@@ -43,7 +43,7 @@ public class NoteVisualizer {
       new Transform3d(0.35, 0, 0.8, new Rotation3d(0.0, Units.degreesToRadians(-55.0), 0.0));
   private static final double shotSpeed = 5.0; // Meters per sec
   private static Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
-  private static boolean hasNote = false;
+  private static boolean hasNote = true;
   private static final List<Translation2d> autoNotes = new ArrayList<>();
 
   public static void setRobotPoseSupplier(Supplier<Pose2d> supplier) {
@@ -119,9 +119,9 @@ public class NoteVisualizer {
 
 
   /** Shows the currently held note if there is one */
-  public static void showIntakedNotes() {
+  public static void showIntakedNotes(double test) {
     if (hasNote) {
-      Logger.recordOutput("NoteVisualizer/HeldNotes", new Pose3d[] {getIndexerPose3d()});
+      Logger.recordOutput("NoteVisualizer/HeldNotes", new Pose3d[] {getIndexerPose3d(test)});
     } else {
       Logger.recordOutput("NoteVisualizer/HeldNotes", new Pose3d());
     }
@@ -198,11 +198,13 @@ public class NoteVisualizer {
   }  
 
   /*Position of the note on the robot */
-  private static Pose3d getIndexerPose3d() {
+  private static Pose3d getIndexerPose3d(double angleRads) {
     Transform3d indexerTransform =
         new Transform3d(
-                -0.45, 0.0, -0.35, new Rotation3d(0.0, -0.959931, 0.0))
-            .plus(new Transform3d(3 * 0.35, 0.0, 0.0, new Rotation3d()));
+          0.1605,
+           0.0,
+           0.262, new Rotation3d(0.0, -angleRads, 0.0))
+            .plus(new Transform3d(0.63, 0.0, 0.0, new Rotation3d(0,1.92,0)));
     return new Pose3d(robotPoseSupplier.get()).transformBy(indexerTransform);
   }
 }

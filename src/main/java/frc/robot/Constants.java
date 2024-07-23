@@ -261,6 +261,8 @@ public class Constants {
         public static double INIT_POSITION = 95.0;
         
         public static double IDLE_UNDER_STAGE = 170.0;
+
+        public static double AMP_POSITION = 93.0;
       }
 
 
