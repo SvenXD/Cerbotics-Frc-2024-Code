@@ -1,6 +1,9 @@
 {
   "NTProvider": {
     "types": {
+      "/AdvantageKit/RealOutputs/Arm/Mechanism2d/Goal": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/Arm/Mechanism2d/Measured": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/Arm/Mechanism2d/Setpoint": "Mechanism2d",
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Arm Mode": "String Chooser",
       "/SmartDashboard/Auto Mode": "String Chooser",

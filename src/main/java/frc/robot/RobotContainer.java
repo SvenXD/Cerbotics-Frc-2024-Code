@@ -237,7 +237,7 @@ public class RobotContainer {
     .whileTrue(new Outake(m_intake, m_shooter));
 
     subsystemsDriver.a()
-    .onTrue(m_arm.goToPosition(93));
+    .onTrue(m_arm.goToPosition(90));
 
   }
 
