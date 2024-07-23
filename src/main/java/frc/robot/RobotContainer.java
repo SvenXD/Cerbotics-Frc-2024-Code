@@ -9,6 +9,7 @@ import static frc.robot.Constants.Arm.*;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,7 +18,9 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.Util.LocalADStarAK;
 import frc.Util.NoteVisualizer;
 import frc.Util.Logging.LoggedDashboardChooser;
 import frc.robot.Commands.AutoCommands.AutoCommand;
@@ -58,7 +61,7 @@ import frc.robot.Subsystems.Vision.AprilTagLocalizer;
 
 public class RobotContainer {
 
-  public static SimDefenseBot defenseBot = new SimDefenseBot(2);
+  //nopublic static SimDefenseBot defenseBot = new SimDefenseBot(2);
 
   private final static CommandXboxController chassisDriver = new CommandXboxController(0);
   private final CommandXboxController subsystemsDriver = new CommandXboxController(1);
@@ -148,6 +151,8 @@ public class RobotContainer {
 
     SmartDashboard.putString("Current Robot mode", Constants.currentMode.toString());
 
+    Pathfinding.setPathfinder(new LocalADStarAK());
+
     // Set up note visualizer
     NoteVisualizer.setRobotPoseSupplier(drive::getPose);
 
@@ -172,7 +177,28 @@ public class RobotContainer {
       //Set field centric
     chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
 
-    chassisDriver.povUp().toggleOnTrue(pathfindAndAlignAmp());
+      //AutoRoutines
+    chassisDriver
+        .povUp()
+        .toggleOnTrue(pathfindAndAlignAmp()
+        .alongWith(
+          Commands.sequence(
+            Commands.waitUntil(
+              ()->       
+                 drive.getPose()
+                 .getTranslation()
+                 .getDistance(
+                      Robot.isRedAlliance() 
+
+                        ? 
+                          FieldConstants.redAmpPose.getTranslation() 
+                           : 
+                              FieldConstants.blueAmpPose.getTranslation())
+                                  <= 1.5),
+                                            Commands.parallel(
+                                              (m_arm.goToPosition(93).raceWith(new WaitCommand(1.5))), new WaitCommand(1).andThen(new AmpShoot(m_shooter, m_intake).raceWith(new WaitCommand(1.5))))
+                         )));
+
     chassisDriver.povLeft().toggleOnTrue(pathfindAndAlignSource());
 
     chassisDriver.rightBumper()
@@ -231,12 +257,11 @@ public class RobotContainer {
               FieldConstants.redAmpPose)
             .until(
               () ->
-              Math.abs(chassisDriver.getRawAxis(1)) > 0.1),       //This value controls at what the distance the robot should stop in reference to the amp
-
+              Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
             drive.goToPose(FieldConstants.blueAmpPose)
             .until(
               () ->
-            Math.abs(chassisDriver.getRawAxis(1)) > 0.1),       //This value controls at what the distance the robot should stop in reference to the amp
+            Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
             Robot::isRedAlliance);
           }
 
