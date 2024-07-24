@@ -14,7 +14,7 @@ public class ArmIOSim implements ArmIO{
     private final SingleJointedArmSim sim =
     new SingleJointedArmSim(
         DCMotor.getNEO(2), 
-        80, 
+        120, 
         1.1, 
         0.6, 
         Units.degreesToRadians(90), 

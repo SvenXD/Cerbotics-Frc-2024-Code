@@ -77,7 +77,6 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     SmartDashboard.putBoolean("IsRedAlliance", isRedAlliance());
 
-    NoteVisualizer.showIntakedNotes(RobotContainer.getArmSubsystem().getAngleRadiants());
 
     robotCords[0] = RobotContainer.getSwerveSubsystem().getPose().getX();
     robotCords[1] = RobotContainer.getSwerveSubsystem().getPose().getY();
@@ -87,6 +86,8 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putBoolean("HasNoteInSim", NoteVisualizer.hasSimNote());
 
     SmartDashboard.putNumberArray("Robot Coords", robotCords);
+                  NoteVisualizer.showIntakedNotes(RobotContainer.getArmSubsystem().getAngleRadiants());
+
   }
 
   @Override
@@ -109,6 +110,7 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+    NoteVisualizer.resetAutoNotes();
 
     for(int i = 0; i < 7; i++){
       xNotes[i] = NoteVisualizer.getAutoNote(i).getX();
@@ -118,11 +120,14 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousPeriodic() {
+        NoteVisualizer.showAutoNotes();
+
     for(int i = 0; i < 7; i++){
       if(Math.abs(xNotes[i] - robotCords[0]) < 0.5 && Math.abs(yNotes[i] - robotCords[1]) < 0.5){
-
+        NoteVisualizer.takeAutoNote(i);
 
       }
+
     }
 
   }

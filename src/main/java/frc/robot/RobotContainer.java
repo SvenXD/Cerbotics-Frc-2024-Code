@@ -18,15 +18,17 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
 import frc.Util.NoteVisualizer;
 import frc.Util.Logging.LoggedDashboardChooser;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.AutoCommands.ComplementPath;
+import frc.robot.Commands.AutoCommands.FiveNoteAutoPath;
 import frc.robot.Commands.AutoCommands.NoneAuto;
-import frc.robot.Commands.AutoCommands.Test2;
-import frc.robot.Commands.AutoCommands.Test3;
 import frc.robot.Commands.IntakeCommands.Intake;
 import frc.robot.Commands.IntakeCommands.IntakeWSensor;
 import frc.robot.Commands.IntakeCommands.Outake;
@@ -128,6 +130,14 @@ public class RobotContainer {
     }
 
     NamedCommands.registerCommand("ShootSim", NoteVisualizer.speakerShoot());
+    NamedCommands.registerCommand("Intake", 
+    new ParallelCommandGroup(
+      new IntakeWSensor(m_intake), 
+      m_arm.goToPosition(INTAKING_POSITION, m_arm.changeState(ArmStates.INTAKING))));
+    NamedCommands.registerCommand("Arm160", m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING)));
+    NamedCommands.registerCommand("Arm150", m_arm.goToPosition(150, m_arm.changeState(ArmStates.SHOOTING)));
+    NamedCommands.registerCommand("StarterShoot",new ParallelCommandGroup(
+      new WaitCommand(1.3).andThen(NoteVisualizer.speakerShoot()), m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING))) );
 
     /** Visualisation of the current auto selected **/
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
@@ -138,9 +148,8 @@ public class RobotContainer {
 
     /**Auto options */      
     autoChooser.addDefaultOption("None", new NoneAuto());
-    autoChooser.addOption("Test1", new ComplementPath());
-    autoChooser.addOption("Test2", new Test2());
-    autoChooser.addOption("Test3", new Test3(AutoConstants.autoValue));
+    autoChooser.addOption("Complement auto", new ComplementPath());
+    autoChooser.addOption("Five Note Auto", new FiveNoteAutoPath());
 
     PathPlannerLogging.setLogActivePathCallback(
       (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));

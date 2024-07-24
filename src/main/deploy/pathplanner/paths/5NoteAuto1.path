@@ -1,0 +1,70 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.23,
+        "y": 5.338016060647505
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.4273388562161742,
+        "y": 5.120943318809715
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.4031274310765443,
+        "y": 4.485250397034318
+      },
+      "prevControl": {
+        "x": 2.2057885748603705,
+        "y": 4.5937867679532145
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "5NoteAuto1"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 135.9391909457356,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "5Note",
+  "previewStartingState": {
+    "rotation": 179.7954059875846,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

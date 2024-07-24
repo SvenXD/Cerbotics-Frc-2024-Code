@@ -7,26 +7,26 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants.AutoConstants;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Test3 extends AutoCommand {
+public class FiveNoteAutoPath extends AutoCommand {
 
-  private String priority = "1";
   private final PathPlannerPath startToFirst;
+  private final PathPlannerPath secondToFirst;
 
-  public Test3(String test) {
-    startToFirst = PathPlannerPath.fromPathFile("Main" + test);
+  public FiveNoteAutoPath() {
+    startToFirst = PathPlannerPath.fromPathFile("5NoteAuto1");
+    secondToFirst = PathPlannerPath.fromPathFile("5NoteAuto2");
 
     addCommands(
         Commands.deadline(
             Commands.sequence(
-                new PathPlannerAuto("Starting pose 1"),
-                AutoBuilder.followPath(startToFirst))));
+                new PathPlannerAuto("5NoteAuto")
+    )));
 
   }
 
@@ -34,7 +34,8 @@ public class Test3 extends AutoCommand {
   @Override
   public List<Pose2d> getAllPathPoses() {
     return Stream.of(
-            startToFirst.getPathPoses()
+            startToFirst.getPathPoses(),
+            secondToFirst.getPathPoses()
     )
         .flatMap(Collection::stream)
         .collect(Collectors.toList());

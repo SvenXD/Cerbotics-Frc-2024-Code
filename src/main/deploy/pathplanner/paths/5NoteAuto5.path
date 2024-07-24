@@ -1,0 +1,70 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 7.778401405590257,
+        "y": 7.436381206571257
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.314546837367568,
+        "y": 7.3544053507507865
+      },
+      "isLocked": false,
+      "linkedName": "5NoteAuto4"
+    },
+    {
+      "anchor": {
+        "x": 3.937247018573922,
+        "y": 5.820285763253409
+      },
+      "prevControl": {
+        "x": 4.569632192046123,
+        "y": 6.347273407813577
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Arm150"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 6.096,
+    "maxAcceleration": 6.096,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 178.9190758133392,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "5Note",
+  "previewStartingState": {
+    "rotation": 179.10482628978892,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}
