@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
 import frc.Util.NoteVisualizer;
 import frc.Util.Logging.LoggedDashboardChooser;
+import frc.robot.Commands.ArmCommands.ArmToPose;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.AutoCommands.ComplementPath;
 import frc.robot.Commands.AutoCommands.FiveNoteAutoPath;
@@ -216,7 +217,7 @@ public class RobotContainer {
 
     subsystemsDriver.x()
     .whileTrue(new SpeakerShoot(m_shooter)
-    .alongWith(m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING))))
+    .alongWith(new ArmToPose(m_arm,m_vision)))
     .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE, m_arm.changeState(ArmStates.IDLE)));
 
     subsystemsDriver.povLeft()

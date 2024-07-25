@@ -7,6 +7,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.PhotonUtils;
 import org.photonvision.estimation.TargetModel;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -24,6 +25,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Subsystems.Swerve.Drive;
@@ -137,6 +139,25 @@ public class AprilTagIOSim implements AprilTagIO {
         return visionSim.getDebugField();
     }  
 
+    public double getDistanceToTarget(){
+        return PhotonUtils.calculateDistanceToTargetMeters(
+            0.5,
+            1.32,
+            Math.toRadians(-15),
+            Units.degreesToRadians(antiNull()));
+    }
+
+    public double antiNull(){
+        double val = 1;
+        if(getLatestResult().getBestTarget() == null){
+            val = 1;
+        }
+        else{
+            val =getLatestResult().getBestTarget().getArea();
+        }
+        return val;
+    }
+
     @Override
     public void measurements(Drive m_drive){
         var visionEst = getEstimatedGlobalPose();
@@ -151,15 +172,18 @@ public class AprilTagIOSim implements AprilTagIO {
                             });
     }
 
+
     @Override
     public void ActivateSimParameters(Pose2d robotPoseMeters){
         Logger.recordOutput("Vision/Tags", targetPose);
+        Logger.recordOutput("Vision/Cameras", new Pose3d(0.1,0,0.5,robotToCameraRot));
         visionSim.update(robotPoseMeters);
     }
     
     @Override
     public void updateInputs(AprilTagIOInputs inputs){
       inputs.tV = getLatestResult().hasTargets();  
+      inputs.distanceFromTarget = Math.abs(getDistanceToTarget());
     }
 
 }

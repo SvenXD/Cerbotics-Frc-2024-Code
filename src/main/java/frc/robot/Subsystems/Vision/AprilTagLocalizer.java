@@ -76,5 +76,12 @@ public class AprilTagLocalizer extends SubsystemBase {
     }
 
   */
+  public double getDistance(){
+    return inputs.distanceFromTarget;
+  }
+
+  public boolean hasTargets(){
+    return inputs.tV;
+  }
   
 }

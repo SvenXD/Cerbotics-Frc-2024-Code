@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.Util.Interpolation.InterpolatingDouble;
+import frc.Util.Interpolation.InterpolatingTreeMap;
 import frc.Util.Logging.LoggedTunableNumber;
 
 import static frc.robot.Constants.Arm.*;
@@ -39,7 +41,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   /* Constrains */
     private final TrapezoidProfile.Constraints m_constraints;
-
+    private TrapezoidProfile.State m_tpState = new TrapezoidProfile.State(0.0, 0.0);
     private ProfiledPIDController m_controller;
 
     private final ArmFeedforward m_feedforward;
@@ -60,6 +62,19 @@ public class ArmSubsystem extends SubsystemBase {
 
     private ArmStates systemStates = ArmStates.IDLE;
 
+    
+  static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> 
+    kDistanceToArmAngle = new InterpolatingTreeMap<>();
+
+  static{ //Added offset of 0 degrees
+    kDistanceToArmAngle.put(new InterpolatingDouble(3.156),  new InterpolatingDouble(160.0));
+    kDistanceToArmAngle.put(new InterpolatingDouble(3.121),  new InterpolatingDouble(153.0)); 
+    kDistanceToArmAngle.put(new InterpolatingDouble(3.098),  new InterpolatingDouble(143.5));
+    kDistanceToArmAngle.put(new InterpolatingDouble(3.075),  new InterpolatingDouble(138.0));
+    kDistanceToArmAngle.put(new InterpolatingDouble(3.070),  new InterpolatingDouble(135.0));
+  }
+
+  
   public ArmSubsystem(ArmIO io) {
     this.io = io;
     io.updateTunableNumbers();
@@ -129,6 +144,12 @@ public class ArmSubsystem extends SubsystemBase {
                 this);
     return ejecutable;
   }
+
+  public double getAngleForDistance(double distance){
+    return kDistanceToArmAngle.getInterpolated(
+      new InterpolatingDouble(
+        Math.max(Math.min(distance, 4.35 ), 1.66))).value;
+  }
   
   public ProfiledPIDController getController(){
     return m_controller;
@@ -161,6 +182,15 @@ public class ArmSubsystem extends SubsystemBase {
   public ArmStates changeState(ArmStates state){
     systemStates = state;
     return systemStates;
+  }
+
+  public void updateArmSetpoint(double setpoint){
+    m_tpState.position = Units.degreesToRadians(setpoint);
+    m_controller.setGoal(setpoint);
+  }
+
+  public double getArmAngle(){
+    return inputs.currentAngle;
   }
 }
 
