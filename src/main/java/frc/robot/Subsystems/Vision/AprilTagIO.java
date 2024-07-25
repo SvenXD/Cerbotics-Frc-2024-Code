@@ -3,7 +3,8 @@ package frc.robot.Subsystems.Vision;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Pose2d;
+import frc.robot.Subsystems.Swerve.Drive;
 
 
 public interface AprilTagIO {
@@ -16,12 +17,15 @@ public interface AprilTagIO {
         public boolean tV = false;
 
         public int currentPipeline = 0;
-        public Pose3d test;
     }
 
    /** Updates the set of loggable inputs. */
   public default void updateInputs(AprilTagIOInputs inputs) {}
 
   public default void changeSmartPipeline(){}
+
+  public default void ActivateSimParameters(Pose2d robotPoseMeters){}
+
+  public default void measurements(Drive m_drive){}
 
 }

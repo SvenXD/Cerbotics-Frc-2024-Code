@@ -59,6 +59,7 @@ import frc.robot.Subsystems.Swerve.ModuleIOSim;
 import frc.robot.Subsystems.Swerve.ModuleIOTalonFX;
 import frc.robot.Subsystems.Vision.AprilTagIO;
 import frc.robot.Subsystems.Vision.AprilTagIOLimelight;
+import frc.robot.Subsystems.Vision.AprilTagIOSim;
 import frc.robot.Subsystems.Vision.AprilTagLocalizer;
 
 public class RobotContainer {
@@ -113,7 +114,7 @@ public class RobotContainer {
                 new ModuleIOSim());
         m_shooter = new ShooterSubsystem(new ShooterIOSim());
         m_arm = new ArmSubsystem(new ArmIOSim()); 
-
+      m_vision = new AprilTagLocalizer(drive, new AprilTagIOSim());
         break;
         //--------------------------------------------
       default:

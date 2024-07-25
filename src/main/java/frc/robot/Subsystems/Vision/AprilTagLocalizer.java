@@ -35,12 +35,18 @@ public class AprilTagLocalizer extends SubsystemBase {
 
   @Override
   public void periodic() {
-        updateOdometry();
+        //updateOdometry();
     io.updateInputs(inputs);
     Logger.processInputs("Vision", inputs);
+    io.ActivateSimParameters(drive.getPose());
+    io.measurements(drive);
+  }
+
+  public void updateSimOdometry(){
+
   }
 /** Updates the field relative position of the robot. */
-  public void updateOdometry() {
+  /*public void updateOdometry() {
 
     drive.updatePoseEstimator();
     boolean doRejectUpdate = false;
@@ -69,6 +75,6 @@ public class AprilTagLocalizer extends SubsystemBase {
       }
     }
 
-  
+  */
   
 }

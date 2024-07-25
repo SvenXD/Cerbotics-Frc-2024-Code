@@ -21,7 +21,6 @@ public class AprilTagIOLimelight implements AprilTagIO{
     inputs.tY = getTy();
     inputs.tV = getTv();
     inputs.currentPipeline = currentPipeline;
-    inputs.test = test();
   }
 
     public double getDistanceToTarget(){
