@@ -202,7 +202,7 @@ public class RobotContainer {
 
     //Control rumbles when game piece is detected
     chassisDriver.rightBumper()
-    .and(() -> m_intake.getSensor())
+    .and(() -> NoteVisualizer.hasSimNote())
     .onTrue(controllerRumbleCommand().withTimeout(1));
 
     /* Control 2 commands */

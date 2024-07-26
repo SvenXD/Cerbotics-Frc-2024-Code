@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
 import frc.Util.NoteVisualizer;
+import frc.robot.Subsystems.Arm.ArmSubsystem.ArmStates;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -149,7 +150,13 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
         SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
+    NoteVisualizer.teleopNote();
 
+    if(Math.abs(NoteVisualizer.getSourceNote().getX() - robotCords[0]) < 0.7
+     && Math.abs(NoteVisualizer.getSourceNote().getY() - robotCords[1]) < 0.7
+     && RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING){
+        NoteVisualizer.enableShowNote();
+      }
   }
 
   @Override

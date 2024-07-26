@@ -17,6 +17,7 @@ import frc.robot.Constants.FieldConstants;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -37,6 +38,8 @@ import java.util.stream.Stream;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.util.GeometryUtil;
+
 public class NoteVisualizer {
 
   private static final Transform3d launcherTransform =
@@ -45,6 +48,7 @@ public class NoteVisualizer {
   private static Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
   private static boolean hasNote = true;
   private static final List<Translation2d> autoNotes = new ArrayList<>();
+  private static Pose3d note = new Pose3d(0,0,0, new Rotation3d(0,0,0));
   
 
   public static void setRobotPoseSupplier(Supplier<Pose2d> supplier) {
@@ -69,6 +73,25 @@ public class NoteVisualizer {
                         Units.inchesToMeters(1.0),
                         new Rotation3d()))
             .toArray(Pose3d[]::new));
+  }
+
+  public static void teleopNote(){
+        final boolean isBlue = DriverStation.getAlliance().isPresent()
+        && DriverStation.getAlliance().get().equals(Alliance.Blue);    
+   if(!hasSimNote()){     
+     note = isBlue ?
+    new Pose3d(15.331, 1.0, 0.0254, new Rotation3d(0.0, 0, 0.0)) 
+    : new Pose3d(1,1.02,0.0254, new Rotation3d(0,0,0));
+   }
+   else{
+    note = new Pose3d(0,0,0, new Rotation3d(0,0,0));
+   }
+
+  Logger.recordOutput("NoteVisualizer/TeleopNote", note);
+  }
+
+  public static Pose2d getSourceNote(){
+    return note.toPose2d();
   }
 
   public static void clearAutoNotes() {
@@ -156,8 +179,7 @@ public class NoteVisualizer {
                       startPose.getTranslation().getDistance(endPose.getTranslation()) / shotSpeed;
                   final Timer timer = new Timer();
                   timer.start();
-                                               hasNote = false;
-
+                         hasNote = false;
                   return Commands.run(
                           () -> {
                             Logger.recordOutput(
@@ -192,6 +214,7 @@ public class NoteVisualizer {
                       startPose.getTranslation().getDistance(endPose.getTranslation()) / shotSpeed;
                   final Timer timer = new Timer();
                   timer.start();
+                         hasNote = false;
                   return Commands.run(
                           () -> {
                             Logger.recordOutput(
