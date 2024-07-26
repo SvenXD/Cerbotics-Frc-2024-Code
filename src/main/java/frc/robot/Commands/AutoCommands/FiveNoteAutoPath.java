@@ -17,15 +17,25 @@ public class FiveNoteAutoPath extends AutoCommand {
 
   private final PathPlannerPath startToFirst;
   private final PathPlannerPath secondToFirst;
+  private final PathPlannerPath thirdToFirst;
+  private final PathPlannerPath fourthoFirst;
+  private final PathPlannerPath fifthToFirst;
+  private final PathPlannerPath sixToFirst;
+  private final PathPlannerPath sevenToFirst;
 
   public FiveNoteAutoPath() {
     startToFirst = PathPlannerPath.fromPathFile("5NoteAuto1");
     secondToFirst = PathPlannerPath.fromPathFile("5NoteAuto2");
+    thirdToFirst = PathPlannerPath.fromPathFile("5NoteAuto3");
+    fourthoFirst = PathPlannerPath.fromPathFile("5NoteAuto4");
+    fifthToFirst = PathPlannerPath.fromPathFile("5NoteAuto5");
+    sixToFirst = PathPlannerPath.fromPathFile("5NoteAuto6");
+    sevenToFirst = PathPlannerPath.fromPathFile("5NoteAuto7");
 
     addCommands(
         Commands.deadline(
             Commands.sequence(
-                new PathPlannerAuto("5NoteAuto")
+                new PathPlannerAuto("6NoteAuto")
     )));
 
   }
@@ -35,7 +45,13 @@ public class FiveNoteAutoPath extends AutoCommand {
   public List<Pose2d> getAllPathPoses() {
     return Stream.of(
             startToFirst.getPathPoses(),
-            secondToFirst.getPathPoses()
+            secondToFirst.getPathPoses(),
+            thirdToFirst.getPathPoses(),
+            fourthoFirst.getPathPoses(),
+            fifthToFirst.getPathPoses(),
+            sixToFirst.getPathPoses(),
+            
+            sevenToFirst.getPathPoses()
     )
         .flatMap(Collection::stream)
         .collect(Collectors.toList());

@@ -1,136 +1,67 @@
 {
-    "name": "DeLorean",
-    "sourceUrl": "https://github.com/TeamCerbotics4400/TEAM-4400-FRC-2024-CAD",
-    "rotations": [
-      {
-        "axis": "x",
-        "degrees": 180
-      },
-      {
-        "axis": "z",
-        "degrees": -90
-      }
-    ],
-    "position": [
-      0.0,
-      0.0,
-      0.078
-    ],
-    "cameras": [
-      {
-        "name": "Northstar 0",
-        "rotations": [
-          {
-            "axis": "y",
-            "degrees": -28.125
-          },
-          {
-            "axis": "z",
-            "degrees": -35.0
-          }
-        ],
-        "position": [
-          0.250825,
-          0.24257,
-          0.1715008
-        ],
-        "resolution": [
-          1600,
-          1200
-        ],
-        "fov": 75
-      },
-      {
-        "name": "Northstar 1",
-        "rotations": [
-          {
-            "axis": "y",
-            "degrees": -28.125
-          },
-          {
-            "axis": "z",
-            "degrees": -82.829
-          }
-        ],
-        "position": [
-          -0.263525,
-          -0.2601468,
-          0.1842008
-        ],
-        "resolution": [
-          1600,
-          1200
-        ],
-        "fov": 75
-      },
-      {
-        "name": "Northstar 2",
-        "rotations": [
-          {
-            "axis": "y",
-            "degrees": -28.125
-          },
-          {
-            "axis": "z",
-            "degrees": 82.829
-          }
-        ],
-        "position": [
-          -0.25781,
-          0.24638,
-          0.1461008
-        ],
-        "resolution": [
-          1600,
-          1200
-        ],
-        "fov": 75
-      },
-      {
-        "name": "Northstar 3",
-        "rotations": [
-          {
-            "axis": "y",
-            "degrees": -28.125
-          },
-          {
-            "axis": "z",
-            "degrees": 145.0
-          }
-        ],
-        "position": [
-          -0.2667,
-          -0.23495,
-          0.1588008
-        ],
-        "resolution": [
-          1600,
-          1200
-        ],
-        "fov": 75
-      }
-    ],
-    "components": [
-      {
-        "zeroedRotations": [
-          {
-            "axis": "x",
-            "degrees": 0
-          },
-          {
-            "axis": "z",
-            "degrees": 270
-          },
-          {
-            "axis": "y",
-            "degrees": 0
-          }
-        ],
-        "zeroedPosition": [
-          0.165,
-          0.0,
-          0.180
-        ]
-      }
-    ]
-  }
+  "name": "DeLorean",
+  "sourceUrl": "https://github.com/TeamCerbotics4400/TEAM-4400-FRC-2024-CAD",
+  "rotations": [
+    {
+      "axis": "x",
+      "degrees": 180
+    },
+    {
+      "axis": "z",
+      "degrees": -90
+    }
+  ],
+  "position": [
+    0.0,
+    0.0,
+    0.078
+  ],
+  "cameras": [
+    {
+      "name": "Note Limelight",
+      "rotations": [
+        {
+          "axis": "y",
+          "degrees": 0
+        },
+        {
+          "axis": "z",
+          "degrees": 180.0
+        }
+      ],
+      "position": [
+        -0.17,
+        0,
+        0.2
+      ],
+      "resolution": [
+        1600,
+        1200
+      ],
+      "fov": 75
+    }
+  ],
+  "components": [
+    {
+      "zeroedRotations": [
+        {
+          "axis": "x",
+          "degrees": 0
+        },
+        {
+          "axis": "z",
+          "degrees": 270
+        },
+        {
+          "axis": "y",
+          "degrees": 0
+        }
+      ],
+      "zeroedPosition": [
+        0.165,
+        0.0,
+        0.180
+      ]
+    }
+  ]
+}

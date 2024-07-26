@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
 import frc.Util.NoteVisualizer;
 
@@ -29,6 +30,7 @@ public class Robot extends LoggedRobot {
   private double[] xNotes = new double[7];
   private double[] yNotes = new double[7];
   private double[] robotCords = new double[2];
+  private final static CommandXboxController chassisDriver = new CommandXboxController(0);
 
   @Override
   public void robotInit() {
@@ -86,7 +88,7 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putBoolean("HasNoteInSim", NoteVisualizer.hasSimNote());
 
     SmartDashboard.putNumberArray("Robot Coords", robotCords);
-                  NoteVisualizer.showIntakedNotes(RobotContainer.getArmSubsystem().getAngleRadiants());
+                            NoteVisualizer.showIntakedNotes(RobotContainer.getArmSubsystem().getAngleRadiants());
 
   }
 
@@ -116,6 +118,7 @@ public class Robot extends LoggedRobot {
       xNotes[i] = NoteVisualizer.getAutoNote(i).getX();
       yNotes[i] = NoteVisualizer.getAutoNote(i).getY();
     }
+
   }
 
   @Override
@@ -125,7 +128,7 @@ public class Robot extends LoggedRobot {
     for(int i = 0; i < 7; i++){
       if(Math.abs(xNotes[i] - robotCords[0]) < 0.5 && Math.abs(yNotes[i] - robotCords[1]) < 0.5){
         NoteVisualizer.takeAutoNote(i);
-
+        NoteVisualizer.enableShowNote();
       }
 
     }
@@ -140,11 +143,13 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+     NoteVisualizer.clearAutoNotes();
   }
 
   @Override
   public void teleopPeriodic() {
         SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
+
   }
 
   @Override

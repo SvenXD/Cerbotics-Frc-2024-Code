@@ -31,7 +31,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.1,
-      "rotationDegrees": -141.54638519439396,
+      "rotationDegrees": -159.65,
       "rotateFast": false
     }
   ],
@@ -39,7 +39,7 @@
     {
       "name": "New Constraints Zone",
       "minWaypointRelativePos": 0.0,
-      "maxWaypointRelativePos": 0.3,
+      "maxWaypointRelativePos": 0.15,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 3.0,
@@ -68,7 +68,7 @@
     },
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.3,
+      "waypointRelativePos": 0.15,
       "command": {
         "type": "parallel",
         "data": {
@@ -115,7 +115,7 @@
   "reversed": false,
   "folder": "5Note",
   "previewStartingState": {
-    "rotation": -146.4426591134386,
+    "rotation": -159.65,
     "velocity": 0
   },
   "useDefaultConstraints": false

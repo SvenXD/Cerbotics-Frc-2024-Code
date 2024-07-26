@@ -43,8 +43,9 @@ public class NoteVisualizer {
       new Transform3d(-0.1, 0, 1.0, new Rotation3d(0.0, Units.degreesToRadians(-55.0), 0.0));
   private static final double shotSpeed = 9.0; // Meters per sec
   private static Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
-  private static boolean hasNote = false;
+  private static boolean hasNote = true;
   private static final List<Translation2d> autoNotes = new ArrayList<>();
+  
 
   public static void setRobotPoseSupplier(Supplier<Pose2d> supplier) {
     robotPoseSupplier = supplier;
@@ -86,8 +87,12 @@ public class NoteVisualizer {
     hasNote = true;
   }
 
-  public static void showStupidNote(){
+  public static void enableShowNote(){
     hasNote = true;
+  }
+
+  public static void disableShowNote(){
+    hasNote = false;
   }
 
   public static Boolean hasSimNote(){
@@ -112,6 +117,14 @@ public class NoteVisualizer {
                                             : FieldConstants.StagingLocations.centerlineTranslations[i]);
     }
   }
+
+  public static void sourceNote(){
+        final boolean isRed = DriverStation.getAlliance().isPresent()
+        && DriverStation.getAlliance().get().equals(Alliance.Red);    
+    autoNotes.add(isRed ? new Translation2d(FieldConstants.redPickupPose.getX()
+                                           ,FieldConstants.redPickupPose.getY())
+                          : new Translation2d(FieldConstants.bluePickupPose.getX(), FieldConstants.bluePickupPose.getY()));
+  }
   
   public static Translation2d getAutoNote(int note){
     return autoNotes.get(note);
@@ -119,7 +132,7 @@ public class NoteVisualizer {
 
 
   /** Shows the currently held note if there is one */
-  public static void showIntakedNotes(double angleRads) {
+  public static void  showIntakedNotes(double angleRads) {
     if (hasNote) {
       Logger.recordOutput("NoteVisualizer/HeldNotes", getIndexerPose3d(angleRads));
     } else {

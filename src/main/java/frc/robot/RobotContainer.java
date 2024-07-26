@@ -151,7 +151,7 @@ public class RobotContainer {
     /**Auto options */      
     autoChooser.addDefaultOption("None", new NoneAuto());
     autoChooser.addOption("Complement auto", new ComplementPath());
-    autoChooser.addOption("Five Note Auto", new FiveNoteAutoPath());
+    autoChooser.addOption("Six Note Auto", new FiveNoteAutoPath());
 
     PathPlannerLogging.setLogActivePathCallback(
       (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));
@@ -217,7 +217,7 @@ public class RobotContainer {
 
     subsystemsDriver.x()
     .whileTrue(new SpeakerShoot(m_shooter)
-    .alongWith(new ArmToPose(m_arm,m_vision)))
+    .alongWith(m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING))))
     .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE, m_arm.changeState(ArmStates.IDLE)));
 
     subsystemsDriver.povLeft()
