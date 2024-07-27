@@ -28,10 +28,9 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
-  private double[] xNotes = new double[7];
-  private double[] yNotes = new double[7];
+  private static double[] xNotes = new double[7];
+  private static double[] yNotes = new double[7];
   private double[] robotCords = new double[2];
-  private final static CommandXboxController chassisDriver = new CommandXboxController(0);
 
   @Override
   public void robotInit() {
@@ -80,7 +79,6 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     SmartDashboard.putBoolean("IsRedAlliance", isRedAlliance());
 
-
     robotCords[0] = RobotContainer.getSwerveSubsystem().getPose().getX();
     robotCords[1] = RobotContainer.getSwerveSubsystem().getPose().getY();
 
@@ -89,18 +87,15 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putBoolean("HasNoteInSim", NoteVisualizer.hasSimNote());
 
     SmartDashboard.putNumberArray("Robot Coords", robotCords);
-                            NoteVisualizer.showIntakedNotes(RobotContainer.getArmSubsystem().getAngleRadiants());
+    NoteVisualizer.showIntakedNotes(RobotContainer.getArmSubsystem().getAngleRadiants());
 
   }
 
   @Override
-  public void disabledInit() {
-  }
+  public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() { 
-
-  }
+  public void disabledPeriodic() {}
 
   @Override
   public void disabledExit() {}
@@ -120,20 +115,25 @@ public class Robot extends LoggedRobot {
       yNotes[i] = NoteVisualizer.getAutoNote(i).getY();
     }
 
+    NoteVisualizer.deleteNote(3);
+    deleteCords(3);
+
+
   }
 
   @Override
   public void autonomousPeriodic() {
-        NoteVisualizer.showAutoNotes();
+    NoteVisualizer.showAutoNotes();
 
     for(int i = 0; i < 7; i++){
-      if(Math.abs(xNotes[i] - robotCords[0]) < 0.5 && Math.abs(yNotes[i] - robotCords[1]) < 0.5){
+      if(Math.abs(xNotes[i] - robotCords[0]) < 0.5 &&
+         Math.abs(yNotes[i] - robotCords[1]) < 0.5 &&
+         RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING )
+         {
         NoteVisualizer.takeAutoNote(i);
         NoteVisualizer.enableShowNote();
       }
-
     }
-
   }
 
   @Override
@@ -149,14 +149,16 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
-        SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
-    NoteVisualizer.teleopNote();
 
-    if(Math.abs(NoteVisualizer.getSourceNote().getX() - robotCords[0]) < 0.7
-     && Math.abs(NoteVisualizer.getSourceNote().getY() - robotCords[1]) < 0.7
-     && RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING){
-        NoteVisualizer.enableShowNote();
-      }
+    SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
+
+    NoteVisualizer.teleopNote();
+      if(Math.abs(NoteVisualizer.getSourceNote().getX() - robotCords[0]) < 0.7
+         && Math.abs(NoteVisualizer.getSourceNote().getY() - robotCords[1]) < 0.7
+         && RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING)
+         {
+            NoteVisualizer.enableShowNote();
+         }
   }
 
   @Override
@@ -176,9 +178,15 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic(){}
 
+  
   public static boolean isRedAlliance() {
     return DriverStation.getAlliance()
         .filter(value -> value == DriverStation.Alliance.Red)
         .isPresent();
+  }
+
+  public static void deleteCords(int note){
+    xNotes[note] = 0;
+    yNotes[note] = 0;
   }
 }

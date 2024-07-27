@@ -3,8 +3,9 @@
   "robotLength": 0.635,
   "holonomicMode": true,
   "pathFolders": [
+    "5Note",
     "Main Auto",
-    "5Note"
+    "Test"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.0,

@@ -46,7 +46,7 @@ public class NoteVisualizer {
       new Transform3d(-0.1, 0, 1.0, new Rotation3d(0.0, Units.degreesToRadians(-55.0), 0.0));
   private static final double shotSpeed = 9.0; // Meters per sec
   private static Supplier<Pose2d> robotPoseSupplier = () -> new Pose2d();
-  private static boolean hasNote = true;
+  private static boolean hasNote = false;
   private static final List<Translation2d> autoNotes = new ArrayList<>();
   private static Pose3d note = new Pose3d(0,0,0, new Rotation3d(0,0,0));
   
@@ -108,6 +108,10 @@ public class NoteVisualizer {
   public static void takeAutoNote(int note) {
     autoNotes.set(note, null);
     hasNote = true;
+  }
+
+  public static void deleteNote(int note){
+    autoNotes.set(note, null);
   }
 
   public static void enableShowNote(){

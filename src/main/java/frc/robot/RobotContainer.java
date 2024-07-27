@@ -19,14 +19,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
 import frc.Util.NoteVisualizer;
 import frc.Util.Logging.LoggedDashboardChooser;
-import frc.robot.Commands.ArmCommands.ArmToPose;
 import frc.robot.Commands.AutoCommands.AutoCommand;
+import frc.robot.Commands.AutoCommands.ChangeTest;
 import frc.robot.Commands.AutoCommands.ComplementPath;
 import frc.robot.Commands.AutoCommands.FiveNoteAutoPath;
 import frc.robot.Commands.AutoCommands.NoneAuto;
@@ -38,7 +37,6 @@ import frc.robot.Commands.ShooterCommands.OverStageShoot;
 import frc.robot.Commands.ShooterCommands.SpeakerShoot;
 import frc.robot.Commands.ShooterCommands.UnderStageShoot;
 import frc.robot.Commands.SwerveCommands.DriveCommands;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOSim;
@@ -152,6 +150,7 @@ public class RobotContainer {
     autoChooser.addDefaultOption("None", new NoneAuto());
     autoChooser.addOption("Complement auto", new ComplementPath());
     autoChooser.addOption("Six Note Auto", new FiveNoteAutoPath());
+    autoChooser.addOption("Test Of Change", new ChangeTest(drive));
 
     PathPlannerLogging.setLogActivePathCallback(
       (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));
@@ -202,7 +201,7 @@ public class RobotContainer {
 
     //Control rumbles when game piece is detected
     chassisDriver.rightBumper()
-    .and(() -> NoteVisualizer.hasSimNote())
+    .and(() -> m_intake.getSensor())
     .onTrue(controllerRumbleCommand().withTimeout(1));
 
     /* Control 2 commands */
