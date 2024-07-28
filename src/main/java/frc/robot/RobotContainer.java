@@ -37,6 +37,7 @@ import frc.robot.Commands.ShooterCommands.OverStageShoot;
 import frc.robot.Commands.ShooterCommands.SpeakerShoot;
 import frc.robot.Commands.ShooterCommands.UnderStageShoot;
 import frc.robot.Commands.SwerveCommands.DriveCommands;
+import frc.robot.Commands.SwerveCommands.NoteAlignCommand;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOSim;
@@ -203,6 +204,9 @@ public class RobotContainer {
     chassisDriver.rightBumper()
     .and(() -> m_intake.getSensor())
     .onTrue(controllerRumbleCommand().withTimeout(1));
+
+    chassisDriver.leftBumper()
+    .whileTrue(new NoteAlignCommand(drive));
 
     /* Control 2 commands */
     subsystemsDriver.leftBumper()
