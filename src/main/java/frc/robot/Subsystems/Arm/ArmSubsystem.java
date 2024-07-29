@@ -67,11 +67,12 @@ public class ArmSubsystem extends SubsystemBase {
     kDistanceToArmAngle = new InterpolatingTreeMap<>();
 
   static{ //Added offset of 0 degrees
-    kDistanceToArmAngle.put(new InterpolatingDouble(3.156),  new InterpolatingDouble(160.0));
-    kDistanceToArmAngle.put(new InterpolatingDouble(3.121),  new InterpolatingDouble(153.0)); 
-    kDistanceToArmAngle.put(new InterpolatingDouble(3.098),  new InterpolatingDouble(143.5));
-    kDistanceToArmAngle.put(new InterpolatingDouble(3.075),  new InterpolatingDouble(138.0));
-    kDistanceToArmAngle.put(new InterpolatingDouble(3.070),  new InterpolatingDouble(135.0));
+    kDistanceToArmAngle.put(new InterpolatingDouble(1.66),  new InterpolatingDouble(160.0));
+    kDistanceToArmAngle.put(new InterpolatingDouble(2.05),  new InterpolatingDouble(153.0)); 
+    kDistanceToArmAngle.put(new InterpolatingDouble(2.66),  new InterpolatingDouble(143.5));
+    kDistanceToArmAngle.put(new InterpolatingDouble(3.50),  new InterpolatingDouble(138.0));
+    kDistanceToArmAngle.put(new InterpolatingDouble(4.15),  new InterpolatingDouble(135.0));
+    kDistanceToArmAngle.put(new InterpolatingDouble(4.35),  new InterpolatingDouble(134.0));
   }
 
   

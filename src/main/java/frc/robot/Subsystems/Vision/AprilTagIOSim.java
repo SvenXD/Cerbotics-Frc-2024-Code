@@ -1,5 +1,7 @@
 package frc.robot.Subsystems.Vision;
 
+import static frc.robot.Constants.VisionConstants.kTagLayout;
+
 import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
@@ -14,6 +16,7 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.simulation.VisionTargetSim;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -22,6 +25,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -36,14 +40,16 @@ public class AprilTagIOSim implements AprilTagIO {
   private final VisionSystemSim visionSim = new VisionSystemSim("main");
   private final TargetModel targetModel = new TargetModel(0.5, 0.25);
   private final PhotonCamera camera = new PhotonCamera("cameraName");     //This camera is just for the simulation
-  private final Translation3d robotToCameraTrl = new Translation3d(0.1, 0, 0.5); //Meters
+  private final Translation3d robotToCameraTrl = new Translation3d(0.0, 0, 0.5); //Meters
   private final Rotation3d robotToCameraRot = new Rotation3d(0, Math.toRadians(-15), 0); //Degrees
   private final Transform3d robotToCamera = new Transform3d(robotToCameraTrl, robotToCameraRot);
   private final PhotonCameraSim cameraSim; 
   private final Pose3d targetPose;
   private final VisionTargetSim visionTarget; //Custom April tag
-  private final SimCameraProperties cameraProp; 
+  private final SimCameraProperties cameraProp;
   private double lastEstTimestamp = 0;
+  private double getX = 0;
+  private double getY = 0;
 
   public AprilTagIOSim(){
     cameraProp = new SimCameraProperties();
@@ -63,27 +69,23 @@ public class AprilTagIOSim implements AprilTagIO {
       targetPose = new Pose3d(16, 4, 0.4, new Rotation3d(0, 0, Math.PI));
       visionTarget = new VisionTargetSim(targetPose, targetModel);
 
-      visionSim.addAprilTags(VisionConstants.kTagLayout);
+      visionSim.addAprilTags(kTagLayout);
       visionSim.addCamera(cameraSim, robotToCamera);
 
-            photonEstimator = new PhotonPoseEstimator(
-                VisionConstants.kTagLayout, 
-                PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
-                camera,
-                robotToCamera);
+      photonEstimator = new PhotonPoseEstimator(
+            VisionConstants.kTagLayout, 
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
+            camera,
+            robotToCamera);
+
+      getX = getCameraToTarget(getYaw(), getPitch(), 1.32).getX();
+      getY = getCameraToTarget(getYaw(), getPitch(), 1.32).getY();
 
     }
      public PhotonPipelineResult getLatestResult() {
         return camera.getLatestResult();
     }
 
-    /**
-     * The latest estimated robot pose on the field from vision data. This may be empty. This should
-     * only be called once per loop.
-     *
-     * @return An {@link EstimatedRobotPose} with an estimated pose, estimate timestamp, and targets
-     *     used for estimation.
-     */
     public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
         var visionEst = photonEstimator.update();
         double latestTimestamp = camera.getLatestResult().getTimestampSeconds();
@@ -102,13 +104,6 @@ public class AprilTagIOSim implements AprilTagIO {
         return visionEst;
     }
 
-     /**
-     * The standard deviations of the estimated pose from {@link #getEstimatedGlobalPose()}, for use
-     * with {@link edu.wpi.first.math.estimator.SwerveDrivePoseEstimator SwerveDrivePoseEstimator}.
-     * This should only be used when there are targets visible.
-     *
-     * @param estimatedPose The estimated pose to guess standard deviations for.
-     */
     public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
         
         var estStdDevs = VisionConstants.kSingleTagStdDevs;
@@ -139,23 +134,42 @@ public class AprilTagIOSim implements AprilTagIO {
         return visionSim.getDebugField();
     }  
 
-    public double getDistanceToTarget(){
-        return PhotonUtils.calculateDistanceToTargetMeters(
-            0.5,
-            1.32,
-            Math.toRadians(-15),
-            Units.degreesToRadians(antiNull()));
+     // Private method that returns the distance to the target
+     public Translation2d getCameraToTarget(
+      double yaw, double pitch, double noteHeightMeters) {
+
+    // Define the vector
+    double x = 1.0 * Math.tan(Units.degreesToRadians(yaw));
+    double y = 1.0 * Math.tan(Units.degreesToRadians(pitch));
+    double z = 1.0;
+    double norm = Math.sqrt(x * x + y * y + z * z);
+    x /= norm;
+    y /= norm;
+    z /= norm;
+
+    // Rotate the vector by the camera pitch
+    double xPrime = x;
+    Translation2d yzPrime =
+        new Translation2d(y, z)
+            .rotateBy(new Rotation2d(robotToCamera.getRotation().getY()));
+    double yPrime = yzPrime.getX();
+    double zPrime = yzPrime.getY();
+
+    // Solve for the intersection
+    double angleToGoalRadians = Math.asin(yPrime);
+    double diffHeight = robotToCamera.getZ() - noteHeightMeters;
+    double distance = diffHeight / Math.tan(angleToGoalRadians);
+
+    // Returns the distance to the target (in meters)
+    return new Translation2d(distance, Rotation2d.fromDegrees(yaw));
+  }
+
+    public double getYaw(){
+      return getLatestResult().getBestTarget() == null ? 0 : getLatestResult().getBestTarget().getYaw();
     }
 
-    public double antiNull(){
-        double val = 1;
-        if(getLatestResult().getBestTarget() == null){
-            val = 1;
-        }
-        else{
-            val =getLatestResult().getBestTarget().getArea();
-        }
-        return val;
+    public double getPitch(){
+      return getLatestResult().getBestTarget() == null ? 0 : getLatestResult().getBestTarget().getPitch();
     }
 
     @Override
@@ -176,14 +190,17 @@ public class AprilTagIOSim implements AprilTagIO {
     @Override
     public void ActivateSimParameters(Pose2d robotPoseMeters){
         Logger.recordOutput("Vision/Tags", targetPose);
-        Logger.recordOutput("Vision/Cameras", new Pose3d(0.1,0,0.5,robotToCameraRot));
+        Logger.recordOutput("Vision/Cameras", robotToCamera);
         visionSim.update(robotPoseMeters);
+         getX = getCameraToTarget(getYaw(), getPitch(), 1.32).getX();
+               getY = getCameraToTarget(getYaw(), getPitch(), 1.32).getY();
     }
     
     @Override
     public void updateInputs(AprilTagIOInputs inputs){
       inputs.tV = getLatestResult().hasTargets();  
-      inputs.distanceFromTarget = Math.abs(getDistanceToTarget());
+      inputs.distanceFromTarget = Math.abs(getX);
+      inputs.tY = getY;
     }
 
 }

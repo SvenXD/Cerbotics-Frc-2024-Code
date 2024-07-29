@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.Util.LimelightHelpers;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
+import frc.robot.Subsystems.Arm.ArmSubsystem.ArmStates;
 import frc.robot.Subsystems.Vision.AprilTagLocalizer;
 
 
@@ -25,9 +26,6 @@ public class ArmToPose extends Command {
     addRequirements(m_arm);
   }
 
-  public ArmToPose(ArmSubsystem m_arm2, Object object) {
-    //TODO Auto-generated constructor stub
-}
 
 // Called when the command is initially scheduled.
   @Override
@@ -41,10 +39,12 @@ public class ArmToPose extends Command {
 
         if(m_tag.hasTargets()){
          angle = m_arm.getAngleForDistance(m_tag.getDistance());
+
         }
         else{
             angle = 160;
         }
+        m_arm.changeState(ArmStates.SHOOTING);
      m_arm.updateArmSetpoint(angle);
       } 
       
