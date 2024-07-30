@@ -133,17 +133,7 @@ public class RobotContainer {
         //--------------------------------------------
     }
 
-    NamedCommands.registerCommand("ShootSim", NoteVisualizer.speakerShoot());
-    NamedCommands.registerCommand("Intake", 
-    new ParallelCommandGroup(
-      new IntakeWSensor(m_intake), 
-      m_arm.goToPosition(INTAKING_POSITION, m_arm.changeState(ArmStates.INTAKING))));
-    NamedCommands.registerCommand("Arm160", m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING)));
-    NamedCommands.registerCommand("Arm150", m_arm.goToPosition(150, m_arm.changeState(ArmStates.SHOOTING)));
-    NamedCommands.registerCommand("StarterShoot",new ParallelCommandGroup(
-      new WaitCommand(1.3).andThen(NoteVisualizer.speakerShoot()), m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING))) );
-    NamedCommands.registerCommand("islandddd", new GoToNoteCommand(drive));
-
+    registerNamedCommands();
     /** Visualisation of the current auto selected **/
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
 
@@ -279,7 +269,20 @@ public class RobotContainer {
               () ->
                Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
             Robot::isRedAlliance);
-          }               
+          }    
+          
+  public void registerNamedCommands(){
+    NamedCommands.registerCommand("ShootSim", NoteVisualizer.speakerShoot());
+    NamedCommands.registerCommand("Intake", 
+    new ParallelCommandGroup(
+      new IntakeWSensor(m_intake), 
+       m_arm.goToPosition(INTAKING_POSITION, m_arm.changeState(ArmStates.INTAKING))));
+    NamedCommands.registerCommand("Arm160", m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING)));
+    NamedCommands.registerCommand("Arm150", m_arm.goToPosition(150, m_arm.changeState(ArmStates.SHOOTING)));
+    NamedCommands.registerCommand("StarterShoot",new ParallelCommandGroup(
+      new WaitCommand(1.3).andThen(NoteVisualizer.speakerShoot()), m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING))) );
+    NamedCommands.registerCommand("GetThatNote", new GoToNoteCommand(drive));
+  }        
           
   public Command getAutonomousCommand() {
     return autoChooser.get();

@@ -18,12 +18,12 @@ public class NoteAlignCommand extends Command {
 
   boolean m_isFinished;
 
-  private static final TrapezoidProfile.Constraints OMEGA_CONSTRATINTS = new TrapezoidProfile.Constraints(.1, .1);
+  private static final TrapezoidProfile.Constraints OMEGA_CONSTRATINTS = new TrapezoidProfile.Constraints(6.0, 6.0);
   private final ProfiledPIDController omegaController = new ProfiledPIDController(.01, 0, 0.5, OMEGA_CONSTRATINTS);
   public NoteAlignCommand(Drive m_drive) {
     this.m_drive = m_drive;
 
-    omegaController.setTolerance(5);
+    omegaController.setTolerance(10);
     omegaController.setGoal(0);
     addRequirements(m_drive);
   }
@@ -57,7 +57,7 @@ public class NoteAlignCommand extends Command {
     ChassisSpeeds chassisSpeeds;
 
     chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-    1* (1 - Math.abs(tx) / 32) * .50,
+    6* (1 - Math.abs(tx) / 32) * .50,
     -omegaSpeed,
     omegaSpeed, 
     m_drive.getRotation());
@@ -85,6 +85,6 @@ public class NoteAlignCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return false;
+    return m_isFinished;
   }
 }

@@ -18,9 +18,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "deadline",
           "data": {
-            "name": "islandddd"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "GetThatNote"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
           }
         }
       ]
