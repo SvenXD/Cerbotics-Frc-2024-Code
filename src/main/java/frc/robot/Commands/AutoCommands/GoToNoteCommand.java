@@ -8,7 +8,6 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import frc.robot.Commands.SwerveCommands.NoteAlignCommand;
-import frc.robot.Subsystems.Intake.IntakeSubsystem;
 import frc.robot.Subsystems.Swerve.Drive;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
