@@ -1,4 +1,4 @@
-package frc.robot.Subsystems.Arm;
+package frc.robot.Subsystems.ArmJoint;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -28,12 +28,11 @@ public class ArmVisualizer {
   public void update(double angleRads) {
     // Log Mechanism2d
     arm.setAngle(Rotation2d.fromRadians(angleRads));
-    Logger.recordOutput("Arm/Mechanism2d/" + key, mechanism);
+    Logger.recordOutput("ArmJoint/Mechanism2d/" + key, mechanism);
 
         // Log 3D poses
     Pose3d pivot =
-      new Pose3d(0.1605, 0.0, 0.262, new Rotation3d(0.0, -angleRads, 0.0));
-    Logger.recordOutput("Arm/Mechanism3d/" + key, pivot);
+      new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, -angleRads, 0.0));
+    Logger.recordOutput("ArmJoint/Mechanism3d/" + key, pivot);
     }
   }
-

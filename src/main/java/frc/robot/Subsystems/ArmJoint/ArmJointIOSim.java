@@ -1,26 +1,29 @@
-package frc.robot.Subsystems.Arm;
+package frc.robot.Subsystems.ArmJoint;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
+//import edu.wpi.first.math.system.LinearSystem;  Interesting, check later
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
-public class ArmIOSim implements ArmIO{
+public class ArmJointIOSim implements ArmJointIO{
     private static final double autoStartAngle = 110.0;
 
 
     private final SingleJointedArmSim sim =
-    new SingleJointedArmSim(
-        DCMotor.getNEO(2), 
-        120, 
-        1.1, 
-        0.6, 
-        Units.degreesToRadians(90), 
-        Units.degreesToRadians(185), 
-        false, 
-        Units.degreesToRadians(autoStartAngle));
+      new SingleJointedArmSim(
+        LinearSystemId.createSingleJointedArmSystem(DCMotor.getFalcon500Foc(2),  SingleJointedArmSim.estimateMOI(Units.inchesToMeters(20.0), 12), 3125.0 / 27.0),
+        DCMotor.getFalcon500Foc(2), 
+        3125.0 / 27.0, 
+        Units.inchesToMeters(20.0), 
+        Rotation2d.fromDegrees(13).getRadians(), 
+        Rotation2d.fromDegrees(180).getRadians(), 
+        true, 
+        Rotation2d.fromDegrees(13).getRadians());
 
     private final PIDController controller;
     private double appliedVoltage = 0.0;
@@ -30,7 +33,7 @@ public class ArmIOSim implements ArmIO{
     private boolean closedLoop = true;
     private boolean wasNotAuto = false;
 
-    public ArmIOSim(){
+    public ArmJointIOSim(){
       controller = new PIDController(0.32, 0.42, 0.0055);
         sim.setState(0.0, 0.0);
         setPosition(0.0);
@@ -38,7 +41,7 @@ public class ArmIOSim implements ArmIO{
     }
     
   @Override
-  public void updateInputs(ArmIoInputs inputs) {
+  public void updateInputs(ArmJointIOInputs inputs) {
     if (DriverStation.isDisabled()) {
       controllerNeedsReset = true;
     }

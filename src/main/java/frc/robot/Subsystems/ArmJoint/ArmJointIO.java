@@ -1,13 +1,13 @@
-package frc.robot.Subsystems.Arm;
+package frc.robot.Subsystems.ArmJoint;
 
 import org.littletonrobotics.junction.AutoLog;
 
 /** Gripper subsystem hardware interface. */
-public interface ArmIO {
+public interface ArmJointIO {
 
   /** Contains all of the input data received from hardware. */
   @AutoLog
-  public static class ArmIoInputs {
+  public static class ArmJointIOInputs {
     public double leftAppliedVolts = 0.0;
     public double leftTempCelcius = 0.0;
     public double rightAppliedVolts = 0.0;
@@ -19,7 +19,7 @@ public interface ArmIO {
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(ArmIoInputs inputs) {}
+  public default void updateInputs(ArmJointIOInputs inputs) {}
 
    /** This keeps the feedfoward needed for the arm to move */
    public default void setVoltage(double output, double feedfoward){}
