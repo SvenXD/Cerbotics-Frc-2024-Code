@@ -1,4 +1,4 @@
-package frc.robot.Commands.AutoCommands;
+package frc.robot.Commands.AutoCommands.Paths;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.Util.NoteVisualizer;
+import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Subsystems.Swerve.Drive;
 
 import java.util.Collection;

@@ -26,10 +26,12 @@ import frc.Util.NoteVisualizer;
 import frc.Util.Logging.LoggedDashboardChooser;
 import frc.robot.Commands.ArmCommands.ArmToPose;
 import frc.robot.Commands.AutoCommands.AutoCommand;
-import frc.robot.Commands.AutoCommands.ChangeTest;
-import frc.robot.Commands.AutoCommands.ComplementPath;
-import frc.robot.Commands.AutoCommands.FiveNoteAutoPath;
-import frc.robot.Commands.AutoCommands.NoneAuto;
+import frc.robot.Commands.AutoCommands.GoToNoteCommand;
+import frc.robot.Commands.AutoCommands.Paths.ChangeTest;
+import frc.robot.Commands.AutoCommands.Paths.ComplementPath;
+import frc.robot.Commands.AutoCommands.Paths.FiveNoteAutoPath;
+import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
+import frc.robot.Commands.AutoCommands.Paths.TestAuto;
 import frc.robot.Commands.IntakeCommands.Intake;
 import frc.robot.Commands.IntakeCommands.IntakeWSensor;
 import frc.robot.Commands.IntakeCommands.Outake;
@@ -140,6 +142,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Arm150", m_arm.goToPosition(150, m_arm.changeState(ArmStates.SHOOTING)));
     NamedCommands.registerCommand("StarterShoot",new ParallelCommandGroup(
       new WaitCommand(1.3).andThen(NoteVisualizer.speakerShoot()), m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING))) );
+    NamedCommands.registerCommand("islandddd", new GoToNoteCommand(drive));
 
     /** Visualisation of the current auto selected **/
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
@@ -153,6 +156,7 @@ public class RobotContainer {
     autoChooser.addOption("Complement auto", new ComplementPath());
     autoChooser.addOption("Six Note Auto", new FiveNoteAutoPath());
     autoChooser.addOption("Test Of Change", new ChangeTest(drive));
+    autoChooser.addOption("Test", new TestAuto());
 
     PathPlannerLogging.setLogActivePathCallback(
       (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));
@@ -203,7 +207,7 @@ public class RobotContainer {
 
     //Control rumbles when game piece is detected
     chassisDriver.rightBumper()
-    .and(() -> m_intake.getSensor())
+    .and(() -> NoteVisualizer.hasSimNote())
     .onTrue(controllerRumbleCommand().withTimeout(1));
 
     chassisDriver.leftBumper()

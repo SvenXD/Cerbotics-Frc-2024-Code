@@ -1,7 +1,9 @@
-package frc.robot.Commands.AutoCommands;
+package frc.robot.Commands.AutoCommands.Paths;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Commands.AutoCommands.AutoCommand;
+
 import java.util.Collections;
 import java.util.List;
 

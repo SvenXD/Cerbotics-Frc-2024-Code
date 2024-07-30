@@ -19,6 +19,7 @@ import static frc.robot.Constants.DriveConstants.*;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
@@ -97,6 +98,12 @@ public class Drive extends SubsystemBase {
         () -> kinematics.toChassisSpeeds(getModuleStates()),
         this::runVelocity,
         new HolonomicPathFollowerConfig(
+                  new PIDConstants(
+          DriveConstants.traslationP, 
+          DriveConstants.traslationD), 
+        new PIDConstants(
+            DriveConstants.rotationP, 
+            DriveConstants.rotationD), 
             MAX_LINEAR_SPEED, 
             DRIVE_BASE_RADIUS, 
             new ReplanningConfig()),
@@ -317,8 +324,8 @@ poseEstimator.addVisionMeasurement(visionMeasurement, timestampSeconds, stdDevs)
     return new Translation2d[] {
       new Translation2d(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0),
       new Translation2d(TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0),
-      new Translation2d(-TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0),
-      new Translation2d(-TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0)
+      new Translation2d(-TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0),
+      new Translation2d(-TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0)
     };
   }
 
