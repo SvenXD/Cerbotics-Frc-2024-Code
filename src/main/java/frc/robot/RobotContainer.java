@@ -33,6 +33,9 @@ import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
 import frc.robot.Commands.AutoCommands.Paths.TestAuto;
 import frc.robot.Commands.SwerveCommands.DriveCommands;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Subsystems.ArmExtention.ArmExtentionIO;
+import frc.robot.Subsystems.ArmExtention.ArmExtentionIOSim;
+import frc.robot.Subsystems.ArmExtention.ArmExtentionSubsystem;
 import frc.robot.Subsystems.ArmJoint.ArmJointIO;
 import frc.robot.Subsystems.ArmJoint.ArmJointIOSim;
 import frc.robot.Subsystems.ArmJoint.ArmJointSubsystem;
@@ -58,6 +61,9 @@ public class RobotContainer {
 
   public static ArmJointIO armJointIO = new ArmJointIOSim();
   public static ArmJointSubsystem m_arm = new ArmJointSubsystem(armJointIO);
+
+  public static ArmExtentionIO armExtentionIO = new ArmExtentionIOSim();
+  public static ArmExtentionSubsystem m_extention = new ArmExtentionSubsystem(armExtentionIO);
   
 
   public RobotContainer() {
@@ -161,10 +167,16 @@ public class RobotContainer {
     .onTrue(controllerRumbleCommand().withTimeout(1));
 
     subsystemsDriver.b()
-    .onTrue(m_arm.goToPosition(Rotation2d.fromDegrees(12)));
+    .onTrue(m_arm.goToPosition(13));
 
     subsystemsDriver.a()
-    .onTrue(m_arm.goToPosition(Rotation2d.fromDegrees(50)));
+    .onTrue(m_arm.goToPosition(90));
+
+    subsystemsDriver.povUp()
+    .onTrue(m_extention.goToPosition(100));
+
+    subsystemsDriver.povDown()
+    .onTrue(m_extention.goToPosition(0));
   }
 
    private Command controllerRumbleCommand() {
@@ -212,7 +224,9 @@ public class RobotContainer {
 
   }
 
-
+  public static ArmJointSubsystem getJointSubsystem(){
+    return m_arm;
+  }
 
   public static Drive getSwerveSubsystem(){
     return drive;

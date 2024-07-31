@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static frc.robot.Constants.Arm.*;
 
 public class ArmJointSubsystem extends SubsystemBase {
   private final ArmJointIO io;
@@ -27,7 +28,6 @@ public class ArmJointSubsystem extends SubsystemBase {
   private final ArmVisualizer setpointVisualizer;
   private final ArmVisualizer goalVisualizer;
 
-  /* Constrains */
     private final TrapezoidProfile.Constraints m_constraints;
     private ProfiledPIDController m_controller;
 
@@ -36,9 +36,9 @@ public class ArmJointSubsystem extends SubsystemBase {
     this.io = io;
     this.inputs = new ArmJointIOInputsAutoLogged();
 
-    m_feedforward = new ArmFeedforward(0.81888, 0.047416,10.657, 1.2939);
-    m_constraints = new TrapezoidProfile.Constraints(1.1,2.5);
-    m_controller = new ProfiledPIDController(200,0,0,m_constraints, 0.02);
+    m_feedforward = new ArmFeedforward(kS, kG,kV,kA);
+    m_constraints = new TrapezoidProfile.Constraints(0.0,0.0);
+    m_controller = new ProfiledPIDController(kP,kI,kD,m_constraints,kPeriod);
 
     measuredVisualizer = new ArmVisualizer("Measured", Color.kBlack);
     setpointVisualizer = new ArmVisualizer("Setpoint", Color.kGreen);
@@ -68,11 +68,11 @@ public class ArmJointSubsystem extends SubsystemBase {
 
     }
 
-    public Command goToPosition(Rotation2d angle){
+    public Command goToPosition(double pose){
     Command ejecutable = Commands.runOnce(
                 () -> {
                 getController().reset(inputs.currentAngle);
-                m_controller.setGoal(angle.getDegrees());
+                m_controller.setGoal(pose);
                 enable = true;
                 },
                 this);

@@ -19,11 +19,11 @@ public class ArmJointIOSim implements ArmJointIO{
         LinearSystemId.createSingleJointedArmSystem(DCMotor.getFalcon500Foc(2),  SingleJointedArmSim.estimateMOI(Units.inchesToMeters(20.0), 12), 3125.0 / 27.0),
         DCMotor.getFalcon500Foc(2), 
         3125.0 / 27.0, 
-        Units.inchesToMeters(20.0), 
-        Rotation2d.fromDegrees(13).getRadians(), 
-        Rotation2d.fromDegrees(180).getRadians(), 
-        true, 
-        Rotation2d.fromDegrees(13).getRadians());
+        0.508, 
+        Units.degreesToRadians(13), 
+        Units.degreesToRadians(180), 
+        false, 
+        Units.degreesToRadians(13));
 
     private final PIDController controller;
     private double appliedVoltage = 0.0;
@@ -56,10 +56,6 @@ public class ArmJointIOSim implements ArmJointIO{
     sim.update(0.02);
 
     inputs.currentAngle = Units.radiansToDegrees(sim.getAngleRads()) + positionOffset;
-    inputs.leftAppliedVolts = appliedVoltage;
-    inputs.rightAppliedVolts = appliedVoltage;
-    inputs.leftTempCelcius = 0.0;
-    inputs.rightTempCelcius = 0.0;
 
     // Reset input
     sim.setInputVoltage(0.0);

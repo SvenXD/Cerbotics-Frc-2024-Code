@@ -18,7 +18,7 @@ public class ArmVisualizer {
 
   public ArmVisualizer(String key, Color color){
     this.key = key;
-    mechanism = new Mechanism2d(3.0, 3.0, new Color8Bit(Color.kWhite));
+    mechanism = new Mechanism2d(4.0, 3.0, new Color8Bit(Color.kWhite));
      MechanismRoot2d root = mechanism.getRoot("pivot", 1.68, 0.1);
     arm = new MechanismLigament2d("arm", 0.6, 20.0, 6, new Color8Bit(color));
     root.append(arm);
@@ -28,11 +28,11 @@ public class ArmVisualizer {
   public void update(double angleRads) {
     // Log Mechanism2d
     arm.setAngle(Rotation2d.fromRadians(angleRads));
-    Logger.recordOutput("ArmJoint/Mechanism2d/" + key, mechanism);
+    Logger.recordOutput("Arm/ArmJoint/Mechanism2d/" + key, mechanism);
 
         // Log 3D poses
     Pose3d pivot =
-      new Pose3d(0.0, 0.0, 0.0, new Rotation3d(0.0, -angleRads, 0.0));
-    Logger.recordOutput("ArmJoint/Mechanism3d/" + key, pivot);
+      new Pose3d(-0.2025, 0.0, 0.3125, new Rotation3d(0.0, -angleRads, 0.0));
+    Logger.recordOutput("Arm/ArmJoint/Mechanism3d/" + key, pivot);
     }
   }

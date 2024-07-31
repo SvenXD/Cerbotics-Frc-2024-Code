@@ -172,53 +172,33 @@ public class Constants {
       // Plus = Clockwise
     }
 
-    public static class Shooter{
-        /* IDs */
-
-        public static final int UPPER_SHOOTER_ID = 13;
-        public static final int LOWER_SHOOTER_ID = 14;
-
-        /* SetPoints and Threesholds */
-
-        public static final int SHOOTER_THREESHOLD = 300;
-        
-        public static final int UPPER_SHOOTER_CUSTOM_RPM = 0;
-        public static final int LOWER_SHOOTER_CUSTOM_RPM = 0;
-
-        public static final int UPPER_SHOOTER_AMP_RPM = 2000;
-        public static final int LOWER_SHOOTER_AMP_RPM = 500;
-
-        public static final int UPPER_SHOOTER_FEEDER_OVER_RPM = 4500;
-        public static final int LOWER_SHOOTER_FEEDER_OVER_RPM = 4500;
-
-        public static final int UPPER_SHOOTER_FEEDER_UNDER_RPM = 6000;
-        public static final int LOWER_SHOOTER_FEEDER_UNDER_RPM = 6000;
-
-        public static final int UPPER_SHOOTER_SPEAKER_RPM = 3000;
-        public static final int LOWER_SHOOTER_SPEAKER_RPM = 3000;
-
-        /*Physical Measurements */
-
-        public static InvertedValue UPPER_SHOOTER_INVERSION = InvertedValue.Clockwise_Positive;
-        public static InvertedValue LOWER_SHOOTER_INVERSION = InvertedValue.Clockwise_Positive;
-
-        /* PID */
-
-        public static double
-        ukP = 1.4,     
-        ukI = 0,        
-        ukD = 0.025,    
-        ukS = 0.50189,
-        ukV = 0.0016926,
-        ukA = 0.00059492,    
-        lkP = 1.4,     
-        lkI = 0,        
-        lkD = 0.025,    
-        lkS = 0.50189,
-        lkV = 0.0016926,
-        lkA = 0.00059492;
-
-    }
+    public static final class ArmExtension {
+      public static final int motorID = 18;
+      public static final double metersPerRotation = Units.inchesToMeters(0.5);
+  
+      public static final double kP = 1.5;
+      public static final double kI = 0.0;
+      public static final double kD = 0.0;
+      public static final double kV = 0.11515;
+      public static final double kA = 0.0017514;
+      public static final double kS = 0.3794;
+  
+      public static final double mmMaxVel = 1.25 / metersPerRotation;
+      public static final double mmMaxAccel = 50.0 / metersPerRotation;
+  
+      public static final double forwardLimit = 0.42;
+      public static final double reverseLimit = 0.0;
+  
+      public static final double currentLimit = 60.0;
+  
+      public static final double ampPositionExtension = 0.3;
+      public static final double trapPositionExtension = 0.38; // 0.38 at pitt
+      public static final double chutePositionExtension = 0.15;
+      public static final double preclimbPositionExtension = 0.35;
+      public static final double intakePositionExtension = 0.04;
+      public static final double shootPositionExtension = 0.0;
+      public static final double highShotExtension = 0.35;
+    } 
 
       public static class Intake{
        /*ID */
