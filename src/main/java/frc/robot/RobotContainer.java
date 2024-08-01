@@ -4,23 +4,17 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.Arm.*;
-
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
 import frc.Util.NoteVisualizer;
@@ -33,12 +27,9 @@ import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
 import frc.robot.Commands.AutoCommands.Paths.TestAuto;
 import frc.robot.Commands.SwerveCommands.DriveCommands;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.Subsystems.ArmExtention.ArmExtentionIO;
-import frc.robot.Subsystems.ArmExtention.ArmExtentionIOSim;
-import frc.robot.Subsystems.ArmExtention.ArmExtentionSubsystem;
-import frc.robot.Subsystems.ArmJoint.ArmJointIO;
-import frc.robot.Subsystems.ArmJoint.ArmJointIOSim;
-import frc.robot.Subsystems.ArmJoint.ArmJointSubsystem;
+import frc.robot.Subsystems.Intake.IntakeIO;
+import frc.robot.Subsystems.Intake.IntakeSimIO;
+import frc.robot.Subsystems.Intake.IntakeSubsystem;
 import frc.robot.Subsystems.Swerve.Drive;
 import frc.robot.Subsystems.Swerve.GyroIO;
 import frc.robot.Subsystems.Swerve.GyroIOPigeon2;
@@ -59,12 +50,8 @@ public class RobotContainer {
 
   public static Drive drive;
 
-  public static ArmJointIO armJointIO = new ArmJointIOSim();
-  public static ArmJointSubsystem m_arm = new ArmJointSubsystem(armJointIO);
-
-  public static ArmExtentionIO armExtentionIO = new ArmExtentionIOSim();
-  public static ArmExtentionSubsystem m_extention = new ArmExtentionSubsystem(armExtentionIO);
-  
+    public static IntakeIO intakeIO = new IntakeSimIO();
+  public static IntakeSubsystem m_intake = new IntakeSubsystem(intakeIO);
 
   public RobotContainer() {
   /** Options for the current mode of the robot */
@@ -154,29 +141,10 @@ public class RobotContainer {
       //Set field centric
     chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
 
-      //AutoRoutines
-    chassisDriver
-        .povUp()
-        .toggleOnTrue(pathfindAndAlignAmp());
+    chassisDriver.leftBumper().onTrue(m_intake.goToPosition(90));
 
-    chassisDriver.povLeft().toggleOnTrue(pathfindAndAlignSource());
+    chassisDriver.a().onTrue(m_intake.goToPosition(150));
 
-    //Control rumbles when game piece is detected
-    chassisDriver.rightBumper()
-    .and(() -> NoteVisualizer.hasSimNote())
-    .onTrue(controllerRumbleCommand().withTimeout(1));
-
-    subsystemsDriver.b()
-    .onTrue(m_arm.goToPosition(13));
-
-    subsystemsDriver.a()
-    .onTrue(m_arm.goToPosition(90));
-
-    subsystemsDriver.povUp()
-    .onTrue(m_extention.goToPosition(100));
-
-    subsystemsDriver.povDown()
-    .onTrue(m_extention.goToPosition(0));
   }
 
    private Command controllerRumbleCommand() {
@@ -223,11 +191,7 @@ public class RobotContainer {
     return autoChooser.get();
 
   }
-
-  public static ArmJointSubsystem getJointSubsystem(){
-    return m_arm;
-  }
-
+  
   public static Drive getSwerveSubsystem(){
     return drive;
   }
