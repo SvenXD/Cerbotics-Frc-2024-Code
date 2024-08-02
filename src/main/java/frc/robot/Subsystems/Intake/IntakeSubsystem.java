@@ -142,6 +142,10 @@ public class IntakeSubsystem extends SubsystemBase {
         m_constraints);
     }
   }
+
+  public double getAngleDegrees(){
+    return inputs.positionDegrees;
+  }
   
 
 

@@ -27,6 +27,9 @@ import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
 import frc.robot.Commands.AutoCommands.Paths.TestAuto;
 import frc.robot.Commands.SwerveCommands.DriveCommands;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Subsystems.Elevator.ElevatorIO;
+import frc.robot.Subsystems.Elevator.ElevatorIOSim;
+import frc.robot.Subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.Subsystems.Intake.IntakeIO;
 import frc.robot.Subsystems.Intake.IntakeSimIO;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
@@ -52,6 +55,9 @@ public class RobotContainer {
 
     public static IntakeIO intakeIO = new IntakeSimIO();
   public static IntakeSubsystem m_intake = new IntakeSubsystem(intakeIO);
+
+  public static ElevatorIO elevatorIO = new ElevatorIOSim();
+  public static ElevatorSubsystem m_elevator = new ElevatorSubsystem(elevatorIO);
 
   public RobotContainer() {
   /** Options for the current mode of the robot */
@@ -143,6 +149,9 @@ public class RobotContainer {
 
     chassisDriver.leftBumper().whileTrue(m_intake.goToPosition(0)).whileFalse(m_intake.goToPosition(90));
 
+    chassisDriver.y().onTrue(m_elevator.goToPosition(100));
+
+    chassisDriver.a().onTrue(m_elevator.goToPosition(0));
   }
 
    private Command controllerRumbleCommand() {
@@ -192,5 +201,9 @@ public class RobotContainer {
   
   public static Drive getSwerveSubsystem(){
     return drive;
+  }
+
+  public static IntakeSubsystem getIntake(){
+    return m_intake;
   }
 }
