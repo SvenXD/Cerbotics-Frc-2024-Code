@@ -221,9 +221,9 @@ public class Constants {
         public static final double ARM_GEARBOX = 320.0 / 1.0;
     
         /* PID */
-        public static double kP = 0.32,
-                             kI = 0.42,
-                             kD = 0.0055,
+        public static double kP = 0.5,
+                             kI = 0.0,
+                             kD = 0.02,
                              kFF = 0.0,
                              kMaxVelocityRadPerSecond = 1000,
                              kMaxAccelerationMetersPerSecondSquared = 1000,

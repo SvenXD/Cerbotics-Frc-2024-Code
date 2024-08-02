@@ -1,25 +1,29 @@
 package frc.robot.Subsystems.Intake;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class IntakeSimIO implements IntakeIO{
-    private static final double autoStartAngle = 110.0;
+    private static final double autoStartAngle = 90.0;
 
 
     private final SingleJointedArmSim sim =
     new SingleJointedArmSim(
         DCMotor.getNEO(2), 
-        120, 
+        18, 
         1.1, 
         0.6, 
-        Units.degreesToRadians(90), 
-        Units.degreesToRadians(185), 
+        Units.degreesToRadians(0), 
+        Units.degreesToRadians(93), 
         false, 
         Units.degreesToRadians(autoStartAngle));
 
@@ -32,7 +36,7 @@ public class IntakeSimIO implements IntakeIO{
     private boolean wasNotAuto = false;
 
     public IntakeSimIO(){
-      controller = new PIDController(0.32, 0.42, 0.0055);
+      controller = new PIDController(0.5, 0.0, 0.1);
         sim.setState(0.0, 0.0);
         setPosition(0.0);
 
@@ -40,6 +44,7 @@ public class IntakeSimIO implements IntakeIO{
     
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
+    visualizer();
     if (DriverStation.isDisabled()) {
       controllerNeedsReset = true;
     }
@@ -54,7 +59,7 @@ public class IntakeSimIO implements IntakeIO{
     sim.update(0.02);
 
     inputs.positionDegrees = Units.radiansToDegrees(sim.getAngleRads()) + positionOffset;
-
+    inputs.intakeCurrentAmps = appliedVoltage;
 
     // Reset input
     sim.setInputVoltage(0.0);
@@ -70,7 +75,7 @@ public class IntakeSimIO implements IntakeIO{
       controller.reset();
       controllerNeedsReset = false;
     }
-    runVolts(controller.calculate(sim.getAngleRads(), output + positionOffset) + feedforward);
+    runVolts(controller.calculate(sim.getAngleRads(), output - positionOffset) + feedforward);
   }
 
   public void runVolts(double volts) {
@@ -79,9 +84,13 @@ public class IntakeSimIO implements IntakeIO{
     sim.setInputVoltage(volts);
   }
 
-
-
     private void setPosition(double position) {
         positionOffset = position - sim.getAngleRads();
       }    
+
+   public void visualizer(){
+    Pose3d pivot = new Pose3d(-0.32,-0.3,0.12, new Rotation3d(0, sim.getAngleRads(),0));
+    Logger.recordOutput("Intake/Mechanism3d/", pivot);
+
+   }   
 }

@@ -141,9 +141,7 @@ public class RobotContainer {
       //Set field centric
     chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
 
-    chassisDriver.leftBumper().onTrue(m_intake.goToPosition(90));
-
-    chassisDriver.a().onTrue(m_intake.goToPosition(150));
+    chassisDriver.leftBumper().whileTrue(m_intake.goToPosition(0)).whileFalse(m_intake.goToPosition(90));
 
   }
 
