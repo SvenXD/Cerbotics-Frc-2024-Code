@@ -7,10 +7,10 @@ package frc.robot;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
 import frc.Util.NoteVisualizer;
 import frc.robot.Subsystems.Arm.ArmSubsystem.ArmStates;
@@ -31,6 +31,8 @@ public class Robot extends LoggedRobot {
   private static double[] xNotes = new double[7];
   private static double[] yNotes = new double[7];
   private double[] robotCords = new double[2];
+  private static Timer timer = new Timer();
+  private static boolean shouldReset = false;
 
   @Override
   public void robotInit() {
@@ -152,17 +154,14 @@ public class Robot extends LoggedRobot {
 
     SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
 
-    NoteVisualizer.teleopNote();
-      if(Math.abs(NoteVisualizer.getSourceNote().getX() - robotCords[0]) < 0.7
-         && Math.abs(NoteVisualizer.getSourceNote().getY() - robotCords[1]) < 0.7
-         && RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING)
-         {
-            NoteVisualizer.enableShowNote();
-         }
+  
   }
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+    timer.stop();
+    timer.reset();
+  }
 
   @Override
   public void testInit() {
@@ -176,7 +175,23 @@ public class Robot extends LoggedRobot {
   public void testExit() {}
 
   @Override
-  public void simulationPeriodic(){}
+  public void simulationPeriodic(){
+    NoteVisualizer.teleopNote();
+      if(Math.abs(NoteVisualizer.getSourceNote().getX() - robotCords[0]) < 0.7
+         && Math.abs(NoteVisualizer.getSourceNote().getY() - robotCords[1]) < 0.7
+         && RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING)
+         {
+            NoteVisualizer.enableShowNote();
+         }
+
+    if(RobotContainer.getArmSubsystem().getState() == ArmStates.SHOOTING){
+      shouldReset = true;
+     oiaefio();
+    }     
+    if(shouldReset){
+      oiaefio();
+    }
+  }
 
   
   public static boolean isRedAlliance() {
@@ -188,5 +203,16 @@ public class Robot extends LoggedRobot {
   public static void deleteCords(int note){
     xNotes[note] = 0;
     yNotes[note] = 0;
+  }
+
+  public static void oiaefio(){
+    timer.start();
+    NoteVisualizer.enableAccurateNotes(2.79253, timer.get()*8);
+
+    if(NoteVisualizer.getZ() > 2.2){
+      timer.stop();
+      timer.reset();
+      shouldReset = false;
+    }
   }
 }

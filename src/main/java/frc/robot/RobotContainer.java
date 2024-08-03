@@ -215,7 +215,7 @@ public class RobotContainer {
 
     subsystemsDriver.x()
     .whileTrue(new SpeakerShoot(m_shooter)
-    .alongWith(new ArmToPose(m_arm, m_vision)))
+    .alongWith(m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING))))
     .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE, m_arm.changeState(ArmStates.IDLE)));
 
     subsystemsDriver.povLeft()

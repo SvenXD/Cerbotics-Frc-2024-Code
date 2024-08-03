@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -49,6 +50,7 @@ public class NoteVisualizer {
   private static boolean hasNote = false;
   private static final List<Translation2d> autoNotes = new ArrayList<>();
   private static Pose3d note = new Pose3d(0,0,0, new Rotation3d(0,0,0));
+  private static double getZ = 0.0;
   
 
   public static void setRobotPoseSupplier(Supplier<Pose2d> supplier) {
@@ -247,4 +249,24 @@ public class NoteVisualizer {
            .plus(new Transform3d(0.63, 0.0, 0.0, new Rotation3d(0,1.92,0)));
     return new Pose3d(robotPoseSupplier.get()).transformBy(indexerTransform);
   }
+
+    public static void enableAccurateNotes(double angleRads, double extention) {
+    Pose3d pivot =
+      new Pose3d(-0.2, 0.0,0.31
+       , new Rotation3d(0.0, -angleRads + 0.226893, 0.0));
+       
+    Logger.recordOutput("NoteVisualizer/MoreAccurateNotes", getArmDistalPose(pivot,extention));
+
+    getZ = getArmDistalPose(pivot, extention).getZ();
+    }
+
+   public static  Pose3d getArmDistalPose(Pose3d armProximalPose, double armExtensionLength) {
+    return armProximalPose.transformBy(
+        new Transform3d(new Translation3d(armExtensionLength, 0.0, 0.0), new Rotation3d()));
+  }
+
+  public static double getZ(){
+    return getZ;
+  }
+
 }
