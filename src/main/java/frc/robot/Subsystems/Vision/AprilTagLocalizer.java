@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Util.LimelightHelpers;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Subsystems.Swerve.Drive;
+import frc.robot.Subsystems.Vision.AprilTagLocalizationIO.AprilTagLocalizationInputs;
 
 import static frc.robot.Constants.VisionConstants.*;
 
@@ -18,14 +19,14 @@ import org.littletonrobotics.junction.Logger;
 public class AprilTagLocalizer extends SubsystemBase {
 
     /*Io and inputs */
-  private final AprilTagIO io;
-  private final AprilTagIOInputsAutoLogged inputs = new AprilTagIOInputsAutoLogged();
+  private final AprilTagLocalizationIO io;
+  private final AprilTagLocalizationInputs inputs = new AprilTagLocalizationInputs();
 
   Field2d m_field = new Field2d();
 
   private final Drive drive;
 
-  public AprilTagLocalizer(Drive drive ,AprilTagIO io) {
+  public AprilTagLocalizer(Drive drive ,AprilTagLocalizationIO io) {
     this.io = io;
     this.drive = drive;
           
@@ -38,8 +39,9 @@ public class AprilTagLocalizer extends SubsystemBase {
         //updateOdometry();
     io.updateInputs(inputs);
     Logger.processInputs("Vision", inputs);
-    io.ActivateSimParameters(drive.getPose());
-    io.measurements(drive);
+    io.updateInputs(inputs);
+
+    
   }
 
   public void updateSimOdometry(){
@@ -77,11 +79,11 @@ public class AprilTagLocalizer extends SubsystemBase {
 
   */
   public double getDistance(){
-    return inputs.distanceFromTarget;
+    return 0;
   }
 
   public boolean hasTargets(){
-    return inputs.tV;
+    return false;
   }
   
 }

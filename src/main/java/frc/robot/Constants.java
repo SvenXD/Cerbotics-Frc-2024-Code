@@ -276,6 +276,8 @@ public class Constants {
                                 medium_Pipeline = 2,
                                 lower_Pipeline = 3;
 
+        public static final double ambiguityThreshold = 0.15;                        
+
         public static final String photonCam1 = "Placeholder0";
         public static final String photonCam2 = "Placeholder1";
         public static final String photonCam3 = "Placeholder2";

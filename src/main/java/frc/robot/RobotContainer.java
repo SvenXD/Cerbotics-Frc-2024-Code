@@ -60,10 +60,10 @@ import frc.robot.Subsystems.Swerve.GyroIOPigeon2;
 import frc.robot.Subsystems.Swerve.ModuleIO;
 import frc.robot.Subsystems.Swerve.ModuleIOSim;
 import frc.robot.Subsystems.Swerve.ModuleIOTalonFX;
-import frc.robot.Subsystems.Vision.AprilTagIO;
-import frc.robot.Subsystems.Vision.AprilTagIOLimelight;
-import frc.robot.Subsystems.Vision.AprilTagIOSim;
+import frc.robot.Subsystems.Vision.AprilTagLocalizationIO;
+import frc.robot.Subsystems.Vision.AprilTagLocalizationIOSim;
 import frc.robot.Subsystems.Vision.AprilTagLocalizer;
+
 
 public class RobotContainer {
 
@@ -87,8 +87,9 @@ public class RobotContainer {
   public static ArmIO armIO = new ArmIOSparkMax();
   public static ArmSubsystem m_arm;
 
-  public static AprilTagIO visionIO = new AprilTagIOLimelight();        
-  public static AprilTagLocalizer m_vision;
+  public static AprilTagLocalizationIO tagIO = new AprilTagLocalizationIOSim();
+  public static AprilTagLocalizer m_localizer = new AprilTagLocalizer(drive, tagIO);
+
 
   public RobotContainer() {
   /** Options for the current mode of the robot */
@@ -103,7 +104,6 @@ public class RobotContainer {
                 new ModuleIOTalonFX(3));   
       m_shooter = new ShooterSubsystem(shooterIO); 
       m_arm = new ArmSubsystem(armIO);
-      m_vision = new AprilTagLocalizer(drive, visionIO);  
         break;
         //--------------------------------------------
       case SIM:
@@ -117,7 +117,6 @@ public class RobotContainer {
                 new ModuleIOSim());
         m_shooter = new ShooterSubsystem(new ShooterIOSim());
         m_arm = new ArmSubsystem(new ArmIOSim()); 
-      m_vision = new AprilTagLocalizer(drive, new AprilTagIOSim());
         break;
         //--------------------------------------------
       default:
