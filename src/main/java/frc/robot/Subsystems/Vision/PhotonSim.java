@@ -50,8 +50,7 @@ public class PhotonSim extends SubsystemBase{
   private final VisionTargetSim visionTarget; //Custom April tag
   private final SimCameraProperties cameraProp;
   private double lastEstTimestamp = 0;
-  private double getX = 0;
-  private double getY = 0;
+
   private Drive m_drive;
 
   public PhotonSim(Drive m_drive, int index){
@@ -98,19 +97,13 @@ public class PhotonSim extends SubsystemBase{
 
       photonEstimator = new PhotonPoseEstimator(
             VisionConstants.kTagLayout, 
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
+            PoseStrategy.AVERAGE_BEST_TARGETS, 
             camera,
             robotToCamera);
-
-      getX = getCameraToTarget(getYaw(), getPitch(), 1.32).getX();
-      getY = getCameraToTarget(getYaw(), getPitch(), 1.32).getY();
-
     }
 
     @Override
     public void periodic(){
-
-      ActivateSimParameters(m_drive.getPose());
 
     }
      public PhotonPipelineResult getLatestResult() {
@@ -217,12 +210,12 @@ public class PhotonSim extends SubsystemBase{
     }
 
 
-    public void ActivateSimParameters(Pose2d robotPoseMeters){
+    public void ActivateSimParameters(Pose2d robotPoseMeters, int index){
         Logger.recordOutput("Vision/Tags", targetPose);
         Logger.recordOutput("Vision/Cameras", robotToCamera);
+                       Logger.recordOutput("Vision/Estimated" + index, visionSim.getRobotPose());
+
         visionSim.update(robotPoseMeters);
-         getX = getCameraToTarget(getYaw(), getPitch(), 1.32).getX();
-               getY = getCameraToTarget(getYaw(), getPitch(), 1.32).getY();
     }
 
 }

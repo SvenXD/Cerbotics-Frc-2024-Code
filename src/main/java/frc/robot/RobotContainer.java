@@ -126,7 +126,7 @@ public class RobotContainer {
         backLeftCamera = new PhotonSim(drive, 2);
         backRightCamera = new PhotonSim(drive, 3);
 
-        aprilTagVision = new PhotonAprilTagVision(frontLeftCamera,frontRightCamera,backLeftCamera,backRightCamera);
+        aprilTagVision = new PhotonAprilTagVision(drive,frontLeftCamera,frontRightCamera,backLeftCamera,backRightCamera);
         break;
         //--------------------------------------------
       default:
