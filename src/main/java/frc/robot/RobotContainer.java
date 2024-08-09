@@ -60,9 +60,9 @@ import frc.robot.Subsystems.Swerve.GyroIOPigeon2;
 import frc.robot.Subsystems.Swerve.ModuleIO;
 import frc.robot.Subsystems.Swerve.ModuleIOSim;
 import frc.robot.Subsystems.Swerve.ModuleIOTalonFX;
-import frc.robot.Subsystems.Vision.AprilTagLocalizationIO;
-import frc.robot.Subsystems.Vision.AprilTagLocalizationIOSim;
-import frc.robot.Subsystems.Vision.AprilTagLocalizer;
+import frc.robot.Subsystems.Vision.PhotonAprilTagVision;
+import frc.robot.Subsystems.Vision.PhotonSim;
+
 
 
 public class RobotContainer {
@@ -87,8 +87,12 @@ public class RobotContainer {
   public static ArmIO armIO = new ArmIOSparkMax();
   public static ArmSubsystem m_arm;
 
-  public static AprilTagLocalizationIO tagIO = new AprilTagLocalizationIOSim();
-  public static AprilTagLocalizer m_localizer = new AprilTagLocalizer(drive, tagIO);
+  public static PhotonSim frontLeftCamera ;
+  public static PhotonSim frontRightCamera;
+  public static PhotonSim backLeftCamera;
+  public static PhotonSim backRightCamera;
+
+  public static  PhotonAprilTagVision aprilTagVision;
 
 
   public RobotContainer() {
@@ -117,6 +121,12 @@ public class RobotContainer {
                 new ModuleIOSim());
         m_shooter = new ShooterSubsystem(new ShooterIOSim());
         m_arm = new ArmSubsystem(new ArmIOSim()); 
+        frontLeftCamera   = new PhotonSim(drive,0); 
+        frontRightCamera   = new PhotonSim(drive,1); 
+        backLeftCamera = new PhotonSim(drive, 2);
+        backRightCamera = new PhotonSim(drive, 3);
+
+        aprilTagVision = new PhotonAprilTagVision(frontLeftCamera,frontRightCamera,backLeftCamera,backRightCamera);
         break;
         //--------------------------------------------
       default:
@@ -131,6 +141,7 @@ public class RobotContainer {
         break;
         //--------------------------------------------
     }
+
 
     registerNamedCommands();
     /** Visualisation of the current auto selected **/

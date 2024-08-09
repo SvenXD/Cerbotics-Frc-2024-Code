@@ -1,8 +1,8 @@
 package frc.robot.Subsystems.Vision;
 
+import static edu.wpi.first.units.Units.Micro;
 import static frc.robot.Constants.VisionConstants.kTagLayout;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
@@ -19,6 +19,8 @@ import org.photonvision.simulation.VisionTargetSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import com.fasterxml.jackson.databind.util.ByteBufferBackedInputStream;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,21 +33,18 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Subsystems.Swerve.Drive;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 
-public class AprilTagLocalizationIOSim implements AprilTagLocalizationIO {
+public class PhotonSim extends SubsystemBase{
   private final PhotonPoseEstimator photonEstimator;
   private final VisionSystemSim visionSim = new VisionSystemSim("main");
   private final TargetModel targetModel = new TargetModel(0.5, 0.25);
   private final PhotonCamera camera = new PhotonCamera("cameraName");     //This camera is just for the simulation
-  private final Translation3d robotToCameraTrl = new Translation3d(0.0, 0, 0.5); //Meters
-  private final Rotation3d robotToCameraRot = new Rotation3d(0, Math.toRadians(-15), 0); //Degrees
-  private final Transform3d robotToCamera = new Transform3d(robotToCameraTrl, robotToCameraRot);
+  private final Transform3d robotToCamera;
   private final PhotonCameraSim cameraSim; 
   private final Pose3d targetPose;
   private final VisionTargetSim visionTarget; //Custom April tag
@@ -53,8 +52,30 @@ public class AprilTagLocalizationIOSim implements AprilTagLocalizationIO {
   private double lastEstTimestamp = 0;
   private double getX = 0;
   private double getY = 0;
+  private Drive m_drive;
 
-  public AprilTagLocalizationIOSim(){
+  public PhotonSim(Drive m_drive, int index){
+    this.m_drive = m_drive;
+    switch(index){
+      case 0:
+      robotToCamera = VisionConstants.kRobotToCam1;
+      break;
+      
+      case 1:
+      robotToCamera = VisionConstants.kRobotToCam2;
+      break;
+
+      case 2:
+      robotToCamera = VisionConstants.kRobotToCam3;
+      break;
+
+      case 3:
+      robotToCamera = VisionConstants.kRobotToCam4;
+      break;
+
+      default:
+      throw new IllegalArgumentException("Invalid index");
+    }
     cameraProp = new SimCameraProperties();
 
     cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(100));
@@ -77,12 +98,19 @@ public class AprilTagLocalizationIOSim implements AprilTagLocalizationIO {
 
       photonEstimator = new PhotonPoseEstimator(
             VisionConstants.kTagLayout, 
-            PoseStrategy.AVERAGE_BEST_TARGETS, 
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
             camera,
             robotToCamera);
 
       getX = getCameraToTarget(getYaw(), getPitch(), 1.32).getX();
       getY = getCameraToTarget(getYaw(), getPitch(), 1.32).getY();
+
+    }
+
+    @Override
+    public void periodic(){
+
+      ActivateSimParameters(m_drive.getPose());
 
     }
      public PhotonPipelineResult getLatestResult() {
@@ -107,6 +135,30 @@ public class AprilTagLocalizationIOSim implements AprilTagLocalizationIO {
         return visionEst;
     }
 
+    public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
+        
+        var estStdDevs = VisionConstants.kSingleTagStdDevs;
+        var targets = getLatestResult().getTargets();
+        int numTags = 0;
+        double avgDist = 0;
+        for (var tgt : targets) {
+            var tagPose = photonEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+            if (tagPose.isEmpty()) continue;
+            numTags++;
+            avgDist +=
+                    tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
+        }
+        if (numTags == 0) return estStdDevs;
+        avgDist /= numTags;
+        // Decrease std devs if multiple targets are visible
+        if (numTags > 1) estStdDevs = VisionConstants.kMultiTagStdDevs;
+        // Increase std devs based on (average) distance
+        if (numTags == 1 && avgDist > 4)
+            estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+
+        return estStdDevs;
+    }
 
     public Field2d getSimDebugField() {
         if (!Robot.isSimulation()) return null;
@@ -150,46 +202,27 @@ public class AprilTagLocalizationIOSim implements AprilTagLocalizationIO {
     public double getPitch(){
       return getLatestResult().getBestTarget() == null ? 0 : getLatestResult().getBestTarget().getPitch();
     }
-    
-    @Override
-    public void updateInputs(AprilTagLocalizationInputs inputs){
-      inputs.estimates = new ArrayList<>();
-    visionSim.update(RobotContainer.getSwerveSubsystem().getPose());
 
-    Optional<EstimatedRobotPose> estimatedRobotPose = photonEstimator.update();
-    estimatedRobotPose.ifPresent(
-        estimate -> {
-          int[] tagIDs = new int[estimate.targetsUsed.size()];
-          double avgDistance = 0.0;
-          int numTags = 0;
+    public void measurements(Drive m_drive){
+        var visionEst = getEstimatedGlobalPose();
+        visionEst.ifPresent(
+                est -> {
+                    var estPose = est.estimatedPose.toPose2d();
+                    // Change our trust in the measurement based on the tags we can see
+                    var estStdDevs = getEstimationStdDevs(estPose);
 
-          Pose3d robotPose = estimate.estimatedPose;
-
-          for (int i = 0; i < estimate.targetsUsed.size(); i++) {
-            tagIDs[i] = estimate.targetsUsed.get(i).getFiducialId();
-
-            Optional<Pose3d> tagPose = VisionConstants.kTagLayout.getTagPose(tagIDs[i]);
-
-            if (tagPose.isPresent()) {
-              numTags++;
-              avgDistance += tagPose.get().getTranslation().getDistance(robotPose.getTranslation());
-            }
-          }
-
-          avgDistance /= numTags;
-
-          inputs.estimates.add(
-              new AprilTagPoseEstimate(
-                  robotPose, 0.0, avgDistance, null, 0.0, 0.0, estimate.timestampSeconds, tagIDs));
-        });
-
-    inputs.fps = 50;
-    inputs.lastFPSTimestamp = Timer.getFPGATimestamp();
+                    m_drive.addVisionMeasurement(
+                            est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+                            });
     }
 
-    @Override
-    public String getCameraName() {
-      return camera.getName();
+
+    public void ActivateSimParameters(Pose2d robotPoseMeters){
+        Logger.recordOutput("Vision/Tags", targetPose);
+        Logger.recordOutput("Vision/Cameras", robotToCamera);
+        visionSim.update(robotPoseMeters);
+         getX = getCameraToTarget(getYaw(), getPitch(), 1.32).getX();
+               getY = getCameraToTarget(getYaw(), getPitch(), 1.32).getY();
     }
 
 }

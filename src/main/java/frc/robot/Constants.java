@@ -288,43 +288,43 @@ public class Constants {
         public static final Transform3d kRobotToCam1 =
                 new Transform3d(
                 new Translation3d(
-                  0.5, 
-                  0.0, 
-                  0.5), 
-                  new Rotation3d(
-                    0, 
-                    0, 
-                    0));
+            Units.inchesToMeters(6.67),
+            Units.inchesToMeters(12.74),
+            Units.inchesToMeters(25.1)),
+            new Rotation3d(
+                Units.degreesToRadians(180.0),
+                Units.degreesToRadians(-25.0),
+                Units.degreesToRadians(15.0)));
         public static final Transform3d kRobotToCam2 =
                 new Transform3d(
                 new Translation3d(
-                  0.5, 
-                  0.0, 
-                  0.5), 
+                  Units.inchesToMeters(6.67),
+                  Units.inchesToMeters(-12.74),
+                  Units.inchesToMeters(25.1)),
                   new Rotation3d(
-                    0, 
-                    0, 
-                    0));
+                      Units.degreesToRadians(180.0),
+                      Units.degreesToRadians(-25.0),
+                      Units.degreesToRadians(-15.0)));
         public static final Transform3d kRobotToCam3 =
                 new Transform3d(
                 new Translation3d(
-                  0.5, 
-                  0.0, 
-                  0.5), 
+                  Units.inchesToMeters(1.33),
+                  Units.inchesToMeters(12.74),
+                  Units.inchesToMeters(25.1)),
                   new Rotation3d(
-                    0, 
-                    0, 
-                    0));
+                      Units.degreesToRadians(180.0),
+                      Units.degreesToRadians(-25.0),
+                      Units.degreesToRadians(165.0)));
         public static final Transform3d kRobotToCam4 =
                 new Transform3d(
                 new Translation3d(
-                  0.5, 
-                  0.0, 
-                  0.5), 
+                  Units.inchesToMeters(1.33),
+                  Units.inchesToMeters(-12.74),
+                  Units.inchesToMeters(25.1)),
                   new Rotation3d(
-                    0, 
-                    0, 
-                    0));
+                      Units.degreesToRadians(180.0),
+                      Units.degreesToRadians(-25.0),
+                      Units.degreesToRadians(-165.0)));
         // (Fake values. Experiment and determine estimation noise on an actual robot.)
         public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(1000, 1000,1000);
         public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(1000, 1000,1000);            

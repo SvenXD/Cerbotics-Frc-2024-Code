@@ -9,19 +9,16 @@ import frc.Util.LimelightHelpers;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
 import frc.robot.Subsystems.Arm.ArmSubsystem.ArmStates;
-import frc.robot.Subsystems.Vision.AprilTagLocalizer;
 
 
 public class ArmToPose extends Command {
   /** Creates a new ArmToPose. */
   ArmSubsystem m_arm;
-  AprilTagLocalizer m_tag;
   double angle = 0.0;
 
-  public ArmToPose(ArmSubsystem m_arm, AprilTagLocalizer m_tag) {
+  public ArmToPose(ArmSubsystem m_arm) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.m_arm = m_arm;
-    this.m_tag = m_tag;
 
     addRequirements(m_arm);
   }
@@ -37,15 +34,7 @@ public class ArmToPose extends Command {
   @Override
   public void execute() {
 
-        if(m_tag.hasTargets()){
-         angle = m_arm.getAngleForDistance(m_tag.getDistance());
-
-        }
-        else{
-            angle = 160;
-        }
-        m_arm.changeState(ArmStates.SHOOTING);
-     m_arm.updateArmSetpoint(angle);
+     m_arm.updateArmSetpoint(0);
       } 
       
   // Called once the command ends or is interrupted.
