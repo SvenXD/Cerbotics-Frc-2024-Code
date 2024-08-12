@@ -326,8 +326,8 @@ public class Constants {
                       Units.degreesToRadians(-25.0),
                       Units.degreesToRadians(-165.0)));
         // (Fake values. Experiment and determine estimation noise on an actual robot.)
-        public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(1000, 1000,1000);
-        public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(1000, 1000,1000);            
+        public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(1500, 1500,1400);
+        public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(1000, 1000,1400);            
       }
 
   

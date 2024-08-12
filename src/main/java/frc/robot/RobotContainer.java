@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
 import frc.Util.NoteVisualizer;
 import frc.Util.Logging.LoggedDashboardChooser;
-import frc.robot.Commands.ArmCommands.ArmToPose;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.AutoCommands.GoToNoteCommand;
 import frc.robot.Commands.AutoCommands.Paths.ChangeTest;
@@ -121,10 +120,10 @@ public class RobotContainer {
                 new ModuleIOSim());
         m_shooter = new ShooterSubsystem(new ShooterIOSim());
         m_arm = new ArmSubsystem(new ArmIOSim()); 
-        frontLeftCamera   = new PhotonSim(drive,0); 
-        frontRightCamera   = new PhotonSim(drive,1); 
-        backLeftCamera = new PhotonSim(drive, 2);
-        backRightCamera = new PhotonSim(drive, 3);
+        frontLeftCamera   = new PhotonSim(0); 
+        frontRightCamera   = new PhotonSim(1); 
+        backLeftCamera = new PhotonSim(2);
+        backRightCamera = new PhotonSim(3);
 
         aprilTagVision = new PhotonAprilTagVision(drive,frontLeftCamera,frontRightCamera,backLeftCamera,backRightCamera);
         break;

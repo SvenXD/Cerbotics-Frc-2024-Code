@@ -7,17 +7,8 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonPipelineResult;
 
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Subsystems.Swerve.Drive;
 
@@ -54,12 +45,8 @@ public class PhotonAprilTagVision extends SubsystemBase {
               });
               
   
-        Logger.recordOutput("Photon/Tags Used " + instanceIndex, tagPose3ds.size());
-
+        Logger.recordOutput("Vision/Tags Used " + instanceIndex, tagPose3ds.size());
+        Logger.recordOutput("Vision/Has tags detected" + instanceIndex, cameras[instanceIndex].hasTargets());
     }
-  }
-
-    public void setDynamicVisionStdDevs(){
-  
   }
 }

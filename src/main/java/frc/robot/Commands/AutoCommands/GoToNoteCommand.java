@@ -4,8 +4,6 @@
 
 package frc.robot.Commands.AutoCommands;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import frc.robot.Commands.SwerveCommands.NoteAlignCommand;
 import frc.robot.Subsystems.Swerve.Drive;

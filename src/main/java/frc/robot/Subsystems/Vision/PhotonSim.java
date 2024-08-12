@@ -1,6 +1,5 @@
 package frc.robot.Subsystems.Vision;
 
-import static edu.wpi.first.units.Units.Micro;
 import static frc.robot.Constants.VisionConstants.kTagLayout;
 
 import java.util.Optional;
@@ -10,17 +9,12 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.PhotonUtils;
 import org.photonvision.estimation.TargetModel;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.simulation.VisionTargetSim;
 import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
-
-import com.fasterxml.jackson.databind.util.ByteBufferBackedInputStream;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -29,7 +23,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -51,10 +44,8 @@ public class PhotonSim extends SubsystemBase{
   private final SimCameraProperties cameraProp;
   private double lastEstTimestamp = 0;
 
-  private Drive m_drive;
 
-  public PhotonSim(Drive m_drive, int index){
-    this.m_drive = m_drive;
+  public PhotonSim(int index){
     switch(index){
       case 0:
       robotToCamera = VisionConstants.kRobotToCam1;
@@ -97,7 +88,7 @@ public class PhotonSim extends SubsystemBase{
 
       photonEstimator = new PhotonPoseEstimator(
             VisionConstants.kTagLayout, 
-            PoseStrategy.AVERAGE_BEST_TARGETS, 
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
             camera,
             robotToCamera);
     }
@@ -122,6 +113,8 @@ public class PhotonSim extends SubsystemBase{
                                     .setPose(est.estimatedPose.toPose2d()),
                     () -> {
                         if (newResult) getSimDebugField().getObject("VisionEstimation").setPoses();
+                        Logger.recordOutput("Vision/RealEstimation", getSimDebugField().getObject("VisionEstimation").getPose());
+
                     });
         }
         if (newResult) lastEstTimestamp = latestTimestamp;
@@ -209,13 +202,16 @@ public class PhotonSim extends SubsystemBase{
                             });
     }
 
-
     public void ActivateSimParameters(Pose2d robotPoseMeters, int index){
         Logger.recordOutput("Vision/Tags", targetPose);
         Logger.recordOutput("Vision/Cameras", robotToCamera);
                        Logger.recordOutput("Vision/Estimated" + index, visionSim.getRobotPose());
 
         visionSim.update(robotPoseMeters);
+    }
+
+    public boolean hasTargets(){
+      return getLatestResult().hasTargets();
     }
 
 }
