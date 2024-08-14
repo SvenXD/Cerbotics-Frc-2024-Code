@@ -14,6 +14,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -120,8 +121,8 @@ public class RobotContainer {
                 new ModuleIOSim());
         m_shooter = new ShooterSubsystem(new ShooterIOSim());
         m_arm = new ArmSubsystem(new ArmIOSim()); 
-        frontLeftCamera   = new PhotonSim(0); 
-        frontRightCamera   = new PhotonSim(1); 
+        frontLeftCamera = new PhotonSim(0); 
+        frontRightCamera = new PhotonSim(1); 
         backLeftCamera = new PhotonSim(2);
         backRightCamera = new PhotonSim(3);
 
@@ -137,6 +138,15 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        m_shooter = new ShooterSubsystem(new ShooterIO() {});
+        m_arm = new ArmSubsystem(new ArmIO(){});
+        frontLeftCamera = new PhotonSim(0); 
+        frontRightCamera = new PhotonSim(2); 
+        backLeftCamera = new PhotonSim(3);
+        backRightCamera = new PhotonSim(1);
+
+        aprilTagVision = new PhotonAprilTagVision(drive,frontLeftCamera);
+
         break;
         //--------------------------------------------
     }
@@ -295,7 +305,6 @@ public class RobotContainer {
           
   public Command getAutonomousCommand() {
     return autoChooser.get();
-
   }
 
   public static ArmSubsystem getArmSubsystem(){

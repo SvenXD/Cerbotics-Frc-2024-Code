@@ -23,7 +23,7 @@ public class ShooterIOSim implements ShooterIO{
 
     sim.update(0.02);
 
-    inputs.upperShooterPosRad = 0.0;
+    inputs.upperShooterPosRad = sim.getAngularVelocityRPM();
     inputs.upperShooterVelocityRpm = sim.getAngularVelocityRadPerSec();
     inputs.upperShooterAppliedVolts = appliedVolts;
     inputs.shooterCurrentAmps = new double[] {sim.getCurrentDrawAmps()};

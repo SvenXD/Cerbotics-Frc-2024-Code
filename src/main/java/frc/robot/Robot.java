@@ -36,9 +36,30 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {
-
      m_robotContainer = new RobotContainer();
-    Logger.recordMetadata("ProjectName", "2024-Beta"); // Set a metadata value
+
+     DataLogManager.start("C:\\Users\\Roman\\Documents\\Logs");
+
+     // Record metadata
+     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+     Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+     Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+     switch (BuildConstants.DIRTY) {
+       case 0:
+         Logger.recordMetadata("GitDirty", "All changes committed");
+         break;
+       case 1:
+         Logger.recordMetadata("GitDirty", "Uncomitted changes");
+         break;
+       default:
+         Logger.recordMetadata("GitDirty", "Unknown");
+         break;
+     }
+ 
+  
+    // Set a metadata value
     Pathfinding.setPathfinder(new LocalADStarAK());
     DataLog log = DataLogManager.getLog();
 
@@ -56,6 +77,7 @@ public class Robot extends LoggedRobot {
 
     case SIM:
       // Running a physics simulator, log to NT
+      Logger.addDataReceiver(new WPILOGWriter());
       Logger.addDataReceiver(new NT4Publisher());
       break;
 
