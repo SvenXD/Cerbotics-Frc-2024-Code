@@ -14,13 +14,12 @@ import frc.robot.Subsystems.Swerve.Drive;
 
 public class GoToNoteCommand extends ParallelRaceGroup {
 
-    Drive drive;
+  Drive drive;
 
+  /** Creates a new autoCollectNote. */
+  public GoToNoteCommand(Drive drive) {
+    this.drive = drive;
 
-    /** Creates a new autoCollectNote. */
-    public GoToNoteCommand(Drive drive) {
-        this.drive = drive;
-      
-        addCommands(new NoteAlignCommand(drive).withTimeout(2.50));
-    }
+    addCommands(new NoteAlignCommand(drive).withTimeout(2.50));
+  }
 }

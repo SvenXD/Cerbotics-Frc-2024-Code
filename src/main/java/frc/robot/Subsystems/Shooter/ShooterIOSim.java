@@ -5,7 +5,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
-public class ShooterIOSim implements ShooterIO{
+public class ShooterIOSim implements ShooterIO {
   private FlywheelSim sim = new FlywheelSim(DCMotor.getKrakenX60(2), 1, 0.004);
   private PIDController pid = new PIDController(0.0, 0.0, 0.0);
 
@@ -28,9 +28,9 @@ public class ShooterIOSim implements ShooterIO{
     inputs.upperShooterAppliedVolts = appliedVolts;
     inputs.shooterCurrentAmps = new double[] {sim.getCurrentDrawAmps()};
   }
-  
+
   @Override
-  public void stop(){
+  public void stop() {
     setVoltage(0.0);
   }
 
@@ -42,7 +42,7 @@ public class ShooterIOSim implements ShooterIO{
   }
 
   @Override
-  public void setVelocity(double velocityUp, double velocityDown){
+  public void setVelocity(double velocityUp, double velocityDown) {
     closedLoop = true;
     pid.setSetpoint(velocityUp);
     this.ffVolts = velocityDown;

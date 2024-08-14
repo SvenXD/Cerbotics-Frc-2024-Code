@@ -28,7 +28,7 @@ public class IntakeWSensor extends Command {
 
   @Override
   public boolean isFinished() {
-    if(intake.getSensor()){
+    if (intake.getSensor()) {
       return true;
     }
     return false;

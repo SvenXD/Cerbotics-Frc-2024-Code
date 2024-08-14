@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -14,16 +15,12 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.Util.LocalADStarAK;
 import frc.Util.NoteVisualizer;
 import frc.robot.Subsystems.Arm.ArmSubsystem.ArmStates;
-
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
-import com.pathplanner.lib.pathfinding.Pathfinding;
-
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
@@ -36,66 +33,63 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {
-     m_robotContainer = new RobotContainer();
+    m_robotContainer = new RobotContainer();
 
-     DataLogManager.start("C:\\Users\\Roman\\Documents\\Logs");
+    DataLogManager.start("C:\\Users\\Roman\\Documents\\Logs");
 
-     // Record metadata
-     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
-     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
-     Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-     Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
-     Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
-     switch (BuildConstants.DIRTY) {
-       case 0:
-         Logger.recordMetadata("GitDirty", "All changes committed");
-         break;
-       case 1:
-         Logger.recordMetadata("GitDirty", "Uncomitted changes");
-         break;
-       default:
-         Logger.recordMetadata("GitDirty", "Unknown");
-         break;
-     }
- 
-  
+    // Record metadata
+    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+    switch (BuildConstants.DIRTY) {
+      case 0:
+        Logger.recordMetadata("GitDirty", "All changes committed");
+        break;
+      case 1:
+        Logger.recordMetadata("GitDirty", "Uncomitted changes");
+        break;
+      default:
+        Logger.recordMetadata("GitDirty", "Unknown");
+        break;
+    }
+
     // Set a metadata value
     Pathfinding.setPathfinder(new LocalADStarAK());
     DataLog log = DataLogManager.getLog();
 
-      if(Constants.needToLog){
+    if (Constants.needToLog) {
       DataLogManager.start();
       DriverStation.startDataLog(log);
     }
 
-  switch (Constants.currentMode) {
-    case REAL:
-      // Running on a real robot, log to a USB stick ("/U/logs")
-      Logger.addDataReceiver(new WPILOGWriter());
-      Logger.addDataReceiver(new NT4Publisher());
-      break;
+    switch (Constants.currentMode) {
+      case REAL:
+        // Running on a real robot, log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
 
-    case SIM:
-      // Running a physics simulator, log to NT
-      Logger.addDataReceiver(new WPILOGWriter());
-      Logger.addDataReceiver(new NT4Publisher());
-      break;
+      case SIM:
+        // Running a physics simulator, log to NT
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
 
-    case REPLAY:
-      // Replaying a log, set up replay source
-      setUseTiming(false); // Run as fast as possible
-      String logPath = LogFileUtil.findReplayLog();
-      Logger.setReplaySource(new WPILOGReader(logPath));
-      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-      break;
+      case REPLAY:
+        // Replaying a log, set up replay source
+        setUseTiming(false); // Run as fast as possible
+        String logPath = LogFileUtil.findReplayLog();
+        Logger.setReplaySource(new WPILOGReader(logPath));
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
+    }
+
+    Logger.start();
+    Logger.disableDeterministicTimestamps();
+    Logger.disableConsoleCapture();
   }
-
-  Logger.start();
-  Logger.disableDeterministicTimestamps();
-  Logger.disableConsoleCapture();
-
-
-}
 
   @Override
   public void robotPeriodic() {
@@ -112,7 +106,6 @@ public class Robot extends LoggedRobot {
 
     SmartDashboard.putNumberArray("Robot Coords", robotCords);
     NoteVisualizer.showIntakedNotes(RobotContainer.getArmSubsystem().getAngleRadiants());
-
   }
 
   @Override
@@ -134,26 +127,23 @@ public class Robot extends LoggedRobot {
     }
     NoteVisualizer.resetAutoNotes();
 
-    for(int i = 0; i < 7; i++){
+    for (int i = 0; i < 7; i++) {
       xNotes[i] = NoteVisualizer.getAutoNote(i).getX();
       yNotes[i] = NoteVisualizer.getAutoNote(i).getY();
     }
 
     NoteVisualizer.deleteNote(3);
     deleteCords(3);
-
-
   }
 
   @Override
   public void autonomousPeriodic() {
     NoteVisualizer.showAutoNotes();
 
-    for(int i = 0; i < 7; i++){
-      if(Math.abs(xNotes[i] - robotCords[0]) < 0.5 &&
-         Math.abs(yNotes[i] - robotCords[1]) < 0.5 &&
-         RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING )
-         {
+    for (int i = 0; i < 7; i++) {
+      if (Math.abs(xNotes[i] - robotCords[0]) < 0.5
+          && Math.abs(yNotes[i] - robotCords[1]) < 0.5
+          && RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING) {
         NoteVisualizer.takeAutoNote(i);
         NoteVisualizer.enableShowNote();
       }
@@ -168,15 +158,13 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-     NoteVisualizer.clearAutoNotes();
+    NoteVisualizer.clearAutoNotes();
   }
 
   @Override
   public void teleopPeriodic() {
 
     SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
-
-  
   }
 
   @Override
@@ -197,41 +185,39 @@ public class Robot extends LoggedRobot {
   public void testExit() {}
 
   @Override
-  public void simulationPeriodic(){
+  public void simulationPeriodic() {
     NoteVisualizer.teleopNote();
-      if(Math.abs(NoteVisualizer.getSourceNote().getX() - robotCords[0]) < 0.7
-         && Math.abs(NoteVisualizer.getSourceNote().getY() - robotCords[1]) < 0.7
-         && RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING)
-         {
-            NoteVisualizer.enableShowNote();
-         }
+    if (Math.abs(NoteVisualizer.getSourceNote().getX() - robotCords[0]) < 0.7
+        && Math.abs(NoteVisualizer.getSourceNote().getY() - robotCords[1]) < 0.7
+        && RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING) {
+      NoteVisualizer.enableShowNote();
+    }
 
-    if(RobotContainer.getArmSubsystem().getState() == ArmStates.SHOOTING){
+    if (RobotContainer.getArmSubsystem().getState() == ArmStates.SHOOTING) {
       shouldReset = true;
-     oiaefio();
-    }     
-    if(shouldReset){
+      oiaefio();
+    }
+    if (shouldReset) {
       oiaefio();
     }
   }
 
-  
   public static boolean isRedAlliance() {
     return DriverStation.getAlliance()
         .filter(value -> value == DriverStation.Alliance.Red)
         .isPresent();
   }
 
-  public static void deleteCords(int note){
+  public static void deleteCords(int note) {
     xNotes[note] = 0;
     yNotes[note] = 0;
   }
 
-  public static void oiaefio(){
+  public static void oiaefio() {
     timer.start();
-    NoteVisualizer.enableAccurateNotes(2.79253, timer.get()*8);
+    NoteVisualizer.enableAccurateNotes(2.79253, timer.get() * 8);
 
-    if(NoteVisualizer.getZ() > 2.2){
+    if (NoteVisualizer.getZ() > 2.2) {
       timer.stop();
       timer.reset();
       shouldReset = false;

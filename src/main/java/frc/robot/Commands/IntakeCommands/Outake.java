@@ -19,20 +19,17 @@ public class Outake extends Command {
   @Override
   public void initialize() {}
 
-
   @Override
   public void execute() {
     intake.setIntake(-0.3);
     shooter.velocity(-900, -500);
   }
 
-
   @Override
   public void end(boolean interrupted) {
     intake.stopIntake();
     shooter.stopMotors();
   }
-
 
   @Override
   public boolean isFinished() {

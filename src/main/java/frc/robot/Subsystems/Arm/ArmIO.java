@@ -21,20 +21,20 @@ public interface ArmIO {
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ArmIoInputs inputs) {}
 
-   /** This keeps the feedfoward needed for the arm to move */
-   public default void setVoltage(double output, double feedfoward){}
+  /** This keeps the feedfoward needed for the arm to move */
+  public default void setVoltage(double output, double feedfoward) {}
 
-   /** Enable brake mode on the intake. */
-   public default void setBrakeMode() {}
+  /** Enable brake mode on the intake. */
+  public default void setBrakeMode() {}
 
-   /** Enable coast mode on the intake. */
-   public default void setCoastMode() {}
+  /** Enable coast mode on the intake. */
+  public default void setCoastMode() {}
 
-   /** Run motors at volts */
-   public default void runVolts(double volts) {}
+  /** Run motors at volts */
+  public default void runVolts(double volts) {}
 
-   /**Stops the motors */
-   public default void stop(){}
+  /** Stops the motors */
+  public default void stop() {}
 
   /* Updates the tunable numbers. */
   public default void updateTunableNumbers() {}

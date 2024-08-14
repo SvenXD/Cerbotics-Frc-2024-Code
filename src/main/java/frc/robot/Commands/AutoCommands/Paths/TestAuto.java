@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Commands.AutoCommands.AutoCommand;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,26 +16,15 @@ public class TestAuto extends AutoCommand {
 
   private final PathPlannerPath startToFirst;
 
-
   public TestAuto() {
     startToFirst = PathPlannerPath.fromPathFile("5NoteAuto1");
 
-
-    addCommands(
-        Commands.deadline(
-            Commands.sequence(
-                new PathPlannerAuto("New Auto")
-    )));
-
+    addCommands(Commands.deadline(Commands.sequence(new PathPlannerAuto("New Auto"))));
   }
-
 
   @Override
   public List<Pose2d> getAllPathPoses() {
-    return Stream.of(
-            startToFirst.getPathPoses()
-
-    )
+    return Stream.of(startToFirst.getPathPoses())
         .flatMap(Collection::stream)
         .collect(Collectors.toList());
   }

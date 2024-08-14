@@ -7,10 +7,10 @@ package frc.robot.Commands.ArmCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
 
-
 public class ArmToPose extends Command {
   /** Creates a new ArmToPose. */
   ArmSubsystem m_arm;
+
   double angle = 0.0;
 
   public ArmToPose(ArmSubsystem m_arm) {
@@ -20,20 +20,19 @@ public class ArmToPose extends Command {
     addRequirements(m_arm);
   }
 
-
-// Called when the command is initially scheduled.
+  // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-   m_arm.getController().reset(m_arm.getArmAngle());
+    m_arm.getController().reset(m_arm.getArmAngle());
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
 
-     m_arm.updateArmSetpoint(0);
-      } 
-      
+    m_arm.updateArmSetpoint(0);
+  }
+
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {

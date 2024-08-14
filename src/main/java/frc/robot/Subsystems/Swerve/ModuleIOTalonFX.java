@@ -13,8 +13,8 @@
 
 package frc.robot.Subsystems.Swerve;
 
+import static frc.robot.Constants.DriveConstants.*;
 import static frc.robot.Constants.ModuleConstants.*;
-import static frc.robot.Constants.DriveConstants.*; 
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -46,7 +46,6 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final TalonFX driveTalon;
   private final TalonFX turnTalon;
   private final CANcoder cancoder;
-  
 
   private final Queue<Double> timestampQueue;
 
@@ -76,8 +75,8 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveTalon = new TalonFX(kFrontLeftDriveMotorId, CANBUS_STRING);
         turnTalon = new TalonFX(kFrontLeftSteerMotorId, CANBUS_STRING);
         cancoder = new CANcoder(kFrontLeftEncoderId, CANBUS_STRING);
-        absoluteEncoderOffset = new Rotation2d(kFrontLeftEncoderOffset); 
-        
+        absoluteEncoderOffset = new Rotation2d(kFrontLeftEncoderOffset);
+
         break;
       case 1:
         driveTalon = new TalonFX(kFrontRightDriveMotorId, CANBUS_STRING);

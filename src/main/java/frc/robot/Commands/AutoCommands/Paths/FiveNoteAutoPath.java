@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Commands.AutoCommands.AutoCommand;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,14 +31,8 @@ public class FiveNoteAutoPath extends AutoCommand {
     sixToFirst = PathPlannerPath.fromPathFile("5NoteAuto6");
     sevenToFirst = PathPlannerPath.fromPathFile("5NoteAuto7");
 
-    addCommands(
-        Commands.deadline(
-            Commands.sequence(
-                new PathPlannerAuto("6NoteAuto")
-    )));
-
+    addCommands(Commands.deadline(Commands.sequence(new PathPlannerAuto("6NoteAuto"))));
   }
-
 
   @Override
   public List<Pose2d> getAllPathPoses() {
@@ -50,9 +43,7 @@ public class FiveNoteAutoPath extends AutoCommand {
             fourthoFirst.getPathPoses(),
             fifthToFirst.getPathPoses(),
             sixToFirst.getPathPoses(),
-            
-            sevenToFirst.getPathPoses()
-    )
+            sevenToFirst.getPathPoses())
         .flatMap(Collection::stream)
         .collect(Collectors.toList());
   }

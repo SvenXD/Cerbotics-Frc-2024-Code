@@ -12,15 +12,14 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-  
 import edu.wpi.first.math.util.Units;
 import frc.Util.Logging.LoggedTunableNumber;
 
 public class ShooterIOTalon implements ShooterIO {
 
   /* Hardware */
-  private final TalonFX upperMotor = new TalonFX(UPPER_SHOOTER_ID,"rio");
-  private final TalonFX lowerMotor = new TalonFX(LOWER_SHOOTER_ID,"rio");
+  private final TalonFX upperMotor = new TalonFX(UPPER_SHOOTER_ID, "rio");
+  private final TalonFX lowerMotor = new TalonFX(LOWER_SHOOTER_ID, "rio");
 
   /* Configurators */
   private TalonFXConfigurator upperConfigurator;
@@ -67,7 +66,6 @@ public class ShooterIOTalon implements ShooterIO {
 
     upperConfigurator = upperMotor.getConfigurator();
     lowerConfigurator = lowerMotor.getConfigurator();
-
 
     /* Configurations*/
 
@@ -123,72 +121,69 @@ public class ShooterIOTalon implements ShooterIO {
     supplyDown = lowerMotor.getSupplyCurrent();
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-      50, 
-      velocityUp,
-      velocityDown,
-      positionUp,
-      positionDown,
-      statorUp,
-      statorDown,
-      supplyUp,
-      supplyDown);
-
-    }
-
-    @Override
-    public void updateInputs(ShooterIOInputs inputs){
-      BaseStatusSignal.refreshAll(
-        velocityUp, 
-        velocityDown, 
-        positionUp, 
-        positionDown, 
-        statorUp, 
-        statorDown, 
-        supplyUp, 
+        50,
+        velocityUp,
+        velocityDown,
+        positionUp,
+        positionDown,
+        statorUp,
+        statorDown,
+        supplyUp,
         supplyDown);
-      /* Upper inputs */
-      inputs.upperShooterPosRad =
-            Units.rotationsToRadians(positionUp.getValue());
-      inputs.upperShooterVelocityRpm = velocityUp.getValueAsDouble() * 60;
-      inputs.upperShooterAppliedVolts = upperMotor.getMotorVoltage().getValue();
-      inputs.upperShooterTempCelcius = upperMotor.getDeviceTemp().getValue();
-      inputs.upperShooterSetPointRpm = desiredUp;
-
-      /* Lower inputs */
-      inputs.lowerShooterPosRad =
-            Units.rotationsToRadians(positionDown.getValue());
-      inputs.lowerShooterVelocityRpm = velocityDown.getValueAsDouble()*60;
-      inputs.lowerShooterAppliedVolts = lowerMotor.getMotorVoltage().getValue();
-      inputs.lowerShooterTempCelcius = lowerMotor.getDeviceTemp().getValue();
-      inputs.lowerShooterSetPointRpm = desiredDown;
-
-      inputs.shooterCurrentAmps = new double[]{supplyUp.getValue(),supplyDown.getValue()};
   }
 
   @Override
-  public void stop(){
+  public void updateInputs(ShooterIOInputs inputs) {
+    BaseStatusSignal.refreshAll(
+        velocityUp,
+        velocityDown,
+        positionUp,
+        positionDown,
+        statorUp,
+        statorDown,
+        supplyUp,
+        supplyDown);
+    /* Upper inputs */
+    inputs.upperShooterPosRad = Units.rotationsToRadians(positionUp.getValue());
+    inputs.upperShooterVelocityRpm = velocityUp.getValueAsDouble() * 60;
+    inputs.upperShooterAppliedVolts = upperMotor.getMotorVoltage().getValue();
+    inputs.upperShooterTempCelcius = upperMotor.getDeviceTemp().getValue();
+    inputs.upperShooterSetPointRpm = desiredUp;
+
+    /* Lower inputs */
+    inputs.lowerShooterPosRad = Units.rotationsToRadians(positionDown.getValue());
+    inputs.lowerShooterVelocityRpm = velocityDown.getValueAsDouble() * 60;
+    inputs.lowerShooterAppliedVolts = lowerMotor.getMotorVoltage().getValue();
+    inputs.lowerShooterTempCelcius = lowerMotor.getDeviceTemp().getValue();
+    inputs.lowerShooterSetPointRpm = desiredDown;
+
+    inputs.shooterCurrentAmps = new double[] {supplyUp.getValue(), supplyDown.getValue()};
+  }
+
+  @Override
+  public void stop() {
     upperMotor.stopMotor();
     lowerMotor.stopMotor();
   }
 
   @Override
-  public void setVelocity(double velocityUp, double velocityDown){
+  public void setVelocity(double velocityUp, double velocityDown) {
     upperVelocity.Velocity = velocityUp / 60;
     upperMotor.setControl(upperVelocity);
 
     lowerVelocity.Velocity = velocityDown / 60;
     lowerMotor.setControl(lowerVelocity);
   }
-  
+
   @Override
   public void setVoltage(double volts) {
     upperMotor.setControl(new VoltageOut(volts).withEnableFOC(true));
     lowerMotor.setControl(new VelocityVoltage(volts).withEnableFOC(true));
   }
 
-    @Override
-    public void updateTunableNumbers(){
-      if (upperShooterKs.hasChanged(0)
+  @Override
+  public void updateTunableNumbers() {
+    if (upperShooterKs.hasChanged(0)
         || upperShooterKv.hasChanged(0)
         || upperShooterKp.hasChanged(0)
         || upperShooterKi.hasChanged(0)

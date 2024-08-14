@@ -1,8 +1,7 @@
 package frc.robot.Subsystems.Intake;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
 
@@ -20,16 +19,15 @@ public class IntakeSubsystem extends SubsystemBase {
     Logger.processInputs("Intake", inputs);
   }
 
-  public void setIntake(double vel){
+  public void setIntake(double vel) {
     io.setVoltage(vel);
   }
 
-  public void stopIntake(){
+  public void stopIntake() {
     io.setVoltage(0);
   }
 
-  public boolean getSensor(){
+  public boolean getSensor() {
     return inputs.sensor;
   }
-
 }

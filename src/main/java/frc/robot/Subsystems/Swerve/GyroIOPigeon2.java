@@ -1,4 +1,3 @@
-
 // Copyright 2021-2024 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
@@ -23,7 +22,6 @@ import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-
 import java.util.Queue;
 
 /** IO implementation for Pigeon2 */
@@ -40,11 +38,9 @@ public class GyroIOPigeon2 implements GyroIO {
     yaw.setUpdateFrequency(Module.ODOMETRY_FREQUENCY);
     yawVelocity.setUpdateFrequency(100.0);
     pigeon.optimizeBusUtilization();
-  
-      yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
-      yawPositionQueue =
-          PhoenixOdometryThread.getInstance().registerSignal(pigeon, pigeon.getYaw());
 
+    yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
+    yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(pigeon, pigeon.getYaw());
   }
 
   @Override
@@ -63,10 +59,10 @@ public class GyroIOPigeon2 implements GyroIO {
     yawPositionQueue.clear();
 
     inputs.pigeonRotation = pigeon.getAngle();
-}
+  }
 
-@Override
-public void zeroHeading(){
-  pigeon.setYaw(0);
-}
+  @Override
+  public void zeroHeading() {
+    pigeon.setYaw(0);
+  }
 }

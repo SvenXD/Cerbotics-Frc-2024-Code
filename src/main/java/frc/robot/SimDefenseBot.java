@@ -13,12 +13,9 @@ public class SimDefenseBot extends SubsystemBase {
   private final CommandXboxController controller;
   private final DefenseBotInputsAutoLogged inputs = new DefenseBotInputsAutoLogged();
 
-  private final SlewRateLimiter xStickLimiter =
-      new SlewRateLimiter(4.0);
-  private final SlewRateLimiter yStickLimiter =
-      new SlewRateLimiter(4.0);
-  private final SlewRateLimiter rotStickLimiter =
-      new SlewRateLimiter(4.0);
+  private final SlewRateLimiter xStickLimiter = new SlewRateLimiter(4.0);
+  private final SlewRateLimiter yStickLimiter = new SlewRateLimiter(4.0);
+  private final SlewRateLimiter rotStickLimiter = new SlewRateLimiter(4.0);
 
   public SimDefenseBot(int controllerPort) {
     this.controller = new CommandXboxController(controllerPort);

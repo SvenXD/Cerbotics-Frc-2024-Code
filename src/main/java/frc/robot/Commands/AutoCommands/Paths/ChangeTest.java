@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.Util.NoteVisualizer;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Subsystems.Swerve.Drive;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,24 +30,21 @@ public class ChangeTest extends AutoCommand {
     addCommands(
         Commands.deadline(
             Commands.sequence(
-              new PathPlannerAuto("Starting pose 1"),
+                new PathPlannerAuto("Starting pose 1"),
                 AutoBuilder.followPath(startToFirst),
-                 new ConditionalCommand(
+                new ConditionalCommand(
                     AutoBuilder.followPath(startToSecond),
-                    AutoBuilder.followPath(startToSecondAlt).until(()->NoteVisualizer.hasSimNote()), 
-                    ()-> NoteVisualizer.hasSimNote()),
-                    m_drive.goToPose(new Pose2d(7.98,6.8, new Rotation2d(0,0))),
-                    AutoBuilder.followPath(startToSecondAltAlt),
-                    NoteVisualizer.ampShoot()
-         )
-               ));
+                    AutoBuilder.followPath(startToSecondAlt)
+                        .until(() -> NoteVisualizer.hasSimNote()),
+                    () -> NoteVisualizer.hasSimNote()),
+                m_drive.goToPose(new Pose2d(7.98, 6.8, new Rotation2d(0, 0))),
+                AutoBuilder.followPath(startToSecondAltAlt),
+                NoteVisualizer.ampShoot())));
   }
 
   @Override
   public List<Pose2d> getAllPathPoses() {
-    return Stream.of(
-            startToFirst.getPathPoses()
-    )
+    return Stream.of(startToFirst.getPathPoses())
         .flatMap(Collection::stream)
         .collect(Collectors.toList());
   }
@@ -60,13 +56,12 @@ public class ChangeTest extends AutoCommand {
         .getInitialTargetHolonomicPose();
   }
 
-  public Command smartChange(){
+  public Command smartChange() {
     Command path;
-    if(NoteVisualizer.hasSimNote()){
-        path = AutoBuilder.followPath(startToSecond);
-    }
-    else{
-        path = AutoBuilder.followPath(startToSecondAlt);
+    if (NoteVisualizer.hasSimNote()) {
+      path = AutoBuilder.followPath(startToSecond);
+    } else {
+      path = AutoBuilder.followPath(startToSecondAlt);
     }
     return path;
   }

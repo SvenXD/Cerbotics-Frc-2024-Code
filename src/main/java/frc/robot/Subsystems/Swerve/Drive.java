@@ -22,7 +22,6 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -43,7 +42,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.Util.LocalADStarAK;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -97,25 +95,20 @@ public class Drive extends SubsystemBase {
         () -> kinematics.toChassisSpeeds(getModuleStates()),
         this::runVelocity,
         new HolonomicPathFollowerConfig(
-                  new PIDConstants(
-          DriveConstants.traslationP, 
-          DriveConstants.traslationD), 
-        new PIDConstants(
-            DriveConstants.rotationP, 
-            DriveConstants.rotationD), 
-            MAX_LINEAR_SPEED, 
-            DRIVE_BASE_RADIUS, 
+            new PIDConstants(DriveConstants.traslationP, DriveConstants.traslationD),
+            new PIDConstants(DriveConstants.rotationP, DriveConstants.rotationD),
+            MAX_LINEAR_SPEED,
+            DRIVE_BASE_RADIUS,
             new ReplanningConfig()),
-        () ->{
+        () -> {
           var alliance = DriverStation.getAlliance();
-                    if (alliance.isPresent()) {
-                        return alliance.get() == DriverStation.Alliance.Red;
-                    }
-                    return false;
-                },
-      this);
-              
-        
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        this);
+
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
@@ -288,8 +281,6 @@ public class Drive extends SubsystemBase {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
-
-
   /**
    * Adds a vision measurement to the pose estimator.
    *
@@ -300,14 +291,14 @@ public class Drive extends SubsystemBase {
     poseEstimator.addVisionMeasurement(visionPose, timestamp);
   }
 
-  public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs){
+  public void setVisionMeasurementStdDevs(Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.setVisionMeasurementStdDevs(visionMeasurementStdDevs);
   }
-  
+
   public void addVisionMeasurement(
-    Pose2d visionMeasurement, double timestampSeconds, Matrix<N3, N1> stdDevs) {
-poseEstimator.addVisionMeasurement(visionMeasurement, timestampSeconds, stdDevs);
-}
+      Pose2d visionMeasurement, double timestampSeconds, Matrix<N3, N1> stdDevs) {
+    poseEstimator.addVisionMeasurement(visionMeasurement, timestampSeconds, stdDevs);
+  }
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
     return MAX_LINEAR_SPEED;
@@ -332,22 +323,19 @@ poseEstimator.addVisionMeasurement(visionMeasurement, timestampSeconds, stdDevs)
     return AutoBuilder.pathfindToPose(target_pose, AutoConstants.kPathConstraints, 0.0, 1);
   }
 
-      public double getangle() {
-        return gyroInputs.pigeonRotation;
-    }
+  public double getangle() {
+    return gyroInputs.pigeonRotation;
+  }
 
-    public void updatePoseEstimator(){
-      poseEstimator.update(
-       getRotation(),
-       getModulePositions());
-    }
+  public void updatePoseEstimator() {
+    poseEstimator.update(getRotation(), getModulePositions());
+  }
 
-    public SwerveDrivePoseEstimator getSwerveDrivePoseEstimator(){
-      return poseEstimator; 
-    }
+  public SwerveDrivePoseEstimator getSwerveDrivePoseEstimator() {
+    return poseEstimator;
+  }
 
-    public void zeroHeading(){
-      gyroIO.zeroHeading();
-    }
-    
+  public void zeroHeading() {
+    gyroIO.zeroHeading();
+  }
 }

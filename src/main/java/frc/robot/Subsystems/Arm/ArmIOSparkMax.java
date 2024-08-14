@@ -1,7 +1,5 @@
 package frc.robot.Subsystems.Arm;
 
-import com.revrobotics.CANSparkMax;
-
 import static frc.robot.Constants.Arm.*;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -10,16 +8,17 @@ import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
 
-public class ArmIOSparkMax implements ArmIO{
+public class ArmIOSparkMax implements ArmIO {
 
-    /* Hardware */
+  /* Hardware */
   private final CANSparkMax leftMotor = new CANSparkMax(LEFT_ARM_ID, MotorType.kBrushless);
   private final CANSparkMax rightMotor = new CANSparkMax(RIGHT_ARM_ID, MotorType.kBrushless);
   private final CANcoder m_encoder = new CANcoder(ABSOLUTE_ENCODER_ID, "Swerve_Canivore");
   private final CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
-        
-    public ArmIOSparkMax(){
+
+  public ArmIOSparkMax() {
 
     encoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     encoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
@@ -30,22 +29,22 @@ public class ArmIOSparkMax implements ArmIO{
 
     leftMotor.restoreFactoryDefaults();
     rightMotor.restoreFactoryDefaults();
-    
+
     leftMotor.setInverted(true);
     rightMotor.setInverted(false);
-    
+
     leftMotor.setSmartCurrentLimit(40);
     rightMotor.setSmartCurrentLimit(40);
-    
+
     leftMotor.setCANTimeout(0);
     rightMotor.setCANTimeout(0);
-    
+
     rightMotor.setIdleMode(IdleMode.kBrake);
     leftMotor.setIdleMode(IdleMode.kBrake);
-    }
-  
+  }
+
   @Override
-  public void updateInputs(ArmIoInputs inputs){
+  public void updateInputs(ArmIoInputs inputs) {
     inputs.leftAppliedVolts = leftMotor.getAppliedOutput();
     inputs.rightAppliedVolts = rightMotor.getAppliedOutput();
     inputs.leftTempCelcius = leftMotor.getMotorTemperature();
@@ -54,28 +53,25 @@ public class ArmIOSparkMax implements ArmIO{
     inputs.currentAngle = getArmAngle();
   }
 
-
   @Override
-  public void setBrakeMode(){
+  public void setBrakeMode() {
     rightMotor.setIdleMode(IdleMode.kBrake);
     leftMotor.setIdleMode(IdleMode.kBrake);
   }
 
   @Override
-  public void setCoastMode(){
+  public void setCoastMode() {
     rightMotor.setIdleMode(IdleMode.kCoast);
     leftMotor.setIdleMode(IdleMode.kCoast);
   }
-    
-  public double getArmAngle() {            
-    return (m_encoder.getAbsolutePosition().getValueAsDouble() * 360)  + 50.6;
+
+  public double getArmAngle() {
+    return (m_encoder.getAbsolutePosition().getValueAsDouble() * 360) + 50.6;
   }
 
   @Override
-  public void setVoltage(double output, double feedfoward){
+  public void setVoltage(double output, double feedfoward) {
     rightMotor.setVoltage(output + feedfoward);
     leftMotor.setVoltage(output + feedfoward);
   }
 }
-
- 

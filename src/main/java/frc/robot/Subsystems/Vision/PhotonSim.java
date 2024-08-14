@@ -2,19 +2,6 @@ package frc.robot.Subsystems.Vision;
 
 import static frc.robot.Constants.VisionConstants.kTagLayout;
 
-import java.util.Optional;
-
-import org.littletonrobotics.junction.Logger;
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.estimation.TargetModel;
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.SimCameraProperties;
-import org.photonvision.simulation.VisionSystemSim;
-import org.photonvision.simulation.VisionTargetSim;
-import org.photonvision.targeting.PhotonPipelineResult;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -29,42 +16,54 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.Subsystems.Swerve.Drive;
 import frc.robot.Robot;
+import frc.robot.Subsystems.Swerve.Drive;
+import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.estimation.TargetModel;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
+import org.photonvision.simulation.VisionTargetSim;
+import org.photonvision.targeting.PhotonPipelineResult;
 
-public class PhotonSim extends SubsystemBase{
+public class PhotonSim extends SubsystemBase {
   private final PhotonPoseEstimator photonEstimator;
   private final VisionSystemSim visionSim = new VisionSystemSim("main");
   private final TargetModel targetModel = new TargetModel(0.5, 0.25);
-  private final PhotonCamera camera = new PhotonCamera("cameraName");     //This camera is just for the simulation
+  private final PhotonCamera camera =
+      new PhotonCamera("cameraName"); // This camera is just for the simulation
   private final Transform3d robotToCamera;
-  private final PhotonCameraSim cameraSim; 
+  private final PhotonCameraSim cameraSim;
   private final Pose3d targetPose;
-  private final VisionTargetSim visionTarget; //Custom April tag
+  private final VisionTargetSim visionTarget; // Custom April tag
   private final SimCameraProperties cameraProp;
   private double lastEstTimestamp = 0;
 
-
-  public PhotonSim(int index){
-    switch(index){
+  public PhotonSim(int index) {
+    switch (index) {
       case 0:
-      robotToCamera = VisionConstants.kRobotToCam1;
-      break;
-      
+        robotToCamera = VisionConstants.kRobotToCam1;
+        break;
+
       case 1:
-      robotToCamera = VisionConstants.kRobotToCam2;
-      break;
+        robotToCamera = VisionConstants.kRobotToCam2;
+        break;
 
       case 2:
-      robotToCamera = VisionConstants.kRobotToCam3;
-      break;
+        robotToCamera = VisionConstants.kRobotToCam3;
+        break;
 
       case 3:
-      robotToCamera = VisionConstants.kRobotToCam4;
-      break;
+        robotToCamera = VisionConstants.kRobotToCam4;
+        break;
 
       default:
-      throw new IllegalArgumentException("Invalid index");
+        throw new IllegalArgumentException("Invalid index");
     }
     cameraProp = new SimCameraProperties();
 
@@ -73,87 +72,87 @@ public class PhotonSim extends SubsystemBase{
     cameraProp.setFPS(20);
     cameraProp.setAvgLatencyMs(35);
     cameraProp.setLatencyStdDevMs(5);
-   
+
     cameraSim = new PhotonCameraSim(camera, cameraProp);
 
     cameraSim.enableRawStream(true);
     cameraSim.enableProcessedStream(true);
 
-      cameraSim.enableDrawWireframe(true);
-      targetPose = new Pose3d(16, 4, 0.4, new Rotation3d(0, 0, Math.PI));
-      visionTarget = new VisionTargetSim(targetPose, targetModel);
+    cameraSim.enableDrawWireframe(true);
+    targetPose = new Pose3d(16, 4, 0.4, new Rotation3d(0, 0, Math.PI));
+    visionTarget = new VisionTargetSim(targetPose, targetModel);
 
-      visionSim.addAprilTags(kTagLayout);
-      visionSim.addCamera(cameraSim, robotToCamera);
+    visionSim.addAprilTags(kTagLayout);
+    visionSim.addCamera(cameraSim, robotToCamera);
 
-      photonEstimator = new PhotonPoseEstimator(
-            VisionConstants.kTagLayout, 
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
+    photonEstimator =
+        new PhotonPoseEstimator(
+            VisionConstants.kTagLayout,
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             camera,
             robotToCamera);
+  }
+
+  @Override
+  public void periodic() {}
+
+  public PhotonPipelineResult getLatestResult() {
+    return camera.getLatestResult();
+  }
+
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+    var visionEst = photonEstimator.update();
+    double latestTimestamp = camera.getLatestResult().getTimestampSeconds();
+    boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
+    if (Robot.isSimulation()) {
+      visionEst.ifPresentOrElse(
+          est ->
+              getSimDebugField()
+                  .getObject("VisionEstimation")
+                  .setPose(est.estimatedPose.toPose2d()),
+          () -> {
+            if (newResult) getSimDebugField().getObject("VisionEstimation").setPoses();
+            Logger.recordOutput(
+                "Vision/RealEstimation",
+                getSimDebugField().getObject("VisionEstimation").getPose());
+          });
     }
+    if (newResult) lastEstTimestamp = latestTimestamp;
+    return visionEst;
+  }
 
-    @Override
-    public void periodic(){
+  public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
 
+    var estStdDevs = VisionConstants.kSingleTagStdDevs;
+    var targets = getLatestResult().getTargets();
+    int numTags = 0;
+    double avgDist = 0;
+    for (var tgt : targets) {
+      var tagPose = photonEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+      if (tagPose.isEmpty()) continue;
+      numTags++;
+      avgDist +=
+          tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
     }
-     public PhotonPipelineResult getLatestResult() {
-        return camera.getLatestResult();
-    }
+    if (numTags == 0) return estStdDevs;
+    avgDist /= numTags;
+    // Decrease std devs if multiple targets are visible
+    if (numTags > 1) estStdDevs = VisionConstants.kMultiTagStdDevs;
+    // Increase std devs based on (average) distance
+    if (numTags == 1 && avgDist > 4)
+      estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+    else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
 
-    public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-        var visionEst = photonEstimator.update();
-        double latestTimestamp = camera.getLatestResult().getTimestampSeconds();
-        boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
-        if (Robot.isSimulation()) {
-            visionEst.ifPresentOrElse(
-                    est ->
-                            getSimDebugField()
-                                    .getObject("VisionEstimation")
-                                    .setPose(est.estimatedPose.toPose2d()),
-                    () -> {
-                        if (newResult) getSimDebugField().getObject("VisionEstimation").setPoses();
-                        Logger.recordOutput("Vision/RealEstimation", getSimDebugField().getObject("VisionEstimation").getPose());
+    return estStdDevs;
+  }
 
-                    });
-        }
-        if (newResult) lastEstTimestamp = latestTimestamp;
-        return visionEst;
-    }
+  public Field2d getSimDebugField() {
+    if (!Robot.isSimulation()) return null;
+    return visionSim.getDebugField();
+  }
 
-    public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
-        
-        var estStdDevs = VisionConstants.kSingleTagStdDevs;
-        var targets = getLatestResult().getTargets();
-        int numTags = 0;
-        double avgDist = 0;
-        for (var tgt : targets) {
-            var tagPose = photonEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
-            if (tagPose.isEmpty()) continue;
-            numTags++;
-            avgDist +=
-                    tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
-        }
-        if (numTags == 0) return estStdDevs;
-        avgDist /= numTags;
-        // Decrease std devs if multiple targets are visible
-        if (numTags > 1) estStdDevs = VisionConstants.kMultiTagStdDevs;
-        // Increase std devs based on (average) distance
-        if (numTags == 1 && avgDist > 4)
-            estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-
-        return estStdDevs;
-    }
-
-    public Field2d getSimDebugField() {
-        if (!Robot.isSimulation()) return null;
-        return visionSim.getDebugField();
-    }  
-
-     // Private method that returns the distance to the target
-     public Translation2d getCameraToTarget(
-      double yaw, double pitch, double noteHeightMeters) {
+  // Private method that returns the distance to the target
+  public Translation2d getCameraToTarget(double yaw, double pitch, double noteHeightMeters) {
 
     // Define the vector
     double x = 1.0 * Math.tan(Units.degreesToRadians(yaw));
@@ -167,8 +166,7 @@ public class PhotonSim extends SubsystemBase{
     // Rotate the vector by the camera pitch
     double xPrime = x;
     Translation2d yzPrime =
-        new Translation2d(y, z)
-            .rotateBy(new Rotation2d(robotToCamera.getRotation().getY()));
+        new Translation2d(y, z).rotateBy(new Rotation2d(robotToCamera.getRotation().getY()));
     double yPrime = yzPrime.getX();
     double zPrime = yzPrime.getY();
 
@@ -181,37 +179,40 @@ public class PhotonSim extends SubsystemBase{
     return new Translation2d(distance, Rotation2d.fromDegrees(yaw));
   }
 
-    public double getYaw(){
-      return getLatestResult().getBestTarget() == null ? 0 : getLatestResult().getBestTarget().getYaw();
-    }
+  public double getYaw() {
+    return getLatestResult().getBestTarget() == null
+        ? 0
+        : getLatestResult().getBestTarget().getYaw();
+  }
 
-    public double getPitch(){
-      return getLatestResult().getBestTarget() == null ? 0 : getLatestResult().getBestTarget().getPitch();
-    }
+  public double getPitch() {
+    return getLatestResult().getBestTarget() == null
+        ? 0
+        : getLatestResult().getBestTarget().getPitch();
+  }
 
-    public void measurements(Drive m_drive){
-        var visionEst = getEstimatedGlobalPose();
-        visionEst.ifPresent(
-                est -> {
-                    var estPose = est.estimatedPose.toPose2d();
-                    // Change our trust in the measurement based on the tags we can see
-                    var estStdDevs = getEstimationStdDevs(estPose);
+  public void measurements(Drive m_drive) {
+    var visionEst = getEstimatedGlobalPose();
+    visionEst.ifPresent(
+        est -> {
+          var estPose = est.estimatedPose.toPose2d();
+          // Change our trust in the measurement based on the tags we can see
+          var estStdDevs = getEstimationStdDevs(estPose);
 
-                    m_drive.addVisionMeasurement(
-                            est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-                            });
-    }
+          m_drive.addVisionMeasurement(
+              est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+        });
+  }
 
-    public void ActivateSimParameters(Pose2d robotPoseMeters, int index){
-        Logger.recordOutput("Vision/Tags", targetPose);
-        Logger.recordOutput("Vision/Cameras", robotToCamera);
-                       Logger.recordOutput("Vision/Estimated" + index, visionSim.getRobotPose());
+  public void ActivateSimParameters(Pose2d robotPoseMeters, int index) {
+    Logger.recordOutput("Vision/Tags", targetPose);
+    Logger.recordOutput("Vision/Cameras", robotToCamera);
+    Logger.recordOutput("Vision/Estimated" + index, visionSim.getRobotPose());
 
-        visionSim.update(robotPoseMeters);
-    }
+    visionSim.update(robotPoseMeters);
+  }
 
-    public boolean hasTargets(){
-      return getLatestResult().hasTargets();
-    }
-
+  public boolean hasTargets() {
+    return getLatestResult().hasTargets();
+  }
 }
