@@ -18,6 +18,7 @@ public class ShooterSubsystem extends SubsystemBase {
     io.updateInputs(inputs);
     io.updateTunableNumbers();
     Logger.processInputs("Shooter", inputs);
+    Logger.recordOutput("Shooter/RPMS", inputs.lowerShooterAppliedVolts);
   }
 
   public void velocity(double up, double down) {
