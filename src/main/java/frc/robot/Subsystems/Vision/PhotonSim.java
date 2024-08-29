@@ -215,4 +215,8 @@ public class PhotonSim extends SubsystemBase {
   public boolean hasTargets() {
     return getLatestResult().hasTargets();
   }
+
+  public int getBestTargetID() {
+    return 1;
+  }
 }

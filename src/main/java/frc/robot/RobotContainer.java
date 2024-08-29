@@ -199,7 +199,25 @@ public class RobotContainer {
     chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
 
     // AutoRoutines
-    chassisDriver.povUp().toggleOnTrue(pathfindAndAlignAmp());
+    chassisDriver
+        .povUp()
+        .toggleOnTrue(
+            pathfindAndAlignAmp()
+                .alongWith(
+                    Commands.sequence(
+                        Commands.waitUntil(
+                            () ->
+                                drive
+                                        .getPose()
+                                        .getTranslation()
+                                        .getDistance(
+                                            Robot.isRedAlliance()
+                                                ? FieldConstants.redAmpPose.getTranslation()
+                                                : FieldConstants.blueAmpPose.getTranslation())
+                                    <= 1.5),
+                        m_arm.goToPosition(12, null))));
+
+    chassisDriver.povDown().toggleOnTrue(pathfindAndAlignAmp());
 
     chassisDriver.povLeft().toggleOnTrue(pathfindAndAlignSource());
 
