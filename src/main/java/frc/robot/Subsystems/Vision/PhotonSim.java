@@ -33,10 +33,9 @@ import org.photonvision.targeting.PhotonPipelineResult;
 
 public class PhotonSim extends SubsystemBase {
   private final PhotonPoseEstimator photonEstimator;
-  private final VisionSystemSim visionSim = new VisionSystemSim("main");
+  private final VisionSystemSim visionSim;
   private final TargetModel targetModel = new TargetModel(0.5, 0.25);
-  private final PhotonCamera camera =
-      new PhotonCamera("cameraName"); // This camera is just for the simulation
+  private final PhotonCamera camera;
   private final Transform3d robotToCamera;
   private final PhotonCameraSim cameraSim;
   private final Pose3d targetPose;
@@ -65,6 +64,8 @@ public class PhotonSim extends SubsystemBase {
       default:
         throw new IllegalArgumentException("Invalid index");
     }
+    camera = new PhotonCamera("PhotonCam " + index); // This camera is just for the simulation
+    visionSim = new VisionSystemSim("sim " + index);
     cameraProp = new SimCameraProperties();
 
     cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(100));
@@ -216,7 +217,13 @@ public class PhotonSim extends SubsystemBase {
     return getLatestResult().hasTargets();
   }
 
-  public int getBestTargetID() {
-    return 1;
+  public double getBestTarget() {
+    return getLatestResult().getBestTarget() == null
+        ? -1
+        : getLatestResult().getBestTarget().getFiducialId();
+  }
+
+  public double getArea() {
+    return getBestTarget();
   }
 }

@@ -44,13 +44,7 @@ public class PhotonAprilTagVision extends SubsystemBase {
       Logger.recordOutput("Vision/Tags Used " + instanceIndex, tagPose3ds.size());
       Logger.recordOutput(
           "Vision/Has tags detected " + instanceIndex, cameras[instanceIndex].hasTargets());
-      Logger.recordOutput(
-          "Vision/Area of target" + instanceIndex,
-          cameras[instanceIndex]
-              .getLatestResult()
-              .getTargets()
-              .get(cameras[instanceIndex].getBestTargetID())
-              .getArea());
+      Logger.recordOutput("Vision/Best Target " + instanceIndex, cameras[instanceIndex].getArea());
     }
   }
 }
