@@ -289,47 +289,37 @@ public class Constants {
 
     public static final AprilTagFieldLayout kTagLayout =
         AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-    // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
+    // Cam mounted facing forward, half a meter forward of center, half a meter up from center,
+    // values are in meters.
     public static final Transform3d kRobotToCam1 =
         new Transform3d(
-            new Translation3d(
-                Units.inchesToMeters(6.67),
-                Units.inchesToMeters(12.74),
-                Units.inchesToMeters(25.1)),
+            new Translation3d(0.169418, 0.323596, 0.63754),
             new Rotation3d(
-                Units.degreesToRadians(180.0),
+                Units.degreesToRadians(0.0),
                 Units.degreesToRadians(-25.0),
                 Units.degreesToRadians(15.0)));
     public static final Transform3d kRobotToCam2 =
         new Transform3d(
-            new Translation3d(
-                Units.inchesToMeters(6.67),
-                Units.inchesToMeters(-12.74),
-                Units.inchesToMeters(25.1)),
+            new Translation3d(0.169418, -0.323596, 0.63754),
             new Rotation3d(
-                Units.degreesToRadians(180.0),
+                Units.degreesToRadians(0.0),
                 Units.degreesToRadians(-25.0),
                 Units.degreesToRadians(-15.0)));
     public static final Transform3d kRobotToCam3 =
         new Transform3d(
-            new Translation3d(
-                Units.inchesToMeters(1.33),
-                Units.inchesToMeters(12.74),
-                Units.inchesToMeters(25.1)),
+            new Translation3d(0.033782, 0.323596, 0.63754),
             new Rotation3d(
-                Units.degreesToRadians(180.0),
+                Units.degreesToRadians(0.0),
                 Units.degreesToRadians(-25.0),
                 Units.degreesToRadians(165.0)));
     public static final Transform3d kRobotToCam4 =
         new Transform3d(
-            new Translation3d(
-                Units.inchesToMeters(1.33),
-                Units.inchesToMeters(-12.74),
-                Units.inchesToMeters(25.1)),
+            new Translation3d(0.033782, -0.323596, 0.63754),
             new Rotation3d(
-                Units.degreesToRadians(180.0),
+                Units.degreesToRadians(0.0),
                 Units.degreesToRadians(-25.0),
                 Units.degreesToRadians(-165.0)));
+
     // (Fake values. Experiment and determine estimation noise on an actual robot.)
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(1500, 1500, 1400);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(1000, 1000, 1400);

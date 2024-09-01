@@ -143,7 +143,6 @@ public class PhotonSim extends SubsystemBase {
     if (numTags == 1 && avgDist > 4)
       estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
     else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-
     return estStdDevs;
   }
 
@@ -224,6 +223,8 @@ public class PhotonSim extends SubsystemBase {
   }
 
   public double getArea() {
-    return getBestTarget();
+    return getLatestResult().getBestTarget() == null
+        ? -1
+        : getLatestResult().getBestTarget().getArea();
   }
 }
