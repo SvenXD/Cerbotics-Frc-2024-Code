@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.Util.LocalADStarAK;
 import frc.Util.NoteVisualizer;
-import frc.robot.Subsystems.Arm.ArmSubsystem.ArmStates;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -105,7 +104,6 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putBoolean("HasNoteInSim", NoteVisualizer.hasSimNote());
 
     SmartDashboard.putNumberArray("Robot Coords", robotCords);
-    NoteVisualizer.showIntakedNotes(RobotContainer.getArmSubsystem().getAngleRadiants());
   }
 
   @Override
@@ -141,9 +139,7 @@ public class Robot extends LoggedRobot {
     NoteVisualizer.showAutoNotes();
 
     for (int i = 0; i < 7; i++) {
-      if (Math.abs(xNotes[i] - robotCords[0]) < 0.5
-          && Math.abs(yNotes[i] - robotCords[1]) < 0.5
-          && RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING) {
+      if (Math.abs(xNotes[i] - robotCords[0]) < 0.5 && Math.abs(yNotes[i] - robotCords[1]) < 0.5) {
         NoteVisualizer.takeAutoNote(i);
         NoteVisualizer.enableShowNote();
       }
@@ -188,17 +184,8 @@ public class Robot extends LoggedRobot {
   public void simulationPeriodic() {
     NoteVisualizer.teleopNote();
     if (Math.abs(NoteVisualizer.getSourceNote().getX() - robotCords[0]) < 0.7
-        && Math.abs(NoteVisualizer.getSourceNote().getY() - robotCords[1]) < 0.7
-        && RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING) {
+        && Math.abs(NoteVisualizer.getSourceNote().getY() - robotCords[1]) < 0.7) {
       NoteVisualizer.enableShowNote();
-    }
-
-    if (RobotContainer.getArmSubsystem().getState() == ArmStates.SHOOTING) {
-      shouldReset = true;
-      oiaefio();
-    }
-    if (shouldReset) {
-      oiaefio();
     }
   }
 
