@@ -18,6 +18,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
@@ -28,6 +29,7 @@ public class PivotIOSim implements PivotIO {
   private final TalonFX pivotMotor;
   private double pivotSetpoint;
   private final double gearRatio = 75;
+  private double latencyCompensatedPosition = 0;
   public final StatusSignal<Double> pivotPositionSignal;
   public final StatusSignal<Double> pivotSetpointSignal;
   public final StatusSignal<Double> pivotVelocitySignal;
@@ -112,6 +114,10 @@ public class PivotIOSim implements PivotIO {
     pivotSimState = pivotMotor.getSimState();
   }
 
+  public Rotation2d getPosition() {
+    return Rotation2d.fromRotations(latencyCompensatedPosition);
+  }
+
   @Override
   public void setOpenLoop(double v) {
     isOpenLoop = true;
@@ -148,5 +154,7 @@ public class PivotIOSim implements PivotIO {
     } else {
       pivotMotor.setControl(openloop.withOverrideBrakeDurNeutral(true));
     }
+    latencyCompensatedPosition =
+        BaseStatusSignal.getLatencyCompensatedValue(pivotPositionSignal, pivotVelocitySignal);
   }
 }
