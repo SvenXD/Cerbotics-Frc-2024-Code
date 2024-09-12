@@ -1,4 +1,4 @@
-package frc.robot.Subsystems.Vision;
+package frc.robot.Subsystems.Vision.PhotonVision;
 
 import static frc.robot.Constants.VisionConstants.kTagLayout;
 

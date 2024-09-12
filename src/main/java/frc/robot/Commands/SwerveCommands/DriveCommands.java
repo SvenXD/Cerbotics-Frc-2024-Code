@@ -23,11 +23,17 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Subsystems.Swerve.Drive;
+import frc.robot.Subsystems.Vision.Limelight.LimelightSim.LimelightNotes;
+import frc.robot.Subsystems.Vision.Limelight.LimelightSim.LimelightNotesIOSim;
 import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
+  private static double kP = 0.1;
+  private static CommandXboxController controller = new CommandXboxController(0);
+  private static final LimelightNotes ll = new LimelightNotes(new LimelightNotesIOSim());
 
   private DriveCommands() {}
 
@@ -39,8 +45,10 @@ public class DriveCommands {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier) {
+
     return Commands.run(
         () -> {
+            metodoLozano();
           // Apply deadband
           double linearMagnitude =
               MathUtil.applyDeadband(
@@ -66,12 +74,24 @@ public class DriveCommands {
           drive.runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                  controller.b().getAsBoolean()
+                      ? Math.pow(ll.getDistanceFromTarget(), 2)
+                          - Math.pow(linearVelocity.getY(), 2) * kP
+                      : linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                   omega * drive.getMaxAngularSpeedRadPerSec(),
                   isFlipped
                       ? drive.getRotation().plus(new Rotation2d(Math.PI))
                       : drive.getRotation()));
         },
         drive);
+  }
+
+  private static void metodoLozano(){
+    if(Math.abs(ll.getTx()) < 0.5){
+        kP = 0;
+    }
+    else{
+    kP = 0.1;
+    }
   }
 }

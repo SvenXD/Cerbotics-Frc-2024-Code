@@ -25,6 +25,8 @@ public class ChangeTest extends AutoCommand {
   private final PathPlannerPath startToSecondAlt = PathPlannerPath.fromPathFile("Test2");
   private final PathPlannerPath startToSecondAltAlt = PathPlannerPath.fromPathFile("Test4");
 
+  private final PathPlannerPath idk = PathPlannerPath.fromPathFile("Test5");
+
   public ChangeTest(Drive m_drive) {
     this.m_drive = m_drive;
     addCommands(
@@ -37,7 +39,7 @@ public class ChangeTest extends AutoCommand {
                     AutoBuilder.followPath(startToSecondAlt)
                         .until(() -> NoteVisualizer.hasSimNote()),
                     () -> NoteVisualizer.hasSimNote()),
-                m_drive.goToPose(new Pose2d(7.98, 6.8, new Rotation2d(0, 0))),
+                AutoBuilder.followPath(idk),
                 AutoBuilder.followPath(startToSecondAltAlt),
                 NoteVisualizer.ampShoot())));
   }

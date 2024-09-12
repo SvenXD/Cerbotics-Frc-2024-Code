@@ -56,8 +56,8 @@ import frc.robot.Subsystems.Swerve.GyroIOPigeon2;
 import frc.robot.Subsystems.Swerve.ModuleIO;
 import frc.robot.Subsystems.Swerve.ModuleIOSim;
 import frc.robot.Subsystems.Swerve.ModuleIOTalonFX;
-import frc.robot.Subsystems.Vision.PhotonAprilTagVision;
-import frc.robot.Subsystems.Vision.PhotonSim;
+import frc.robot.Subsystems.Vision.Limelight.LimelightSim.LimelightNotes;
+import frc.robot.Subsystems.Vision.Limelight.LimelightSim.LimelightNotesIOSim;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -82,12 +82,14 @@ public class RobotContainer {
   public static ArmIO armIO = new ArmIOSparkMax();
   public static ArmSubsystem m_arm;
 
-  public static PhotonSim frontLeftCamera;
+  public static LimelightNotes llNotes = new LimelightNotes(new LimelightNotesIOSim());
+
+  /*public static PhotonSim frontLeftCamera;
   public static PhotonSim frontRightCamera;
   public static PhotonSim backLeftCamera;
-  public static PhotonSim backRightCamera;
+  public static PhotonSim backRightCamera;*/
 
-  public static PhotonAprilTagVision aprilTagVision;
+  // public static PhotonAprilTagVision aprilTagVision;
 
   public RobotContainer() {
     /** Options for the current mode of the robot */
@@ -103,6 +105,10 @@ public class RobotContainer {
                 new ModuleIOTalonFX(3));
         m_shooter = new ShooterSubsystem(shooterIO);
         m_arm = new ArmSubsystem(armIO);
+
+        /*aprilTagVision =
+        new PhotonAprilTagVision(
+            drive, frontLeftCamera, frontRightCamera, backLeftCamera, backRightCamera);*/
         break;
         // --------------------------------------------
       case SIM:
@@ -116,14 +122,14 @@ public class RobotContainer {
                 new ModuleIOSim());
         m_shooter = new ShooterSubsystem(new ShooterIOSim());
         m_arm = new ArmSubsystem(new ArmIOSim());
-        frontLeftCamera = new PhotonSim(0);
+        /*frontLeftCamera = new PhotonSim(0);
         frontRightCamera = new PhotonSim(1);
         backLeftCamera = new PhotonSim(2);
         backRightCamera = new PhotonSim(3);
 
         aprilTagVision =
             new PhotonAprilTagVision(
-                drive, frontLeftCamera, frontRightCamera, backLeftCamera, backRightCamera);
+                drive, frontLeftCamera, frontRightCamera, backLeftCamera, backRightCamera);*/
         break;
         // --------------------------------------------
       default:
@@ -137,12 +143,12 @@ public class RobotContainer {
                 new ModuleIO() {});
         m_shooter = new ShooterSubsystem(new ShooterIO() {});
         m_arm = new ArmSubsystem(new ArmIO() {});
-        frontLeftCamera = new PhotonSim(0);
+        /*frontLeftCamera = new PhotonSim(0);
         frontRightCamera = new PhotonSim(2);
         backLeftCamera = new PhotonSim(3);
         backRightCamera = new PhotonSim(1);
 
-        aprilTagVision = new PhotonAprilTagVision(drive, frontLeftCamera);
+        aprilTagVision = new PhotonAprilTagVision(drive, frontLeftCamera);*/
 
         break;
         // --------------------------------------------
