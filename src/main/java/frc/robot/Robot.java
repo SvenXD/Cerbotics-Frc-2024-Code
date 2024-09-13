@@ -131,9 +131,11 @@ public class Robot extends LoggedRobot {
       xNotes[i] = NoteVisualizer.getAutoNote(i).getX();
       yNotes[i] = NoteVisualizer.getAutoNote(i).getY();
     }
-
     NoteVisualizer.deleteNote(3);
     deleteCords(3);
+    NoteVisualizer.deleteNote(4);
+    deleteCords(4);
+    NoteVisualizer.resetAutoNotes();
   }
 
   @Override

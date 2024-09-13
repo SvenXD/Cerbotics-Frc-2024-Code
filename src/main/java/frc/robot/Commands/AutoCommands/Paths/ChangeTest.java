@@ -39,7 +39,6 @@ public class ChangeTest extends AutoCommand {
                     AutoBuilder.followPath(startToSecondAlt)
                         .until(() -> NoteVisualizer.hasSimNote()),
                     () -> NoteVisualizer.hasSimNote()),
-                AutoBuilder.followPath(idk),
                 AutoBuilder.followPath(startToSecondAltAlt),
                 NoteVisualizer.ampShoot())));
   }

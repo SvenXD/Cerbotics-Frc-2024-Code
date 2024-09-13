@@ -82,7 +82,7 @@ public class LimelightNotes extends SubsystemBase {
     return inputs.distanceFromTarget;
   }
 
-  public double getTx(){
+  public double getTx() {
     return inputs.tx;
   }
 }
