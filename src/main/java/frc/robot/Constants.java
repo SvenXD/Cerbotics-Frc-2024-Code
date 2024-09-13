@@ -320,6 +320,16 @@ public class Constants {
                 Units.degreesToRadians(-25.0),
                 Units.degreesToRadians(-165.0)));
 
+
+                public static final Transform3d noteCam =
+                new Transform3d(
+                    new Translation3d(0.0, 0.0, 0.63754),
+                    new Rotation3d(
+                        Units.degreesToRadians(0.0),
+                        Units.degreesToRadians(0.0),
+                        Units.degreesToRadians(0.0)));
+        
+
     // (Fake values. Experiment and determine estimation noise on an actual robot.)
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(1500, 1500, 1400);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(1000, 1000, 1400);

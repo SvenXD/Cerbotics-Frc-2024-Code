@@ -12,6 +12,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -101,6 +102,7 @@ public class PivotIOSim implements PivotIO {
             .withSoftwareLimitSwitch(softLimitConfig);
 
     pivotMotor = new TalonFX(0, "*");
+    pivotMotor.setControl(new StaticBrake());
     pivotMotor.getConfigurator().apply(pivotMotorConfig);
 
     pivotPositionSignal = pivotMotor.getPosition();
@@ -132,8 +134,15 @@ public class PivotIOSim implements PivotIO {
 
   @Override
   public void updateInputs(PivotIOInputs inputs) {
-    inputs.pivotPositionDeg = Units.radiansToDegrees(pivotSim.getAngleRads());
-    inputs.pivotVoltage = pivotSimState.getMotorVoltage();
+    inputs.simPivotPositionDeg = Units.radiansToDegrees(pivotSim.getAngleRads());
+    inputs.simPivotVoltage = pivotSimState.getMotorVoltage();
+
+    latencyCompensatedPosition =
+        BaseStatusSignal.getLatencyCompensatedValue(pivotPositionSignal, pivotVelocitySignal);
+    inputs.pivotPositionDeg = getPosition().getDegrees();
+    inputs.pivotVel = pivotVelocitySignal.getValue();
+    inputs.pivotSetpoint = pivotSetpointSignal.getValue();
+    inputs.pivotVoltage = pivotMotor.get();
   }
 
   @Override
