@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -243,6 +244,8 @@ public class RobotContainer {
 
     chassisDriver.leftBumper().whileTrue(new NoteAlignCommand(drive));
 
+    chassisDriver.y().onTrue(new InstantCommand(() -> drive.changeIntakeAssist()));
+
     /* Control 2 commands */
     subsystemsDriver
         .leftBumper()
@@ -330,6 +333,8 @@ public class RobotContainer {
             new WaitCommand(1.3).andThen(NoteVisualizer.speakerShoot()),
             m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING))));
     NamedCommands.registerCommand("GetThatNote", new GoToNoteCommand(drive));
+    NamedCommands.registerCommand(
+        "ActivateIntakeAssist", new InstantCommand(() -> drive.changeIntakeAssist()));
   }
 
   public Command getAutonomousCommand() {

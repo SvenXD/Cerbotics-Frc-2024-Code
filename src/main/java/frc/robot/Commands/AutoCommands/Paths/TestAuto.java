@@ -1,5 +1,6 @@
 package frc.robot.Commands.AutoCommands.Paths;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,9 +18,12 @@ public class TestAuto extends AutoCommand {
   private final PathPlannerPath startToFirst;
 
   public TestAuto() {
-    startToFirst = PathPlannerPath.fromPathFile("5NoteAuto1");
+    startToFirst = PathPlannerPath.fromPathFile("IntakeAssist1");
 
-    addCommands(Commands.deadline(Commands.sequence(new PathPlannerAuto("New Auto"))));
+    addCommands(
+        Commands.deadline(
+            Commands.sequence(
+                new PathPlannerAuto("Starting pose 1"), AutoBuilder.followPath(startToFirst))));
   }
 
   @Override

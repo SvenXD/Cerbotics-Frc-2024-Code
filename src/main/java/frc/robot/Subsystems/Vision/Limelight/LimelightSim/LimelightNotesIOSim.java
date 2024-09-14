@@ -6,8 +6,11 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import java.util.List;
+import org.littletonrobotics.junction.Logger;
 
 public class LimelightNotesIOSim implements LimelightNotesIO {
+  private double x = 0;
+  private double y = 0;
   private final List<Translation3d> notePositions =
       List.of(
           new Translation3d(2.9, 7.0, 0.025),
@@ -43,9 +46,20 @@ public class LimelightNotesIOSim implements LimelightNotesIO {
         double distance = llPose.getTranslation().getDistance(pos);
         if (distance <= 6.0 && target == null) {
           target = pos;
+
         } else if (target != null && distance < llPose.getTranslation().getDistance(target)) {
           target = pos;
         }
+        if (target == null) {
+
+          x = 0;
+          y = 0;
+        } else {
+          x = target.getX();
+          y = target.getY();
+        }
+        Logger.recordOutput("Vision/Testx", x);
+        Logger.recordOutput("Vision/Testy", y);
       }
     }
 
@@ -75,5 +89,6 @@ public class LimelightNotesIOSim implements LimelightNotesIO {
 
     inputs.fps = 30.0;
     inputs.lastFPSTimestamp = Timer.getFPGATimestamp();
+    inputs.currentNotePose = new Pose2d(x, y, new Rotation2d());
   }
 }

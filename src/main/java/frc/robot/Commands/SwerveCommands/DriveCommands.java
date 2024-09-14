@@ -34,10 +34,10 @@ import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
-  private static double kP = 0.3;
+  private static double kP = 0.4;
   private static CommandXboxController controller = new CommandXboxController(0);
   private static final LimelightNotes ll = new LimelightNotes(new LimelightNotesIOSim());
-  private static PIDController aimController = new PIDController(0.13, 0, 0.001);
+  private static PIDController aimController = new PIDController(0.3, 0, 0.01);
 
   private DriveCommands() {}
 

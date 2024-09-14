@@ -11,6 +11,8 @@ import org.littletonrobotics.junction.Logger;
 public class LimelightNotes extends SubsystemBase {
   private final LimelightNotesIO io;
   private final LimelightNotesInputsAutoLogged inputs;
+  /*private Optional<Translation2d> noteLocation;
+  private static final double LIMELIGHT_HEIGHT = 25.1; // todo get real num*/
 
   public LimelightNotes(LimelightNotesIO io) {
     this.io = io;
@@ -36,7 +38,24 @@ public class LimelightNotes extends SubsystemBase {
 
     double runtimeMS = (Logger.getRealTimestamp() - startTime) / 1000.0;
     Logger.recordOutput("LimelightNotes/PeriodicRuntimeMS", runtimeMS);
+
+    /*if (hasTarget()) {
+      double d = LIMELIGHT_HEIGHT / Math.tan(Units.degreesToRadians(inputs.ty + 0));
+      double x = d * Math.cos(Units.degreesToRadians(inputs.tx));
+      double y = d * Math.sin(Units.degreesToRadians(inputs.tx));
+      SmartDashboard.putNumber("Note detection x", x);
+      SmartDashboard.putNumber("Note detection y", y);
+      noteLocation = Optional.of(new Translation2d(x, y));
+    } else {
+      noteLocation = Optional.empty();
+    }
+
+    notePose().ifPresent(pose -> Logger.recordOutput("CalculatedNotePosition", pose.getX()));*/
   }
+
+  // public Optional<Translation2d> notePose() {
+  // return noteLocation;
+  // }
 
   public boolean hasTarget() {
     return inputs.hasTarget && (Timer.getFPGATimestamp() - inputs.lastFPSTimestamp < 5.0);
@@ -48,6 +67,10 @@ public class LimelightNotes extends SubsystemBase {
 
   public Rotation2d getTY() {
     return Rotation2d.fromDegrees(inputs.ty);
+  }
+
+  public Pose2d notePosition() {
+    return inputs.currentNotePose;
   }
 
   public double getMeasurementTimestamp() {

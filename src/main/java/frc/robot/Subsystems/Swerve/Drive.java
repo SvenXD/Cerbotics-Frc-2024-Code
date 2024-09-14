@@ -36,24 +36,30 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.Util.LocalADStarAK;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Subsystems.Vision.Limelight.LimelightSim.LimelightNotes;
+import frc.robot.Subsystems.Vision.Limelight.LimelightSim.LimelightNotesIOSim;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
+  private static final LimelightNotes ll = new LimelightNotes(new LimelightNotesIOSim());
   private static final double MAX_LINEAR_SPEED = Units.feetToMeters(MaxLinearSpeed);
   private static final double TRACK_WIDTH_X = kWheelBase;
   private static final double TRACK_WIDTH_Y = kTrackWidth;
   private static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
+
+  private boolean shouldUseIntakeAssist = false;
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
@@ -62,6 +68,7 @@ public class Drive extends SubsystemBase {
   private final SysIdRoutine sysId;
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
+
   private Rotation2d rawGyroRotation = new Rotation2d();
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
@@ -92,7 +99,7 @@ public class Drive extends SubsystemBase {
     AutoBuilder.configureHolonomic(
         this::getPose,
         this::setPose,
-        () -> kinematics.toChassisSpeeds(getModuleStates()),
+        () -> kinematics.toChassisSpeeds(getModuleStates()), // Chassis speeds generation
         this::runVelocity,
         new HolonomicPathFollowerConfig(
             new PIDConstants(DriveConstants.traslationP, DriveConstants.traslationD),
@@ -138,7 +145,13 @@ public class Drive extends SubsystemBase {
                 this));
   }
 
+  @Override
   public void periodic() {
+
+    SmartDashboard.putBoolean("Intake assist activated", shouldUseIntakeAssist);
+    SmartDashboard.putNumber(
+        "CHASSIS c", kinematics.toChassisSpeeds(getModuleStates()).vyMetersPerSecond);
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     for (var module : modules) {
@@ -203,7 +216,13 @@ public class Drive extends SubsystemBase {
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
-    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
+    /*TODO : EXTREMELY IMPORTATNT, NEED TO CHECK THE DISCRETIZE FUNCTION, WHAT IT DOES AND IF IT CAN BE APPLIED TO MODIFIEDO SPEEDS
+     * OR MAKE NEW CLASS FOR AUTONOMOUS
+    */
+
+
+    SwerveModuleState[] setpointStates =
+        kinematics.toSwerveModuleStates(getModifiedChassisSpeeds(speeds));
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
 
     // Send setpoints to modules
@@ -218,14 +237,26 @@ public class Drive extends SubsystemBase {
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
   }
 
+  private ChassisSpeeds getModifiedChassisSpeeds(ChassisSpeeds speedtest) {
+    ChassisSpeeds originalSpeeds = kinematics.toChassisSpeeds(getModuleStates());
+
+    double modifiedXSpeed = speedtest.vxMetersPerSecond; // Keep X movement
+    double modifiedYSpeed = 0; // Stop Y movement
+    double modifiedOmega = 0; // Stop rotation
+
+    // Return the modified chassis speeds with only X movement allowed
+    return new ChassisSpeeds(modifiedXSpeed, modifiedYSpeed, modifiedOmega);
+  }
+
   /** Stops the drive. */
   public void stop() {
     runVelocity(new ChassisSpeeds());
   }
 
   /**
-   * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
-   * return to their normal orientations the next time a nonzero velocity is requested.
+   * originalSpeeds.vyMetersPerSecond * 0.5; Stops the drive and turns the modules to an X
+   * arrangement to resist movement. The modules will return to their normal orientations the next
+   * time a nonzero velocity is requested.
    */
   public void stopWithX() {
     Rotation2d[] headings = new Rotation2d[4];
@@ -360,5 +391,9 @@ public class Drive extends SubsystemBase {
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
+  }
+
+  public void changeIntakeAssist() {
+    this.shouldUseIntakeAssist = !shouldUseIntakeAssist;
   }
 }
