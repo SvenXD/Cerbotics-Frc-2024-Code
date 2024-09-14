@@ -23,6 +23,7 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -58,6 +59,7 @@ public class Drive extends SubsystemBase {
   private static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
+  private static double kP = 1;
 
   private boolean shouldUseIntakeAssist = false;
 
@@ -149,8 +151,7 @@ public class Drive extends SubsystemBase {
   public void periodic() {
 
     SmartDashboard.putBoolean("Intake assist activated", shouldUseIntakeAssist);
-    SmartDashboard.putNumber(
-        "CHASSIS c", kinematics.toChassisSpeeds(getModuleStates()).vyMetersPerSecond);
+    SmartDashboard.putNumber("PID for intake assist", kP);
 
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
@@ -215,14 +216,11 @@ public class Drive extends SubsystemBase {
    */
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(getModifiedChassisSpeeds(speeds), 0.02);
     /*TODO : EXTREMELY IMPORTATNT, NEED TO CHECK THE DISCRETIZE FUNCTION, WHAT IT DOES AND IF IT CAN BE APPLIED TO MODIFIEDO SPEEDS
      * OR MAKE NEW CLASS FOR AUTONOMOUS
-    */
-
-
-    SwerveModuleState[] setpointStates =
-        kinematics.toSwerveModuleStates(getModifiedChassisSpeeds(speeds));
+     */
+    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
 
     // Send setpoints to modules
@@ -238,13 +236,19 @@ public class Drive extends SubsystemBase {
   }
 
   private ChassisSpeeds getModifiedChassisSpeeds(ChassisSpeeds speedtest) {
+
     ChassisSpeeds originalSpeeds = kinematics.toChassisSpeeds(getModuleStates());
 
     double modifiedXSpeed = speedtest.vxMetersPerSecond; // Keep X movement
     double modifiedYSpeed = 0; // Stop Y movement
-    double modifiedOmega = 0; // Stop rotation
+    double modifiedOmega = speedtest.omegaRadiansPerSecond; // Stop rotation
+    changePID();
+    if (shouldUseIntakeAssist) {
 
-    // Return the modified chassis speeds with only X movement allowed
+      modifiedYSpeed = kP;
+    } else {
+      modifiedYSpeed = speedtest.vyMetersPerSecond;
+    }
     return new ChassisSpeeds(modifiedXSpeed, modifiedYSpeed, modifiedOmega);
   }
 
@@ -395,5 +399,15 @@ public class Drive extends SubsystemBase {
 
   public void changeIntakeAssist() {
     this.shouldUseIntakeAssist = !shouldUseIntakeAssist;
+  }
+
+  private static void changePID() {
+    PIDController aimController = new PIDController(0.3, 0, 0.01);
+
+    if (aimController.calculate(ll.getTx()) < 0) {
+      kP = kP * -1;
+    } else {
+      kP = Math.abs(kP);
+    }
   }
 }
