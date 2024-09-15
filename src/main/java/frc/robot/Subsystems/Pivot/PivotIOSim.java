@@ -143,6 +143,11 @@ public class PivotIOSim implements PivotIO {
     inputs.pivotVel = pivotVelocitySignal.getValue();
     inputs.pivotSetpoint = pivotSetpointSignal.getValue();
     inputs.pivotVoltage = pivotMotor.get();
+
+    BaseStatusSignal.refreshAll(
+      pivotPositionSignal,
+      pivotSetpointSignal,
+      pivotVelocitySignal);
   }
 
   @Override
@@ -165,5 +170,10 @@ public class PivotIOSim implements PivotIO {
     }
     latencyCompensatedPosition =
         BaseStatusSignal.getLatencyCompensatedValue(pivotPositionSignal, pivotVelocitySignal);
+  }
+
+  @Override
+  public void setBrake(boolean brake) {
+    pivotMotor.setControl(new StaticBrake());
   }
 }

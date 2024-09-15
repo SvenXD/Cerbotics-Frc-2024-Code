@@ -1,12 +1,12 @@
-package frc.robot.Subsystems.Pivot;
+package frc.robot.Subsystems.Elevator;
 
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface PivotIO {
+public interface ElevatorIO {
   @AutoLog
-  public static class PivotIOInputs {
+  public static class ElevatorIOInputs {
 
     public double simPivotPositionDeg = 0.0;
     public double simPivotVoltage = 0.0;
@@ -17,7 +17,7 @@ public interface PivotIO {
     public double pivotVoltage = 0.0;
   }
 
-  public default void updateInputs(PivotIOInputs inputs) {}
+  public default void updateInputs(ElevatorIOInputs inputs) {}
 
   public default void setOpenLoop(double v) {}
 
@@ -26,6 +26,8 @@ public interface PivotIO {
   public default void superSimPeriodic() {}
 
   public default void setBrake(boolean brake) {}
+
+  public default void superPeriodic(){}
 
   /* Updates the tunable numbers. */
   public default void updateTunableNumbers() {}
