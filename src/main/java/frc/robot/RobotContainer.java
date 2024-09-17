@@ -209,20 +209,18 @@ public class RobotContainer {
     chassisDriver
         .povUp()
         .toggleOnTrue(
-            pathfindAndAlignAmp()
-                .alongWith(
-                    Commands.sequence(
-                        Commands.waitUntil(
-                            () ->
-                                drive
-                                        .getPose()
-                                        .getTranslation()
-                                        .getDistance(
-                                            Robot.isRedAlliance()
-                                                ? FieldConstants.redAmpPose.getTranslation()
-                                                : FieldConstants.blueAmpPose.getTranslation())
-                                    <= 1.5),
-                        m_arm.goToPosition(12, null))));
+            Commands.sequence(
+                pathfindAndAlignAmp().until(chassisDriver.axisGreaterThan(1, 0.1)),
+                /*(() ->
+                drive
+                        .getPose()
+                        .getTranslation()
+                        .getDistance(
+                            Robot.isRedAlliance()
+                                ? FieldConstants.redAmpPose.getTranslation()
+                                : FieldConstants.blueAmpPose.getTranslation())
+                    <= 1.5),*/
+                m_arm.goToPosition(12, m_arm.changeState(ArmStates.STANDING))));
 
     chassisDriver.povDown().toggleOnTrue(pathfindAndAlignAmp());
 

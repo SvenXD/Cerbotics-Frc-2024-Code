@@ -216,7 +216,15 @@ public class Drive extends SubsystemBase {
    */
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(getModifiedChassisSpeeds(speeds), 0.02);
+    ChassisSpeeds discreteSpeeds;
+
+    // Checks if the robot is in autonomous and
+    if (DriverStation.isAutonomous()) {
+      discreteSpeeds = ChassisSpeeds.discretize(getModifiedChassisSpeeds(speeds), 0.02);
+    } else {
+      discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+    }
+
     /*TODO : EXTREMELY IMPORTATNT, NEED TO CHECK THE DISCRETIZE FUNCTION, WHAT IT DOES AND IF IT CAN BE APPLIED TO MODIFIEDO SPEEDS
      * OR MAKE NEW CLASS FOR AUTONOMOUS
      */
@@ -237,14 +245,11 @@ public class Drive extends SubsystemBase {
 
   private ChassisSpeeds getModifiedChassisSpeeds(ChassisSpeeds speedtest) {
 
-    ChassisSpeeds originalSpeeds = kinematics.toChassisSpeeds(getModuleStates());
-
     double modifiedXSpeed = speedtest.vxMetersPerSecond; // Keep X movement
     double modifiedYSpeed = 0; // Stop Y movement
     double modifiedOmega = speedtest.omegaRadiansPerSecond; // Stop rotation
     changePID();
     if (shouldUseIntakeAssist) {
-
       modifiedYSpeed = kP;
     } else {
       modifiedYSpeed = speedtest.vyMetersPerSecond;
@@ -258,9 +263,8 @@ public class Drive extends SubsystemBase {
   }
 
   /**
-   * originalSpeeds.vyMetersPerSecond * 0.5; Stops the drive and turns the modules to an X
-   * arrangement to resist movement. The modules will return to their normal orientations the next
-   * time a nonzero velocity is requested.
+   * ksStops the drive and turns the modules to an X arrangement to resist movement. The modules
+   * will return to their normal orientations the next time a nonzero velocity is requested.
    */
   public void stopWithX() {
     Rotation2d[] headings = new Rotation2d[4];
