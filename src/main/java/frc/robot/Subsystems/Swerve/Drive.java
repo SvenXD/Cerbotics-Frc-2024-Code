@@ -25,6 +25,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -36,6 +37,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -44,8 +46,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.Util.LocalADStarAK;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Subsystems.Vision.Limelight.LimelightSim.LimelightNotes;
-import frc.robot.Subsystems.Vision.Limelight.LimelightSim.LimelightNotesIOSim;
+import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotes;
+import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotesIOSim;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -70,6 +72,14 @@ public class Drive extends SubsystemBase {
   private final SysIdRoutine sysId;
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
+
+  private final BuiltInAccelerometer accelerometer =
+      new BuiltInAccelerometer(); // To detect colitions
+  private final LinearFilter xAccelFilter = LinearFilter.movingAverage(10);
+  private final LinearFilter yAccelFilter = LinearFilter.movingAverage(10);
+
+  private double lastXAccel = 0.0;
+  private double lastYAccel = 0.0;
 
   private Rotation2d rawGyroRotation = new Rotation2d();
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
@@ -151,7 +161,7 @@ public class Drive extends SubsystemBase {
   public void periodic() {
 
     SmartDashboard.putBoolean("Intake assist activated", shouldUseIntakeAssist);
-    SmartDashboard.putNumber("PID for intake assist", kP);
+    SmartDashboard.putBoolean("Detected Collision", detectCollision());
 
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
@@ -412,6 +422,28 @@ public class Drive extends SubsystemBase {
       kP = kP * -1;
     } else {
       kP = Math.abs(kP);
+    }
+  }
+
+  public boolean detectCollision() {
+    // Get the current filtered X and Y acceleration
+    double filteredXAccel = xAccelFilter.calculate(accelerometer.getX());
+    double filteredYAccel = yAccelFilter.calculate(accelerometer.getY());
+
+    // Calculate the change in acceleration (delta)
+    double deltaXAccel = Math.abs(filteredXAccel - lastXAccel);
+    double deltaYAccel = Math.abs(filteredYAccel - lastYAccel);
+
+    // Store current acceleration for next loop
+    lastXAccel = filteredXAccel;
+    lastYAccel = filteredYAccel;
+
+    // Check if the change in acceleration exceeds the threshold
+    if (deltaXAccel > 1.5 || deltaYAccel > 1.5) {
+      // Collision detected
+      return true;
+    } else {
+      return false;
     }
   }
 }

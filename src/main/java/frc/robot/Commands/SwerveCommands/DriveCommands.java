@@ -28,8 +28,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.RobotContainer;
 import frc.robot.Subsystems.Swerve.Drive;
-import frc.robot.Subsystems.Vision.Limelight.LimelightSim.LimelightNotes;
-import frc.robot.Subsystems.Vision.Limelight.LimelightSim.LimelightNotesIOSim;
+import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotes;
+import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotesIOSim;
 import java.util.function.DoubleSupplier;
 
 public class DriveCommands {

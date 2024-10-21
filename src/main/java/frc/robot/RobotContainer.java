@@ -57,8 +57,11 @@ import frc.robot.Subsystems.Swerve.GyroIOPigeon2;
 import frc.robot.Subsystems.Swerve.ModuleIO;
 import frc.robot.Subsystems.Swerve.ModuleIOSim;
 import frc.robot.Subsystems.Swerve.ModuleIOTalonFX;
-import frc.robot.Subsystems.Vision.Limelight.LimelightSim.LimelightNotes;
-import frc.robot.Subsystems.Vision.Limelight.LimelightSim.LimelightNotesIOSim;
+import frc.robot.Subsystems.Vision.Limelight.LimelightAprilTag.LimelightAprilTagIO;
+import frc.robot.Subsystems.Vision.Limelight.LimelightAprilTag.LimelightAprilTagIOSim;
+import frc.robot.Subsystems.Vision.Limelight.LimelightAprilTag.LimelightAprilTagVision;
+import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotes;
+import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotesIOSim;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -84,6 +87,9 @@ public class RobotContainer {
   public static ArmSubsystem m_arm;
 
   public static LimelightNotes llNotes = new LimelightNotes(new LimelightNotesIOSim());
+
+  public static LimelightAprilTagIO llTagIO = new LimelightAprilTagIOSim();
+  public static LimelightAprilTagVision m_Vision;
 
   /*public static PhotonSim frontLeftCamera;
   public static PhotonSim frontRightCamera;
@@ -123,6 +129,7 @@ public class RobotContainer {
                 new ModuleIOSim());
         m_shooter = new ShooterSubsystem(new ShooterIOSim());
         m_arm = new ArmSubsystem(new ArmIOSim());
+        m_Vision = new LimelightAprilTagVision(drive, llTagIO);
         /*frontLeftCamera = new PhotonSim(0);
         frontRightCamera = new PhotonSim(1);
         backLeftCamera = new PhotonSim(2);
