@@ -23,10 +23,6 @@ import frc.Util.LocalADStarAK;
 import frc.Util.Logging.LoggedDashboardChooser;
 import frc.Util.NoteVisualizer;
 import frc.robot.Commands.AutoCommands.AutoCommand;
-import frc.robot.Commands.AutoCommands.GoToNoteCommand;
-import frc.robot.Commands.AutoCommands.Paths.ChangeTest;
-import frc.robot.Commands.AutoCommands.Paths.ComplementPath;
-import frc.robot.Commands.AutoCommands.Paths.FiveNoteAutoPath;
 import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
 import frc.robot.Commands.AutoCommands.Paths.TestAuto;
 import frc.robot.Commands.IntakeCommands.Intake;
@@ -38,7 +34,6 @@ import frc.robot.Commands.ShooterCommands.SpeakerShoot;
 import frc.robot.Commands.ShooterCommands.UnderStageShoot;
 import frc.robot.Commands.SwerveCommands.DriveCommands;
 import frc.robot.Commands.SwerveCommands.NoteAlignCommand;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOSim;
 import frc.robot.Subsystems.Arm.ArmIOSparkMax;
@@ -57,9 +52,6 @@ import frc.robot.Subsystems.Swerve.GyroIOPigeon2;
 import frc.robot.Subsystems.Swerve.ModuleIO;
 import frc.robot.Subsystems.Swerve.ModuleIOSim;
 import frc.robot.Subsystems.Swerve.ModuleIOTalonFX;
-import frc.robot.Subsystems.Vision.Limelight.LimelightAprilTag.LimelightAprilTagIO;
-import frc.robot.Subsystems.Vision.Limelight.LimelightAprilTag.LimelightAprilTagIOSim;
-import frc.robot.Subsystems.Vision.Limelight.LimelightAprilTag.LimelightAprilTagVision;
 import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotes;
 import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotesIOSim;
 import org.littletonrobotics.junction.Logger;
@@ -87,9 +79,6 @@ public class RobotContainer {
   public static ArmSubsystem m_arm;
 
   public static LimelightNotes llNotes = new LimelightNotes(new LimelightNotesIOSim());
-
-  public static LimelightAprilTagIO llTagIO = new LimelightAprilTagIOSim();
-  public static LimelightAprilTagVision m_Vision;
 
   /*public static PhotonSim frontLeftCamera;
   public static PhotonSim frontRightCamera;
@@ -129,7 +118,6 @@ public class RobotContainer {
                 new ModuleIOSim());
         m_shooter = new ShooterSubsystem(new ShooterIOSim());
         m_arm = new ArmSubsystem(new ArmIOSim());
-        m_Vision = new LimelightAprilTagVision(drive, llTagIO);
         /*frontLeftCamera = new PhotonSim(0);
         frontRightCamera = new PhotonSim(1);
         backLeftCamera = new PhotonSim(2);
@@ -173,9 +161,9 @@ public class RobotContainer {
 
     /** Auto options */
     autoChooser.addDefaultOption("None", new NoneAuto());
-    autoChooser.addOption("Complement auto", new ComplementPath());
-    autoChooser.addOption("Six Note Auto", new FiveNoteAutoPath());
-    autoChooser.addOption("Test Of Change", new ChangeTest(drive));
+    // autoChooser.addOption("Complement auto", new ComplementPath());
+    // autoChooser.addOption("Six Note Auto", new FiveNoteAutoPath());
+    // autoChooser.addOption("Test Of Change", new ChangeTest(drive));
     autoChooser.addOption("Test", new TestAuto());
 
     PathPlannerLogging.setLogActivePathCallback(
@@ -213,25 +201,25 @@ public class RobotContainer {
     chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
 
     // AutoRoutines
-    chassisDriver
-        .povUp()
-        .toggleOnTrue(
-            Commands.sequence(
-                pathfindAndAlignAmp().until(chassisDriver.axisGreaterThan(1, 0.1)),
-                /*(() ->
-                drive
-                        .getPose()
-                        .getTranslation()
-                        .getDistance(
-                            Robot.isRedAlliance()
-                                ? FieldConstants.redAmpPose.getTranslation()
-                                : FieldConstants.blueAmpPose.getTranslation())
-                    <= 1.5),*/
-                m_arm.goToPosition(12, m_arm.changeState(ArmStates.STANDING))));
+    /*chassisDriver
+    .povUp()
+    .toggleOnTrue(
+        Commands.sequence(
+            pathfindAndAlignAmp().until(chassisDriver.axisGreaterThan(1, 0.1)),
+            /*(() ->
+            drive
+                    .getPose()
+                    .getTranslation()
+                    .getDistance(
+                        Robot.isRedAlliance()
+                            ? FieldConstants.redAmpPose.getTranslation()
+                            : FieldConstants.blueAmpPose.getTranslation())
+                <= 1.5),*/
+    //   m_arm.goToPosition(12, m_arm.changeState(ArmStates.STANDING))));
 
-    chassisDriver.povDown().toggleOnTrue(pathfindAndAlignAmp());
+    // chassisDriver.povDown().toggleOnTrue(pathfindAndAlignAmp());
 
-    chassisDriver.povLeft().toggleOnTrue(pathfindAndAlignSource());
+    // chassisDriver.povLeft().toggleOnTrue(pathfindAndAlignSource());
 
     chassisDriver
         .rightBumper()
@@ -298,7 +286,7 @@ public class RobotContainer {
         });
   }
 
-  public static Command pathfindAndAlignAmp() {
+  /*public static Command pathfindAndAlignAmp() {
     return Commands.either(
         drive
             .goToPose(FieldConstants.redAmpPose)
@@ -318,7 +306,7 @@ public class RobotContainer {
             .goToPose(FieldConstants.bluePickupPose)
             .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
         Robot::isRedAlliance);
-  }
+  }*/
 
   public void registerNamedCommands() {
     NamedCommands.registerCommand("ShootSim", NoteVisualizer.speakerShoot());
@@ -337,7 +325,6 @@ public class RobotContainer {
         new ParallelCommandGroup(
             new WaitCommand(1.3).andThen(NoteVisualizer.speakerShoot()),
             m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING))));
-    NamedCommands.registerCommand("GetThatNote", new GoToNoteCommand(drive));
     NamedCommands.registerCommand(
         "ActivateIntakeAssist", new InstantCommand(() -> drive.changeIntakeAssist()));
   }

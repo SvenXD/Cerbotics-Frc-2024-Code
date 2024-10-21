@@ -1,12 +1,8 @@
 package frc.robot;
 
-import static frc.robot.Constants.DriveConstants.MaxLinearSpeed;
 import static frc.robot.Constants.DriveConstants.kPhysicalMaxAngularSpeedRadiansPerSecond;
-import static frc.robot.Constants.DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;
 
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.util.GeometryUtil;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
@@ -70,12 +66,12 @@ public class Constants {
   public static class AutoConstants {
     public static String autoValue = "2";
 
-    public static final PathConstraints kPathConstraints =
-        new PathConstraints(
-            Units.feetToMeters(MaxLinearSpeed),
-            kTeleDriveMaxSpeedMetersPerSecond,
-            kPhysicalMaxAngularSpeedRadiansPerSecond,
-            Math.PI * 2);
+    /*public static final PathConstraints kPathConstraints =
+    new PathConstraints(
+        Units.feetToMeters(MaxLinearSpeed),
+        kTeleDriveMaxSpeedMetersPerSecond,
+        kPhysicalMaxAngularSpeedRadiansPerSecond,
+        Math.PI * 2);*/
   }
 
   public class FieldConstants {
@@ -88,10 +84,8 @@ public class Constants {
     /* For auto aligning */
     public static Pose2d blueAmpPose = new Pose2d(2.0, 7.62, Rotation2d.fromDegrees(90));
     public static Pose2d bluePickupPose = new Pose2d(15.331, 1, Rotation2d.fromDegrees(-60));
-    public static Pose2d redPickupPose =
-        GeometryUtil.flipFieldPose(new Pose2d(15.331, 1, Rotation2d.fromDegrees(-60)));
-    public static Pose2d redAmpPose =
-        GeometryUtil.flipFieldPose(new Pose2d(1.8, 7.62, Rotation2d.fromDegrees(90)));
+    public static Pose2d redPickupPose = new Pose2d(2, 1, Rotation2d.fromDegrees(-60));
+    public static Pose2d redAmpPose = new Pose2d(15.331, 7.62, Rotation2d.fromDegrees(90));
 
     /*For note simulation */
     public static final Translation3d blueSpeaker = new Translation3d(0.225, 5.55, 2.1);

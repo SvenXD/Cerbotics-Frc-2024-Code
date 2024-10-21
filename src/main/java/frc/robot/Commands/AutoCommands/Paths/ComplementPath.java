@@ -1,4 +1,4 @@
-package frc.robot.Commands.AutoCommands.Paths;
+/*package frc.robot.Commands.AutoCommands.Paths;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -40,3 +40,4 @@ public class ComplementPath extends AutoCommand {
         .getInitialTargetHolonomicPose();
   }
 }
+*/

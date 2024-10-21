@@ -17,11 +17,11 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.DriveConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
-import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -44,8 +44,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.Util.LocalADStarAK;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotes;
 import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotesIOSim;
 import java.util.concurrent.locks.Lock;
@@ -62,6 +60,19 @@ public class Drive extends SubsystemBase {
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
   private static double kP = 1;
+  /*private static final PathConstraints constraints =
+  new PathConstraints(3.0, 3.0, 2 * 3.14, 4 * 3.14); // The constraints for this path.*/
+
+  RobotConfig config;
+
+  {
+    try {
+      config = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      // Handle exception as needed
+      e.printStackTrace();
+    }
+  }
 
   private boolean shouldUseIntakeAssist = false;
 
@@ -104,29 +115,35 @@ public class Drive extends SubsystemBase {
     modules[2] = new Module(blModuleIO, 2);
     modules[3] = new Module(brModuleIO, 3);
 
-    // Start threads (no-op for each if no signals have been created)
-    PhoenixOdometryThread.getInstance().start();
+    // Start threads (no-op for each if no signals have been created)        () ->
+    // kinematics.toChassisSpeeds(getModuleStates()), // Chassis speeds generation
 
+    PhoenixOdometryThread.getInstance().start();
     // Configure AutoBuilder for PathPlanner
-    AutoBuilder.configureHolonomic(
-        this::getPose,
-        this::setPose,
-        () -> kinematics.toChassisSpeeds(getModuleStates()), // Chassis speeds generation
-        this::runVelocity,
-        new HolonomicPathFollowerConfig(
-            new PIDConstants(DriveConstants.traslationP, DriveConstants.traslationD),
-            new PIDConstants(DriveConstants.rotationP, DriveConstants.rotationD),
-            MAX_LINEAR_SPEED,
-            DRIVE_BASE_RADIUS,
-            new ReplanningConfig()),
+    AutoBuilder.configure(
+        this::getPose, // Robot pose supplier
+        this::setPose, // Method to reset odometry (will be called if your auto has a starting pose)
+        () -> kinematics.toChassisSpeeds(getModuleStates()),
+        (speeds, feedforwards) ->
+            getModifiedChassisSpeeds(
+                speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds.
+        // Also optionally outputs individual module feedforwards
+        new PPHolonomicDriveController( // PPHolonomicController is the built in path following
+            // controller for holonomic drive trains
+            new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+            new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            ),
+        config, // The robot configuration
         () -> {
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
           var alliance = DriverStation.getAlliance();
           if (alliance.isPresent()) {
             return alliance.get() == DriverStation.Alliance.Red;
           }
           return false;
         },
-        this);
+        this // Reference to this subsystem to set requirements
+        );
 
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
@@ -368,9 +385,9 @@ public class Drive extends SubsystemBase {
     };
   }
 
-  public Command goToPose(Pose2d target_pose) {
-    return AutoBuilder.pathfindToPose(target_pose, AutoConstants.kPathConstraints, 0.0, 1);
-  }
+  /*public Command goToPose(Pose2d target_pose) {
+    return AutoBuilder.pathfindToPose(target_pose, constraints);
+  } */
 
   public double getangle() {
     return gyroInputs.pigeonRotation;
