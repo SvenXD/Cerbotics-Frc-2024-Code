@@ -235,9 +235,6 @@ public class Drive extends SubsystemBase {
       discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     }
 
-    /*TODO : EXTREMELY IMPORTATNT, NEED TO CHECK THE DISCRETIZE FUNCTION, WHAT IT DOES AND IF IT CAN BE APPLIED TO MODIFIEDO SPEEDS
-     * OR MAKE NEW CLASS FOR AUTONOMOUS
-     */
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
 
@@ -255,9 +252,9 @@ public class Drive extends SubsystemBase {
 
   private ChassisSpeeds getModifiedChassisSpeeds(ChassisSpeeds speedtest) {
 
-    double modifiedXSpeed = speedtest.vxMetersPerSecond; // Keep X movement
-    double modifiedYSpeed = 0; // Stop Y movement
-    double modifiedOmega = speedtest.omegaRadiansPerSecond; // Stop rotation
+    double modifiedXSpeed = speedtest.vxMetersPerSecond;
+    double modifiedYSpeed = 0;
+    double modifiedOmega = speedtest.omegaRadiansPerSecond;
     changePID();
     if (shouldUseIntakeAssist) {
       modifiedYSpeed = kP;
@@ -327,7 +324,8 @@ public class Drive extends SubsystemBase {
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
-    poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+    poseEstimator.resetPosition(
+        rawGyroRotation.minus(new Rotation2d(Math.PI)), getModulePositions(), pose);
   }
 
   /**
@@ -413,6 +411,10 @@ public class Drive extends SubsystemBase {
 
   public void changeIntakeAssist() {
     this.shouldUseIntakeAssist = !shouldUseIntakeAssist;
+  }
+
+  public void enableDisableIntakeAssist(boolean bool) {
+    shouldUseIntakeAssist = bool;
   }
 
   private static void changePID() {

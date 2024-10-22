@@ -1,6 +1,5 @@
 package frc.robot.Commands.AutoCommands.Paths;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,27 +14,43 @@ import java.util.stream.Stream;
 
 public class TestAuto extends AutoCommand {
 
-  private final PathPlannerPath startToFirst;
+  private final PathPlannerPath first;
+  private final PathPlannerPath second;
+  private final PathPlannerPath third;
+  private final PathPlannerPath fourth;
+  private final PathPlannerPath fifth;
+  private final PathPlannerPath sixth;
 
   public TestAuto() {
-    startToFirst = PathPlannerPath.fromPathFile("IntakeAssist1");
+    first = PathPlannerPath.fromPathFile("Intake1");
+    second = PathPlannerPath.fromPathFile("Intake2");
+    third = PathPlannerPath.fromPathFile("Intake3");
+    fourth = PathPlannerPath.fromPathFile("Intake4");
+    fifth = PathPlannerPath.fromPathFile("Intake5");
+    sixth = PathPlannerPath.fromPathFile("Intake6");
 
     addCommands(
         Commands.deadline(
             Commands.sequence(
-                new PathPlannerAuto("Starting pose 1"), AutoBuilder.followPath(startToFirst))));
+                new PathPlannerAuto("Starting pose 1"), new PathPlannerAuto("IntakeAssistAuto"))));
   }
 
   @Override
   public List<Pose2d> getAllPathPoses() {
-    return Stream.of(startToFirst.getPathPoses())
+    return Stream.of(
+            first.getPathPoses(),
+            second.getPathPoses(),
+            third.getPathPoses(),
+            fourth.getPathPoses(),
+            fifth.getPathPoses(),
+            sixth.getPathPoses())
         .flatMap(Collection::stream)
         .collect(Collectors.toList());
   }
 
   @Override
   public Pose2d getStartingPose() {
-    return startToFirst
+    return first
         .getTrajectory(new ChassisSpeeds(), new Rotation2d())
         .getInitialTargetHolonomicPose();
   }

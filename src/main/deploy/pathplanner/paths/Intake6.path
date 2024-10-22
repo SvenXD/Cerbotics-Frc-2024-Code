@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.20862210340683,
-        "y": 5.539225686154654
+        "x": 7.860377261410728,
+        "y": 5.949104965257007
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5013930170513679,
-        "y": 6.323851734722014
+        "x": 6.197438471909753,
+        "y": 6.581490138729208
       },
       "isLocked": false,
-      "linkedName": "MainStartPoint"
+      "linkedName": "Intake6"
     },
     {
       "anchor": {
-        "x": 4.827270596053316,
-        "y": 7.29585116802188
+        "x": 3.0823559507318716,
+        "y": 7.014791090923124
       },
       "prevControl": {
-        "x": 2.9418259121824937,
-        "y": 7.729152120215796
+        "x": 3.780807344781593,
+        "y": 7.104426094729509
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.85,
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "ShootSim"
+                "name": "Arm150"
               }
             }
           ]
@@ -57,13 +57,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": -165.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Main Auto",
+  "folder": "Intake Assist",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": 180.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

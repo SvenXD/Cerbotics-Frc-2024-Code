@@ -3,39 +3,56 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.4290263965143337,
-        "y": 5.594556573728533
+        "x": 2.379705757984981,
+        "y": 7.014791090923124
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.2437546130441748,
-        "y": 5.925683292165444
+        "x": 3.379705757984981,
+        "y": 7.014791090923124
       },
       "isLocked": false,
-      "linkedName": "5NoteAuto2"
+      "linkedName": "Intake4"
     },
     {
       "anchor": {
-        "x": 2.4290263965143337,
-        "y": 7.096766946743594
+        "x": 7.860377261410728,
+        "y": 5.949104965257007
       },
       "prevControl": {
-        "x": 0.9861162090369815,
-        "y": 7.37782702384235
+        "x": 6.724426116469923,
+        "y": 6.476092609817175
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "5NoteAuto3"
+      "linkedName": "Intake6"
     }
   ],
-  "rotationTargets": [
+  "rotationTargets": [],
+  "constraintZones": [
     {
-      "waypointRelativePos": 0.25,
-      "rotationDegrees": -160.11850008104756,
-      "rotateFast": false
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.1,
+      "constraints": {
+        "maxVelocity": 0.5,
+        "maxAcceleration": 0.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    },
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 0.75,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 3.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
     }
   ],
-  "constraintZones": [],
   "eventMarkers": [
     {
       "name": "New Event Marker",
@@ -47,7 +64,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Arm160"
+                "name": "Arm150"
               }
             }
           ]
@@ -56,7 +73,7 @@
     },
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.25,
+      "waypointRelativePos": 0.05,
       "command": {
         "type": "parallel",
         "data": {
@@ -73,7 +90,24 @@
     },
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.3,
+      "waypointRelativePos": 0.85,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ActivateIntakeAssist"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.55,
       "command": {
         "type": "parallel",
         "data": {
@@ -97,13 +131,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 177.7542574341049,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "5Note",
+  "folder": "Intake Assist",
   "previewStartingState": {
-    "rotation": 177.76169207364615,
+    "rotation": -147.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

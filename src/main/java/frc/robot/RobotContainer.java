@@ -23,7 +23,6 @@ import frc.Util.LocalADStarAK;
 import frc.Util.Logging.LoggedDashboardChooser;
 import frc.Util.NoteVisualizer;
 import frc.robot.Commands.AutoCommands.AutoCommand;
-import frc.robot.Commands.AutoCommands.GoToNoteCommand;
 import frc.robot.Commands.AutoCommands.Paths.ChangeTest;
 import frc.robot.Commands.AutoCommands.Paths.ComplementPath;
 import frc.robot.Commands.AutoCommands.Paths.FiveNoteAutoPath;
@@ -57,9 +56,6 @@ import frc.robot.Subsystems.Swerve.GyroIOPigeon2;
 import frc.robot.Subsystems.Swerve.ModuleIO;
 import frc.robot.Subsystems.Swerve.ModuleIOSim;
 import frc.robot.Subsystems.Swerve.ModuleIOTalonFX;
-import frc.robot.Subsystems.Vision.Limelight.LimelightAprilTag.LimelightAprilTagIO;
-import frc.robot.Subsystems.Vision.Limelight.LimelightAprilTag.LimelightAprilTagIOSim;
-import frc.robot.Subsystems.Vision.Limelight.LimelightAprilTag.LimelightAprilTagVision;
 import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotes;
 import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotesIOSim;
 import org.littletonrobotics.junction.Logger;
@@ -87,9 +83,6 @@ public class RobotContainer {
   public static ArmSubsystem m_arm;
 
   public static LimelightNotes llNotes = new LimelightNotes(new LimelightNotesIOSim());
-
-  public static LimelightAprilTagIO llTagIO = new LimelightAprilTagIOSim();
-  public static LimelightAprilTagVision m_Vision;
 
   /*public static PhotonSim frontLeftCamera;
   public static PhotonSim frontRightCamera;
@@ -129,7 +122,6 @@ public class RobotContainer {
                 new ModuleIOSim());
         m_shooter = new ShooterSubsystem(new ShooterIOSim());
         m_arm = new ArmSubsystem(new ArmIOSim());
-        m_Vision = new LimelightAprilTagVision(drive, llTagIO);
         /*frontLeftCamera = new PhotonSim(0);
         frontRightCamera = new PhotonSim(1);
         backLeftCamera = new PhotonSim(2);
@@ -176,7 +168,7 @@ public class RobotContainer {
     autoChooser.addOption("Complement auto", new ComplementPath());
     autoChooser.addOption("Six Note Auto", new FiveNoteAutoPath());
     autoChooser.addOption("Test Of Change", new ChangeTest(drive));
-    autoChooser.addOption("Test", new TestAuto());
+    autoChooser.addOption("5 note auto align", new TestAuto());
 
     PathPlannerLogging.setLogActivePathCallback(
         (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));
@@ -337,7 +329,7 @@ public class RobotContainer {
         new ParallelCommandGroup(
             new WaitCommand(1.3).andThen(NoteVisualizer.speakerShoot()),
             m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING))));
-    NamedCommands.registerCommand("GetThatNote", new GoToNoteCommand(drive));
+    NamedCommands.registerCommand("InstaShoot", new Intake(m_intake));
     NamedCommands.registerCommand(
         "ActivateIntakeAssist", new InstantCommand(() -> drive.changeIntakeAssist()));
   }

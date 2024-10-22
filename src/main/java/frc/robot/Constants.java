@@ -39,7 +39,7 @@ public class Constants {
 
   public static class DriveConstants {
 
-    public static final double kDriveGearRatio = 5.5;
+    public static final double kDriveGearRatio = 4.59;
     public static final double kTurnGearRatio = 10.29;
 
     // Distance between left and right wheels

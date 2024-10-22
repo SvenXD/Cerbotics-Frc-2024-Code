@@ -3,60 +3,37 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.4290263965143337,
-        "y": 5.594556573728533
+        "x": 2.5202357965343594,
+        "y": 4.075371117931965
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.2437546130441748,
-        "y": 5.925683292165444
+        "x": 1.852718113424813,
+        "y": 4.614069599037914
       },
       "isLocked": false,
-      "linkedName": "5NoteAuto2"
+      "linkedName": "Intake3"
     },
     {
       "anchor": {
-        "x": 2.4290263965143337,
-        "y": 7.096766946743594
+        "x": 2.379705757984981,
+        "y": 7.014791090923124
       },
       "prevControl": {
-        "x": 0.9861162090369815,
-        "y": 7.37782702384235
+        "x": 1.379705757984981,
+        "y": 7.014791090923124
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "5NoteAuto3"
+      "linkedName": "Intake4"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.25,
-      "rotationDegrees": -160.11850008104756,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Arm160"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "New Event Marker",
-      "waypointRelativePos": 0.25,
+      "waypointRelativePos": 0.4,
       "command": {
         "type": "parallel",
         "data": {
@@ -73,7 +50,24 @@
     },
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.3,
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Arm150"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.5,
       "command": {
         "type": "parallel",
         "data": {
@@ -97,13 +91,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 177.7542574341049,
+    "rotation": -147.38,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "5Note",
+  "folder": "Intake Assist",
   "previewStartingState": {
-    "rotation": 177.76169207364615,
+    "rotation": 180.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

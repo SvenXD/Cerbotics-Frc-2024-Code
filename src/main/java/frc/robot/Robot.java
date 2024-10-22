@@ -24,7 +24,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
-  private RobotContainer m_robotContainer;
+  private static RobotContainer m_robotContainer;
   private static double[] xNotes = new double[7];
   private static double[] yNotes = new double[7];
   private double[] robotCords = new double[2];
@@ -109,7 +109,9 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    RobotContainer.getSwerveSubsystem().enableDisableIntakeAssist(false);
+  }
 
   @Override
   public void disabledPeriodic() {}
