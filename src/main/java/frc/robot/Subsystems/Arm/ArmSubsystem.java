@@ -2,9 +2,7 @@ package frc.robot.Subsystems.Arm;
 
 import static frc.robot.Constants.Arm.*;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -15,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Util.Interpolation.InterpolatingDouble;
 import frc.Util.Interpolation.InterpolatingTreeMap;
-import frc.Util.Logging.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -24,26 +21,10 @@ public class ArmSubsystem extends SubsystemBase {
   private final ArmIO io;
   private final ArmIoInputsAutoLogged inputs = new ArmIoInputsAutoLogged();
 
-  /* PID Gains */
-  LoggedTunableNumber armKg = new LoggedTunableNumber("ArmPID/kG", kG);
-  LoggedTunableNumber armKs = new LoggedTunableNumber("ArmPID/kS", kS);
-  LoggedTunableNumber armKa = new LoggedTunableNumber("ArmPID/kA", kA);
-  LoggedTunableNumber armKv = new LoggedTunableNumber("ArmPID/kV", kV);
-  LoggedTunableNumber armKp = new LoggedTunableNumber("ArmPID/kP", kP);
-  LoggedTunableNumber armKi = new LoggedTunableNumber("ArmPID/kI", kI);
-  LoggedTunableNumber armKd = new LoggedTunableNumber("ArmPID/kD", kD);
-
   /* Visualizer */
   private final ArmVisualizer measuredVisualizer;
   private final ArmVisualizer setpointVisualizer;
   private final ArmVisualizer goalVisualizer;
-
-  /* Constrains */
-  private final TrapezoidProfile.Constraints m_constraints;
-  private TrapezoidProfile.State m_tpState = new TrapezoidProfile.State(0.0, 0.0);
-  private ProfiledPIDController m_controller;
-
-  private final ArmFeedforward m_feedforward;
 
   /*Variables */
   private SendableChooser<String> armModeChooser = new SendableChooser<>();
@@ -76,14 +57,8 @@ public class ArmSubsystem extends SubsystemBase {
   public ArmSubsystem(ArmIO io) {
     this.io = io;
     io.updateTunableNumbers();
+    io.superSimPeriodic();
     Logger.processInputs("Arm", inputs);
-
-    m_feedforward = new ArmFeedforward(armKs.get(), armKg.get(), armKv.get(), armKa.get());
-    m_constraints =
-        new TrapezoidProfile.Constraints(
-            kMaxVelocityRadPerSecond, kMaxAccelerationMetersPerSecondSquared);
-    m_controller =
-        new ProfiledPIDController(armKp.get(), armKi.get(), armKd.get(), m_constraints, kPeriod);
 
     measuredVisualizer = new ArmVisualizer("Measured", Color.kBlack);
     setpointVisualizer = new ArmVisualizer("Setpoint", Color.kGreen);
@@ -99,50 +74,50 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    updatePID();
+    io.superSimPeriodic();
 
     Logger.processInputs("Arm", inputs);
     Logger.recordOutput("Arm/Current State", systemStates.toString());
-
-    if (enable) {
-      io.setVoltage(
-          m_controller.calculate(inputs.currentAngle),
-          m_feedforward.calculate(
-              m_controller.getSetpoint().position, m_controller.getSetpoint().velocity));
-    }
 
     if (DriverStation.isDisabled()) {
       currentModeSelection = armModeChooser.getSelected();
       switch (currentModeSelection) {
         case "BRAKE":
-          io.setBrakeMode();
+          io.setBrakeMode(true);
           break;
 
         case "COAST":
-          io.setCoastMode();
+          io.setBrakeMode(false);
           break;
       }
     } else {
-      io.setBrakeMode();
+      io.setBrakeMode(false);
     }
 
-    goalVisualizer.update(getController().getGoal().position);
-    Logger.recordOutput("Arm/GoalAngle", getController().getGoal().position);
+    goalVisualizer.update(inputs.currentAngle);
+    Logger.recordOutput("Arm/GoalAngle", inputs.setPoint);
 
     measuredVisualizer.update(getAngleRadiants());
-    setpointVisualizer.update(m_controller.getSetpoint().position);
-    Logger.recordOutput("Arm/SetpointAngle", m_controller.getSetpoint().position);
-    Logger.recordOutput("Arm/SetpointVelocity", m_controller.getSetpoint().velocity);
+    setpointVisualizer.update(inputs.currentAngle);
+    Logger.recordOutput("Arm/SetpointAngle", inputs.setPoint);
+    Logger.recordOutput("Arm/SetpointVelocity", inputs.pivotVel);
   }
 
-  public Command goToPosition(double position, ArmStates state) {
+  public Command goToPosition(Rotation2d position) {
     Command ejecutable =
         Commands.runOnce(
             () -> {
-              systemStates = state;
-              getController().reset(inputs.currentAngle);
-              m_controller.setGoal(position);
-              enable = true;
+              io.setDesiredAngle(position);
+            },
+            this);
+    return ejecutable;
+  }
+
+  public Command setOpenLoop(double position) {
+    Command ejecutable =
+        Commands.runOnce(
+            () -> {
+              io.setOpenLoop(position);
             },
             this);
     return ejecutable;
@@ -152,23 +127,6 @@ public class ArmSubsystem extends SubsystemBase {
     return kDistanceToArmAngle.getInterpolated(
             new InterpolatingDouble(Math.max(Math.min(distance, 4.35), 1.66)))
         .value;
-  }
-
-  public ProfiledPIDController getController() {
-    return m_controller;
-  }
-
-  public void updatePID() {
-    if (armKs.hasChanged(0)
-        || armKv.hasChanged(0)
-        || armKp.hasChanged(0)
-        || armKi.hasChanged(0)
-        || armKd.hasChanged(0)
-        || armKa.hasChanged(0)) {
-
-      m_controller =
-          new ProfiledPIDController(armKp.get(), armKi.get(), armKd.get(), m_constraints);
-    }
   }
 
   public double getAngleRadiants() {
@@ -182,11 +140,6 @@ public class ArmSubsystem extends SubsystemBase {
   public ArmStates changeState(ArmStates state) {
     systemStates = state;
     return systemStates;
-  }
-
-  public void updateArmSetpoint(double setpoint) {
-    m_tpState.position = Units.degreesToRadians(setpoint);
-    m_controller.setGoal(setpoint);
   }
 
   public double getArmAngle() {

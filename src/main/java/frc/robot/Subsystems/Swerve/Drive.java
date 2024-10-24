@@ -23,7 +23,6 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -46,15 +45,12 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.Util.LocalADStarAK;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotes;
-import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotesIOSim;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
-  private static final LimelightNotes ll = new LimelightNotes(new LimelightNotesIOSim());
   private static final double MAX_LINEAR_SPEED = Units.feetToMeters(MaxLinearSpeed);
   private static final double TRACK_WIDTH_X = kWheelBase;
   private static final double TRACK_WIDTH_Y = kTrackWidth;
@@ -417,15 +413,7 @@ public class Drive extends SubsystemBase {
     shouldUseIntakeAssist = bool;
   }
 
-  private static void changePID() {
-    PIDController aimController = new PIDController(0.3, 0, 0.01);
-
-    if (aimController.calculate(ll.getTx()) < 0) {
-      kP = kP * -1;
-    } else {
-      kP = Math.abs(kP);
-    }
-  }
+  private static void changePID() {}
 
   public boolean detectCollision() {
     // Get the current filtered X and Y acceleration

@@ -8,13 +8,10 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.Util.LocalADStarAK;
-import frc.Util.NoteVisualizer;
-import frc.robot.Subsystems.Arm.ArmSubsystem.ArmStates;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -25,11 +22,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   private static RobotContainer m_robotContainer;
-  private static double[] xNotes = new double[7];
-  private static double[] yNotes = new double[7];
-  private double[] robotCords = new double[2];
-  private static Timer timer = new Timer();
-  private static boolean shouldReset = false;
 
   @Override
   public void robotInit() {
@@ -96,16 +88,6 @@ public class Robot extends LoggedRobot {
 
     CommandScheduler.getInstance().run();
     SmartDashboard.putBoolean("IsRedAlliance", isRedAlliance());
-
-    robotCords[0] = RobotContainer.getSwerveSubsystem().getPose().getX();
-    robotCords[1] = RobotContainer.getSwerveSubsystem().getPose().getY();
-
-    SmartDashboard.putNumber("Xnote", xNotes[0]);
-    SmartDashboard.putNumber("Ynote", yNotes[0]);
-    SmartDashboard.putBoolean("HasNoteInSim", NoteVisualizer.hasSimNote());
-
-    SmartDashboard.putNumberArray("Robot Coords", robotCords);
-    NoteVisualizer.showIntakedNotes(RobotContainer.getArmSubsystem().getAngleRadiants());
   }
 
   @Override
@@ -127,32 +109,10 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    NoteVisualizer.resetAutoNotes();
-
-    for (int i = 0; i < 7; i++) {
-      xNotes[i] = NoteVisualizer.getAutoNote(i).getX();
-      yNotes[i] = NoteVisualizer.getAutoNote(i).getY();
-    }
-    NoteVisualizer.deleteNote(3);
-    deleteCords(3);
-    NoteVisualizer.deleteNote(4);
-    deleteCords(4);
-    NoteVisualizer.resetAutoNotes();
   }
 
   @Override
-  public void autonomousPeriodic() {
-    NoteVisualizer.showAutoNotes();
-
-    for (int i = 0; i < 7; i++) {
-      if (Math.abs(xNotes[i] - robotCords[0]) < 0.5
-          && Math.abs(yNotes[i] - robotCords[1]) < 0.5
-          && RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING) {
-        NoteVisualizer.takeAutoNote(i);
-        NoteVisualizer.enableShowNote();
-      }
-    }
-  }
+  public void autonomousPeriodic() {}
 
   @Override
   public void autonomousExit() {}
@@ -162,7 +122,6 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    NoteVisualizer.clearAutoNotes();
   }
 
   @Override
@@ -172,10 +131,7 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void teleopExit() {
-    timer.stop();
-    timer.reset();
-  }
+  public void teleopExit() {}
 
   @Override
   public void testInit() {
@@ -189,42 +145,11 @@ public class Robot extends LoggedRobot {
   public void testExit() {}
 
   @Override
-  public void simulationPeriodic() {
-    NoteVisualizer.teleopNote();
-    if (Math.abs(NoteVisualizer.getSourceNote().getX() - robotCords[0]) < 0.7
-        && Math.abs(NoteVisualizer.getSourceNote().getY() - robotCords[1]) < 0.7
-        && RobotContainer.getArmSubsystem().getState() == ArmStates.INTAKING) {
-      NoteVisualizer.enableShowNote();
-    }
-
-    if (RobotContainer.getArmSubsystem().getState() == ArmStates.SHOOTING) {
-      shouldReset = true;
-      oiaefio();
-    }
-    if (shouldReset) {
-      oiaefio();
-    }
-  }
+  public void simulationPeriodic() {}
 
   public static boolean isRedAlliance() {
     return DriverStation.getAlliance()
         .filter(value -> value == DriverStation.Alliance.Red)
         .isPresent();
-  }
-
-  public static void deleteCords(int note) {
-    xNotes[note] = 0;
-    yNotes[note] = 0;
-  }
-
-  public static void oiaefio() {
-    timer.start();
-    NoteVisualizer.enableAccurateNotes(2.79253, timer.get() * 8);
-
-    if (NoteVisualizer.getZ() > 2.2) {
-      timer.stop();
-      timer.reset();
-      shouldReset = false;
-    }
   }
 }

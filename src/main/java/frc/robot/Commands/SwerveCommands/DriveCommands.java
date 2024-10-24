@@ -28,15 +28,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.RobotContainer;
 import frc.robot.Subsystems.Swerve.Drive;
-import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotes;
-import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotesIOSim;
 import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
   private static double kP = 0.4;
   private static CommandXboxController controller = new CommandXboxController(0);
-  private static final LimelightNotes ll = new LimelightNotes(new LimelightNotesIOSim());
   private static PIDController aimController = new PIDController(0.3, 0, 0.01);
 
   private DriveCommands() {}
@@ -52,7 +49,6 @@ public class DriveCommands {
 
     return Commands.run(
         () -> {
-          changePID();
           // Apply deadband
           double linearMagnitude =
               MathUtil.applyDeadband(
@@ -78,11 +74,7 @@ public class DriveCommands {
           drive.runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  controller.b().getAsBoolean()
-                      ? (Math.pow(ll.getDistanceFromTarget(), 2)
-                              - Math.pow(linearVelocity.getY(), 2))
-                          * -kP
-                      : linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                   omega * drive.getMaxAngularSpeedRadPerSec(),
                   isFlipped
                       ? drive.getRotation().plus(new Rotation2d(Math.PI))
@@ -91,26 +83,5 @@ public class DriveCommands {
               "PID VALUE", RobotContainer.getSwerveSubsystem().getRotation().getDegrees());
         },
         drive);
-  }
-
-  private static void changePID() {
-    if (Math.abs(ll.getTx()) < 0.5) {
-      kP = 0;
-    } else {
-      kP = 0.3;
-    }
-
-    if (aimController.calculate(ll.getTx()) < 0) {
-      kP = kP * -1;
-    } else {
-      kP = Math.abs(kP);
-    }
-
-    if (RobotContainer.getSwerveSubsystem().getRotation().getDegrees() > 90
-        || RobotContainer.getSwerveSubsystem().getRotation().getDegrees() < -90) {
-      kP = kP * -1;
-    } else {
-      kP = kP * -1;
-    }
   }
 }

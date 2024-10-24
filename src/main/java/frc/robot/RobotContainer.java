@@ -10,54 +10,34 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
 import frc.Util.Logging.LoggedDashboardChooser;
-import frc.Util.NoteVisualizer;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.AutoCommands.Paths.ChangeTest;
 import frc.robot.Commands.AutoCommands.Paths.ComplementPath;
 import frc.robot.Commands.AutoCommands.Paths.FiveNoteAutoPath;
 import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
 import frc.robot.Commands.AutoCommands.Paths.TestAuto;
-import frc.robot.Commands.IntakeCommands.Intake;
-import frc.robot.Commands.IntakeCommands.IntakeWSensor;
-import frc.robot.Commands.IntakeCommands.Outake;
-import frc.robot.Commands.ShooterCommands.AmpShoot;
-import frc.robot.Commands.ShooterCommands.OverStageShoot;
-import frc.robot.Commands.ShooterCommands.SpeakerShoot;
-import frc.robot.Commands.ShooterCommands.UnderStageShoot;
 import frc.robot.Commands.SwerveCommands.DriveCommands;
 import frc.robot.Commands.SwerveCommands.NoteAlignCommand;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.Subsystems.Arm.ArmIO;
-import frc.robot.Subsystems.Arm.ArmIOSim;
-import frc.robot.Subsystems.Arm.ArmIOSparkMax;
-import frc.robot.Subsystems.Arm.ArmSubsystem;
-import frc.robot.Subsystems.Arm.ArmSubsystem.ArmStates;
-import frc.robot.Subsystems.Intake.IntakeIO;
-import frc.robot.Subsystems.Intake.IntakeIOSparkMax;
-import frc.robot.Subsystems.Intake.IntakeSubsystem;
-import frc.robot.Subsystems.Shooter.ShooterIO;
-import frc.robot.Subsystems.Shooter.ShooterIOSim;
-import frc.robot.Subsystems.Shooter.ShooterIOTalon;
-import frc.robot.Subsystems.Shooter.ShooterSubsystem;
+import frc.robot.Subsystems.JointRanger.ArmIOTest;
+import frc.robot.Subsystems.JointRanger.RangerIO;
+import frc.robot.Subsystems.JointRanger.RangerSubsystem;
 import frc.robot.Subsystems.Swerve.Drive;
 import frc.robot.Subsystems.Swerve.GyroIO;
 import frc.robot.Subsystems.Swerve.GyroIOPigeon2;
 import frc.robot.Subsystems.Swerve.ModuleIO;
 import frc.robot.Subsystems.Swerve.ModuleIOSim;
 import frc.robot.Subsystems.Swerve.ModuleIOTalonFX;
-import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotes;
-import frc.robot.Subsystems.Vision.Limelight.LimelightNotes.LimelightNotesIOSim;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -73,23 +53,8 @@ public class RobotContainer {
 
   public static Drive drive;
 
-  public static ShooterIO shooterIO = new ShooterIOTalon();
-  public static ShooterSubsystem m_shooter;
-
-  public static IntakeIO intakeIO = new IntakeIOSparkMax();
-  public static IntakeSubsystem m_intake = new IntakeSubsystem(intakeIO);
-
-  public static ArmIO armIO = new ArmIOSparkMax();
-  public static ArmSubsystem m_arm;
-
-  public static LimelightNotes llNotes = new LimelightNotes(new LimelightNotesIOSim());
-
-  /*public static PhotonSim frontLeftCamera;
-  public static PhotonSim frontRightCamera;
-  public static PhotonSim backLeftCamera;
-  public static PhotonSim backRightCamera;*/
-
-  // public static PhotonAprilTagVision aprilTagVision;
+  public static RangerIO armIO = new ArmIOTest();
+  public static RangerSubsystem m_arm = new RangerSubsystem(armIO);
 
   public RobotContainer() {
     /** Options for the current mode of the robot */
@@ -103,12 +68,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(1),
                 new ModuleIOTalonFX(2),
                 new ModuleIOTalonFX(3));
-        m_shooter = new ShooterSubsystem(shooterIO);
-        m_arm = new ArmSubsystem(armIO);
 
-        /*aprilTagVision =
-        new PhotonAprilTagVision(
-            drive, frontLeftCamera, frontRightCamera, backLeftCamera, backRightCamera);*/
         break;
         // --------------------------------------------
       case SIM:
@@ -120,16 +80,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim());
-        m_shooter = new ShooterSubsystem(new ShooterIOSim());
-        m_arm = new ArmSubsystem(new ArmIOSim());
-        /*frontLeftCamera = new PhotonSim(0);
-        frontRightCamera = new PhotonSim(1);
-        backLeftCamera = new PhotonSim(2);
-        backRightCamera = new PhotonSim(3);
 
-        aprilTagVision =
-            new PhotonAprilTagVision(
-                drive, frontLeftCamera, frontRightCamera, backLeftCamera, backRightCamera);*/
         break;
         // --------------------------------------------
       default:
@@ -141,14 +92,6 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        m_shooter = new ShooterSubsystem(new ShooterIO() {});
-        m_arm = new ArmSubsystem(new ArmIO() {});
-        /*frontLeftCamera = new PhotonSim(0);
-        frontRightCamera = new PhotonSim(2);
-        backLeftCamera = new PhotonSim(3);
-        backRightCamera = new PhotonSim(1);
-
-        aprilTagVision = new PhotonAprilTagVision(drive, frontLeftCamera);*/
 
         break;
         // --------------------------------------------
@@ -182,7 +125,6 @@ public class RobotContainer {
     Pathfinding.setPathfinder(new LocalADStarAK());
 
     // Set up note visualizer
-    NoteVisualizer.setRobotPoseSupplier(drive::getPose);
 
     configureBindings();
   }
@@ -204,80 +146,16 @@ public class RobotContainer {
     // Set field centric
     chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
 
-    // AutoRoutines
-    chassisDriver
-        .povUp()
-        .toggleOnTrue(
-            Commands.sequence(
-                pathfindAndAlignAmp().until(chassisDriver.axisGreaterThan(1, 0.1)),
-                /*(() ->
-                drive
-                        .getPose()
-                        .getTranslation()
-                        .getDistance(
-                            Robot.isRedAlliance()
-                                ? FieldConstants.redAmpPose.getTranslation()
-                                : FieldConstants.blueAmpPose.getTranslation())
-                    <= 1.5),*/
-                m_arm.goToPosition(12, m_arm.changeState(ArmStates.STANDING))));
-
     chassisDriver.povDown().toggleOnTrue(pathfindAndAlignAmp());
 
     chassisDriver.povLeft().toggleOnTrue(pathfindAndAlignSource());
-
-    chassisDriver
-        .rightBumper()
-        .whileTrue(
-            new IntakeWSensor(m_intake)
-                .alongWith(
-                    m_arm.goToPosition(INTAKING_POSITION, m_arm.changeState(ArmStates.INTAKING))))
-        .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE, m_arm.changeState(ArmStates.IDLE)));
-
-    // Control rumbles when game piece is detected
-    chassisDriver
-        .rightBumper()
-        .and(() -> NoteVisualizer.hasSimNote())
-        .onTrue(controllerRumbleCommand().withTimeout(1));
 
     chassisDriver.leftBumper().whileTrue(new NoteAlignCommand(drive));
 
     chassisDriver.y().onTrue(new InstantCommand(() -> drive.changeIntakeAssist()));
 
-    /* Control 2 commands */
-    subsystemsDriver
-        .leftBumper()
-        .whileTrue(new AmpShoot(m_shooter, m_intake).alongWith(NoteVisualizer.ampShoot()))
-        .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE, m_arm.changeState(ArmStates.IDLE)));
-
-    subsystemsDriver
-        .rightBumper()
-        .whileTrue(
-            new Intake(m_intake)
-                .alongWith(
-                    NoteVisualizer.speakerShoot()
-                        .onlyIf(() -> m_arm.getState() == ArmStates.SHOOTING)));
-
-    subsystemsDriver
-        .x()
-        .whileTrue(
-            new SpeakerShoot(m_shooter)
-                .alongWith(
-                    m_arm.goToPosition(
-                        SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING))))
-        .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE, m_arm.changeState(ArmStates.IDLE)));
-
-    subsystemsDriver
-        .povLeft()
-        .whileTrue(new UnderStageShoot(m_shooter))
-        .whileFalse(m_arm.goToPosition(IDLE_UNDER_STAGE, m_arm.changeState(ArmStates.IDLE)));
-
-    subsystemsDriver.povRight().whileTrue(new OverStageShoot(m_shooter));
-
-    subsystemsDriver.b().whileTrue(new Outake(m_intake, m_shooter));
-
-    subsystemsDriver
-        .a()
-        .onTrue(m_arm.goToPosition(AMP_POSITION, m_arm.changeState(ArmStates.STANDING)));
+    subsystemsDriver.y().onTrue(m_arm.setTargetAngleCommand(Rotation2d.fromDegrees(140)));
+    subsystemsDriver.a().onTrue(m_arm.setTargetAngleCommand(Rotation2d.fromDegrees(100)));
   }
 
   private Command controllerRumbleCommand() {
@@ -313,33 +191,12 @@ public class RobotContainer {
   }
 
   public void registerNamedCommands() {
-    NamedCommands.registerCommand("ShootSim", NoteVisualizer.speakerShoot());
-    NamedCommands.registerCommand(
-        "Intake",
-        new ParallelCommandGroup(
-            new IntakeWSensor(m_intake),
-            m_arm.goToPosition(INTAKING_POSITION, m_arm.changeState(ArmStates.INTAKING))));
-    NamedCommands.registerCommand(
-        "Arm160",
-        m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING)));
-    NamedCommands.registerCommand(
-        "Arm150", m_arm.goToPosition(150, m_arm.changeState(ArmStates.SHOOTING)));
-    NamedCommands.registerCommand(
-        "StarterShoot",
-        new ParallelCommandGroup(
-            new WaitCommand(1.3).andThen(NoteVisualizer.speakerShoot()),
-            m_arm.goToPosition(SPEAKER_SCORING_POSITION, m_arm.changeState(ArmStates.SHOOTING))));
-    NamedCommands.registerCommand("InstaShoot", new Intake(m_intake));
     NamedCommands.registerCommand(
         "ActivateIntakeAssist", new InstantCommand(() -> drive.changeIntakeAssist()));
   }
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
-  }
-
-  public static ArmSubsystem getArmSubsystem() {
-    return m_arm;
   }
 
   public static Drive getSwerveSubsystem() {
