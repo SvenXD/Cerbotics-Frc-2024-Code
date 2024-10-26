@@ -29,6 +29,7 @@ import frc.robot.Commands.AutoCommands.Paths.ComplementPath;
 import frc.robot.Commands.AutoCommands.Paths.FiveNoteAutoPath;
 import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
 import frc.robot.Commands.AutoCommands.Paths.TestAuto;
+import frc.robot.Commands.IntakeAB.IntakeABCommand;
 import frc.robot.Commands.IntakeCommands.Intake;
 import frc.robot.Commands.IntakeCommands.IntakeWSensor;
 import frc.robot.Commands.IntakeCommands.Outake;
@@ -47,6 +48,9 @@ import frc.robot.Subsystems.Arm.ArmSubsystem.ArmStates;
 import frc.robot.Subsystems.Intake.IntakeIO;
 import frc.robot.Subsystems.Intake.IntakeIOSparkMax;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
+import frc.robot.Subsystems.IntakexAbajo.IntakeAbIO;
+import frc.robot.Subsystems.IntakexAbajo.IntakexAbIOTalon;
+import frc.robot.Subsystems.IntakexAbajo.IntakexAbSubsystem;
 import frc.robot.Subsystems.Shooter.ShooterIO;
 import frc.robot.Subsystems.Shooter.ShooterIOSim;
 import frc.robot.Subsystems.Shooter.ShooterIOTalon;
@@ -84,6 +88,9 @@ public class RobotContainer {
   public static ArmSubsystem m_arm;
 
   public static LimelightNotes llNotes = new LimelightNotes(new LimelightNotesIOSim());
+
+  public static IntakeAbIO intakeAbIO = new IntakexAbIOTalon();
+  public static IntakexAbSubsystem m_intakeab = new IntakexAbSubsystem(intakeAbIO);
 
   /*public static PhotonSim frontLeftCamera;
   public static PhotonSim frontRightCamera;
@@ -279,6 +286,11 @@ public class RobotContainer {
     subsystemsDriver
         .a()
         .onTrue(m_arm.goToPosition(AMP_POSITION, m_arm.changeState(ArmStates.STANDING)));
+
+    
+    chassisDriver.leftBumper().whileTrue(new IntakeABCommand(m_intakeab));
+
+    chassisDriver.rightBumper().whileTrue(m_intakeab.setVoltage(-1));
   }
 
   private Command controllerRumbleCommand() {

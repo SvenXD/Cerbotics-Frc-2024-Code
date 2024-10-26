@@ -235,6 +235,12 @@ public class Constants {
     public static final boolean INTAKE_INVERSION = false;
   }
 
+  public static class IntakexAb {
+    public static final int INTAKE_AB_ID = 11;
+
+    public static InvertedValue INTAKE_AB_INVERSION = InvertedValue.Clockwise_Positive;
+  }
+
   public static class Arm {
     /*ID */
 
