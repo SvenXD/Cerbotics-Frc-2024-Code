@@ -23,7 +23,7 @@ import edu.wpi.first.math.util.Units;
 
 public class Constants {
 
-  public static final Mode currentMode = Mode.SIM;
+  public static final Mode currentMode = Mode.REAL;
   public static final boolean needToLog = true;
 
   public static enum Mode {
@@ -48,11 +48,11 @@ public class Constants {
     public static final double kWheelBase = 0.635;
 
     public static final double MaxAngularRate = 1.5 * Math.PI;
-    public static final double MaxLinearSpeed = 18.01;
+    public static final double MaxLinearSpeed = 22.80184;
 
     public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
 
-    public static final double kTeleDriveMaxSpeedMetersPerSecond = Units.feetToMeters(18.01) * 0.80;
+    public static final double kTeleDriveMaxSpeedMetersPerSecond = 5.56;
     public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond =
         kPhysicalMaxAngularSpeedRadiansPerSecond / 3;
     public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;

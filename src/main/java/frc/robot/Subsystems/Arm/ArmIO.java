@@ -1,41 +1,68 @@
 package frc.robot.Subsystems.Arm;
 
+import com.ctre.phoenix6.hardware.ParentDevice;
 import edu.wpi.first.math.geometry.Rotation2d;
+import java.util.Collections;
+import java.util.List;
 import org.littletonrobotics.junction.AutoLog;
 
-/** Gripper subsystem hardware interface. */
 public interface ArmIO {
-
-  /** Contains all of the input data received from hardware. */
   @AutoLog
-  public static class ArmIoInputs {
+  class ArmInputs {
+    public double angleDegrees = 0.0;
+    public double closedLoopError = 0.0;
 
-    public double pivotVel = 0.0;
-    public double pivotVoltage = 0.0;
+    public double leftVelocityDps = 0.0;
+    public double leftAccelDpsSq = 0.0;
 
-    public double currentAngle = 0.0;
-    public double setPoint = 0.0;
-    public double error = 0.0;
+    public double rightVelocityDps = 0.0;
+    public double rightAccelDpsSq = 0.0;
+
+    public double leftMotorTemp = 0.0;
+    public double leftMotorSupplyCurrent = 0.0;
+    public double leftMotorStatorCurrent = 0.0;
+    public double leftMotorVoltage = 0.0;
+    public double leftMotorSupplyVoltage = 0.0;
+
+    public double rightMotorTemp = 0.0;
+    public double rightMotorSupplyCurrent = 0.0;
+    public double rightMotorStatorCurrent = 0.0;
+    public double rightMotorVoltage = 0.0;
+    public double rightMotorSupplyVoltage = 0.0;
   }
 
-  /** Updates the set of loggable inputs. */
-  public default void updateInputs(ArmIoInputs inputs) {}
+  /**
+   * Update the inputs for the arm joint
+   *
+   * @param inputs The inputs to update
+   */
+  void updateInputs(ArmInputs inputs);
 
-  /** This keeps the feedfoward needed for the arm to move */
-  public default void setDesiredAngle(Rotation2d angle) {}
+  /**
+   * Set the target angle for the arm joint
+   *
+   * @param angle Target arm angle
+   */
+  void setTargetAngle(Rotation2d angle);
 
-  /** Enable brake mode on the intake. */
-  public default void setBrakeMode(boolean enable) {}
+  void setTargetAngle(Rotation2d angle, double maxVel, double maxAccel);
 
-  /** Enable coast mode on the intake. */
-  public default void setCoastMode() {}
+  /**
+   * Set the voltage output to the arm joint motors
+   *
+   * @param volts Voltage to output
+   */
+  void setVoltage(double volts);
 
-  /** Run motors at volts */
-  public default void setOpenLoop(double v) {}
+  /** Optimize status signals for running sysID */
+  default void optimizeForSysID() {}
 
-  /** Stops the motors */
-  public default void superSimPeriodic() {}
-
-  /* Updates the tunable numbers. */
-  public default void updateTunableNumbers() {}
+  /**
+   * Get a list of all devices to be used for orchestra commands
+   *
+   * @return Orchestra compatible CTRE devices
+   */
+  default List<ParentDevice> getOrchestraDevices() {
+    return Collections.emptyList();
+  }
 }

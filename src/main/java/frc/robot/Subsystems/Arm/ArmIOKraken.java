@@ -1,287 +1,280 @@
 package frc.robot.Subsystems.Arm;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.StaticBrake;
-import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.*;
 import com.ctre.phoenix6.sim.CANcoderSimState;
-import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import frc.Util.Logging.LoggedTunableNumber;
 import frc.robot.Robot;
 
 public class ArmIOKraken implements ArmIO {
+  private final TalonFX rightMotor;
+  private final TalonFX leftMotor;
 
-  /* Hardware */
-  private final TalonFX leftArmMotor;
-  private final TalonFX rightArmMotor;
+  private final TalonFXConfiguration leftConfig;
+  private final TalonFXConfiguration rightConfig;
 
-  /* Configurators */
-  private static MotorOutputConfigs leftMotorConfig;
-  private static TalonFXConfiguration leftConfig;
+  private final TalonFXSimState leftMotorSim;
+  private final TalonFXSimState rightMotorSim;
 
-  private static MotorOutputConfigs rightMotorConfig;
-  private static TalonFXConfiguration rightConfig;
-
-  /* Configs */
-  private final CurrentLimitsConfigs currentLimitsConfigs;
-  private final Slot0Configs slot0Configs;
-  private final MotionMagicConfigs motionMagicConfigs;
-
-  public final StatusSignal<Double> armPositionSignal;
-  public final StatusSignal<Double> armSetpointSignal;
-  public final StatusSignal<Double> armVelocitySignal;
-
-  /* Ranger stuff */
-  private final CANcoder jointEncoder;
-  private final CANcoderSimState encoderSim;
-
-  private final StatusSignal<Double> jointPositiionSignal;
-  private final StatusSignal<Double> jointVelocitySignal;
-  private final StatusSignal<Double> jointAccelSignal;
-  private final StatusSignal<Double> jointErrorSignal;
-  private final StatusSignal<Double> jointMotorTempSignal;
-  private final StatusSignal<Double> jointMotorSupplyCurrentSignal;
-  private final StatusSignal<Double> jointMotorStatorCurrentSignal;
-  /* Gains */
-  LoggedTunableNumber kA = new LoggedTunableNumber("Elevator/kA", 0.0);
-  LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.3);
-  LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0.12);
-  LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP", 10.0);
-  LoggedTunableNumber kI = new LoggedTunableNumber("Elevator/kI", 0.0);
-  LoggedTunableNumber kD = new LoggedTunableNumber("Elevator/kD", 0.0);
-
-  private MotionMagicVoltage pivotPositionVoltage = new MotionMagicVoltage(0).withEnableFOC(true);
-  private VoltageOut openloop = new VoltageOut(0);
-  private boolean isOpenLoop = true;
-  private static double armsetPoint = 0.0;
-
+  //  private final TalonFX leftMotorFollower;
   private static final double HOOD_LENGTH = Units.inchesToMeters(3);
   private static final double HOOD_WEIGHT = Units.lbsToKilograms(15);
 
-  private SingleJointedArmSim pivotSim =
-      new SingleJointedArmSim(
-          DCMotor.getKrakenX60(2),
-          100,
-          SingleJointedArmSim.estimateMOI(Units.inchesToMeters(8), HOOD_WEIGHT),
-          HOOD_LENGTH,
-          Units.degreesToRadians(90),
-          Units.degreesToRadians(190),
-          false,
-          Units.degreesToRadians(92));
+  private final CANcoder armEncoder;
+  private final CANcoderSimState encoderSim;
 
-  private TalonFXSimState pivotSimState;
+  private final StatusSignal<Double> positiionSignal;
+  private final StatusSignal<Double> leftVelocitySignal;
+  private final StatusSignal<Double> leftAccelSignal;
+  private final StatusSignal<Double> leftErrorSignal;
+  private final StatusSignal<Double> leftMotorTempSignal;
+  private final StatusSignal<Double> leftMotorSupplyCurrentSignal;
+  private final StatusSignal<Double> leftMotorStatorCurrentSignal;
+  private final StatusSignal<Double> leftMotorSupplyVoltage;
+  private final StatusSignal<Double> leftMotorVoltageSignal;
+
+  private final StatusSignal<Double> rightVelocitySignal;
+  private final StatusSignal<Double> rightAccelSignal;
+  private final StatusSignal<Double> rightErrorSignal;
+  private final StatusSignal<Double> rightMotorTempSignal;
+  private final StatusSignal<Double> rightMotorSupplyCurrentSignal;
+  private final StatusSignal<Double> rightMotorStatorCurrentSignal;
+  private final StatusSignal<Double> rightMotorSupplyVoltage;
+  private final StatusSignal<Double> rightMotorVoltageSignal;
+
+  private final DynamicMotionMagicVoltage positionRequest =
+      new DynamicMotionMagicVoltage(0.0, 1.1, 1.1, 100);
+  private final VoltageOut voltageRequest = new VoltageOut(0.0);
+  private final StaticBrake brakeRequest = new StaticBrake();
+
+  private final SingleJointedArmSim leftSim;
 
   public ArmIOKraken() {
 
-    jointEncoder = new CANcoder(1, "*");
+    leftMotor = new TalonFX(42, "Swerve_Canivore");
+    rightMotor = new TalonFX(42, "*");
 
+    armEncoder = new CANcoder(1, "*");
+    // Load the config from the encoder so we don't overwrite the offset
     CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
+    StatusCode refreshStatus = armEncoder.getConfigurator().refresh(encoderConfig, 2.0);
 
-    leftMotorConfig =
-        new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive);
-    rightMotorConfig = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
+    encoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+    encoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
 
-    currentLimitsConfigs =
-        new CurrentLimitsConfigs()
-            .withSupplyCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(20)
-            .withStatorCurrentLimitEnable(true)
-            .withStatorCurrentLimit(80);
-
-    slot0Configs = new Slot0Configs();
-    slot0Configs.kA = kA.get();
-    slot0Configs.kP = kP.get();
-    slot0Configs.kI = kI.get();
-    slot0Configs.kD = kD.get();
-    slot0Configs.kS = kS.get();
-    slot0Configs.kV = kV.get();
-
-    FeedbackConfigs feedbackConfigs =
-        new FeedbackConfigs()
-            .withRotorToSensorRatio(1)
-            .withSensorToMechanismRatio(70); // TODO ASK FOR GEAR RATIO
-    var velo = DegreesPerSecond.of(180);
-
-    motionMagicConfigs =
-        new MotionMagicConfigs()
-            .withMotionMagicCruiseVelocity(velo.in(RotationsPerSecond))
-            .withMotionMagicAcceleration(
-                velo.in(RotationsPerSecond) * 100) // Reach max vel in 1 second
-            .withMotionMagicJerk(velo.in(RotationsPerSecond) * 100 * 10);
-    var feederOutput = new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive);
-
-    var softLimitConfig =
-        new SoftwareLimitSwitchConfigs()
-            .withForwardSoftLimitEnable(true)
-            .withForwardSoftLimitThreshold(65)
-            .withReverseSoftLimitEnable(true)
-            .withReverseSoftLimitThreshold(0);
-
-    leftConfig =
-        new TalonFXConfiguration()
-            .withMotorOutput(leftMotorConfig)
-            .withSlot0(slot0Configs)
-            .withMotionMagic(motionMagicConfigs)
-            .withFeedback(feedbackConfigs)
-            .withMotorOutput(feederOutput)
-            .withCurrentLimits(currentLimitsConfigs)
-            .withSoftwareLimitSwitch(softLimitConfig);
-
-    rightConfig =
-        new TalonFXConfiguration()
-            .withMotorOutput(rightMotorConfig)
-            .withSlot0(slot0Configs)
-            .withMotionMagic(motionMagicConfigs)
-            .withFeedback(feedbackConfigs)
-            .withMotorOutput(feederOutput)
-            .withCurrentLimits(currentLimitsConfigs)
-            .withSoftwareLimitSwitch(softLimitConfig);
-
-    leftArmMotor = new TalonFX(0, "*");
-    leftArmMotor.setControl(new StaticBrake());
-    leftArmMotor.getConfigurator().apply(leftConfig);
-
-    rightArmMotor = new TalonFX(1, "*");
-    rightArmMotor.setControl(new StaticBrake());
-    rightArmMotor.getConfigurator().apply(rightConfig);
-
-    armPositionSignal = leftArmMotor.getPosition();
-    armSetpointSignal = leftArmMotor.getClosedLoopReference();
-    armVelocitySignal = leftArmMotor.getVelocity();
-
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        100, armPositionSignal, armSetpointSignal, armVelocitySignal);
-
-    leftArmMotor.optimizeBusUtilization();
-
-    pivotSimState = leftArmMotor.getSimState();
-
+    // Phoenix has a hardcoded offset in sim
     if (Robot.isSimulation()) {
       encoderConfig.MagnetSensor.MagnetOffset = 0.25;
+    } else if (refreshStatus != StatusCode.OK || encoderConfig.MagnetSensor.MagnetOffset == 0) {
+      encoderConfig.MagnetSensor.MagnetOffset =
+          Preferences.getDouble("ArmleftEncoderOffset", encoderConfig.MagnetSensor.MagnetOffset);
+    } else {
+      Preferences.setDouble("ArmleftEncoderOffset", encoderConfig.MagnetSensor.MagnetOffset);
     }
 
-    jointEncoder.getConfigurator().apply(encoderConfig);
+    armEncoder.getConfigurator().apply(encoderConfig);
 
-    TalonFXConfiguration motorConfig = new TalonFXConfiguration();
-    motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    motorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    motorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-    motorConfig.Feedback.FeedbackRemoteSensorID = jointEncoder.getDeviceID();
+    leftConfig = new TalonFXConfiguration();
+    leftConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    leftConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    leftConfig.CurrentLimits.SupplyCurrentLimit = 40;
+    leftConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    leftConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+    leftConfig.Feedback.FeedbackRemoteSensorID = armEncoder.getDeviceID();
+    leftConfig.Feedback.RotorToSensorRatio = 70;
+    leftConfig.Slot0.kP = 200;
+    leftConfig.Slot0.kI = 0.0;
+    leftConfig.Slot0.kD = 0.0;
+    leftConfig.Slot0.kS = 0.81888;
 
-    motorConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    leftConfig.Slot0.kG = 0.047416;
+    leftConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+    leftConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    leftConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    leftConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(180);
+    leftConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations(90);
+    leftConfig.MotionMagic.MotionMagicExpo_kV = 10.657;
+    leftConfig.MotionMagic.MotionMagicExpo_kA = 1.2939;
+    leftConfig.MotionMagic.MotionMagicCruiseVelocity = 1.1;
+    leftConfig.MotionMagic.MotionMagicAcceleration = 2.1;
+    leftConfig.MotionMagic.MotionMagicJerk = 100;
+    leftConfig.Audio.AllowMusicDurDisable = true;
+    leftConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
-    motorConfig.Audio.AllowMusicDurDisable = true;
-    motorConfig.ClosedLoopGeneral.ContinuousWrap = true;
+    leftMotor.getConfigurator().apply(leftConfig);
 
-    //    jointMotorFollower.getConfigurator().apply(motorConfig);
+    rightConfig = new TalonFXConfiguration();
+    rightConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    rightConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    rightConfig.CurrentLimits.SupplyCurrentLimit = 40;
+    rightConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    rightConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+    rightConfig.Feedback.FeedbackRemoteSensorID = armEncoder.getDeviceID();
+    rightConfig.Feedback.RotorToSensorRatio = 70;
+    rightConfig.Slot0.kP = 200;
+    rightConfig.Slot0.kI = 0.0;
+    rightConfig.Slot0.kD = 0.0;
+    rightConfig.Slot0.kS = 0.81888;
 
-    jointPositiionSignal = jointEncoder.getAbsolutePosition();
-    jointVelocitySignal = jointEncoder.getVelocity();
-    jointAccelSignal = leftArmMotor.getAcceleration();
-    jointErrorSignal = leftArmMotor.getClosedLoopError();
-    jointMotorTempSignal = leftArmMotor.getDeviceTemp();
-    jointMotorSupplyCurrentSignal = leftArmMotor.getSupplyCurrent();
-    jointMotorStatorCurrentSignal = leftArmMotor.getStatorCurrent();
-    //    jointFollowerTempSignal = jointMotorFollower.getDeviceTemp();
-    //    jointFollowerSupplyCurrentSignal = jointMotorFollower.getSupplyCurrent();
-    //    jointFollowerStatorCurrentSignal = jointMotorFollower.getStatorCurrent();
-    //    jointFollowerVoltageSignal = jointMotorFollower.getMotorVoltage();
-    encoderSim = jointEncoder.getSimState();
+    rightConfig.Slot0.kG = 0.047416;
+    rightConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+    rightConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    rightConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    rightConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Units.degreesToRotations(180);
+    rightConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Units.degreesToRotations(90);
+    rightConfig.MotionMagic.MotionMagicExpo_kV = 10.657;
+    rightConfig.MotionMagic.MotionMagicExpo_kA = 1.2939;
+    rightConfig.MotionMagic.MotionMagicCruiseVelocity = 1.1;
+    rightConfig.MotionMagic.MotionMagicAcceleration = 2.1;
+    rightConfig.MotionMagic.MotionMagicJerk = 100;
+    rightConfig.Audio.AllowMusicDurDisable = true;
+    rightConfig.ClosedLoopGeneral.ContinuousWrap = true;
+
+    rightMotor.getConfigurator().apply(rightConfig);
+
+    positiionSignal = armEncoder.getAbsolutePosition();
+    leftVelocitySignal = armEncoder.getVelocity();
+    leftAccelSignal = leftMotor.getAcceleration();
+    leftErrorSignal = leftMotor.getClosedLoopError();
+    leftMotorTempSignal = leftMotor.getDeviceTemp();
+    leftMotorSupplyCurrentSignal = leftMotor.getSupplyCurrent();
+    leftMotorStatorCurrentSignal = leftMotor.getStatorCurrent();
+    leftMotorVoltageSignal = leftMotor.getMotorVoltage();
+    leftMotorSupplyVoltage = leftMotor.getSupplyVoltage();
+
+    rightVelocitySignal = armEncoder.getVelocity();
+    rightAccelSignal = rightMotor.getAcceleration();
+    rightErrorSignal = rightMotor.getClosedLoopError();
+    rightMotorTempSignal = rightMotor.getDeviceTemp();
+    rightMotorSupplyCurrentSignal = rightMotor.getSupplyCurrent();
+    rightMotorStatorCurrentSignal = rightMotor.getStatorCurrent();
+    rightMotorVoltageSignal = rightMotor.getMotorVoltage();
+    rightMotorSupplyVoltage = rightMotor.getSupplyVoltage();
+
+    leftSim =
+        new SingleJointedArmSim(
+            DCMotor.getKrakenX60(2),
+            100,
+            SingleJointedArmSim.estimateMOI(Units.inchesToMeters(8), HOOD_WEIGHT),
+            HOOD_LENGTH,
+            Units.degreesToRadians(180),
+            Units.degreesToRadians(90),
+            true,
+            Units.degreesToRadians(100));
+
+    leftMotorSim = leftMotor.getSimState();
+    rightMotorSim = rightMotor.getSimState();
+    encoderSim = armEncoder.getSimState();
   }
 
+  /**
+   * Update the inputs for the arm left
+   *
+   * @param inputs The inputs to update
+   */
   @Override
-  public void setOpenLoop(double v) {
-    isOpenLoop = true;
-    leftArmMotor.setControl(openloop.withOutput(v));
-  }
+  public void updateInputs(ArmInputs inputs) {
+    if (Robot.isSimulation()) {
+      leftMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+      rightMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+      encoderSim.setSupplyVoltage(RobotController.getBatteryVoltage());
 
-  @Override
-  public void setDesiredAngle(Rotation2d angle) {
-    leftArmMotor.setControl(pivotPositionVoltage.withPosition(angle.getRotations()));
-    isOpenLoop = false;
-  }
+      double leftVoltage = leftMotorSim.getMotorVoltage();
 
-  @Override
-  public void updateInputs(ArmIoInputs inputs) {
-    inputs.pivotVel = armVelocitySignal.getValue();
-    inputs.setPoint = armsetPoint;
-    inputs.pivotVoltage = pivotSim.getCurrentDrawAmps();
+      leftSim.setInput(leftVoltage);
+      leftSim.update(0.02);
 
-    inputs.currentAngle = Units.rotationsToDegrees(jointPositiionSignal.getValueAsDouble());
+      double leftPosRot = Units.radiansToRotations(leftSim.getAngleRads());
+      double leftVelRot = Units.radiansToRotations(leftSim.getVelocityRadPerSec());
 
-    BaseStatusSignal.refreshAll(armPositionSignal, armSetpointSignal, armVelocitySignal);
-  }
-
-  @Override
-  public void setBrakeMode(boolean enable) {
-    leftMotorConfig.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    rightMotorConfig.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-
-    leftArmMotor.getConfigurator().apply(leftMotorConfig);
-    rightArmMotor.getConfigurator().apply(rightMotorConfig);
-  }
-
-  @Override
-  public void updateTunableNumbers() {
-    if (kA.hasChanged(0)
-        || kS.hasChanged(0)
-        || kV.hasChanged(0)
-        || kP.hasChanged(0)
-        || kI.hasChanged(0)
-        || kD.hasChanged(0)) {
-      slot0Configs.kA = kA.get();
-      slot0Configs.kS = kS.get();
-      slot0Configs.kV = kV.get();
-      slot0Configs.kP = kP.get();
-      slot0Configs.kI = kI.get();
-      slot0Configs.kD = kD.get();
-
-      leftArmMotor.getConfigurator().apply(slot0Configs);
-      rightArmMotor.getConfigurator().apply(slot0Configs);
+      encoderSim.setRawPosition(leftPosRot);
+      encoderSim.setVelocity(leftVelRot);
     }
-  }
 
-  @Override
-  public void superSimPeriodic() {
-    pivotSimState = leftArmMotor.getSimState();
-    pivotSimState.setSupplyVoltage(12);
-    pivotSimState.Orientation = ChassisReference.CounterClockwise_Positive;
-    pivotSim.setInputVoltage(pivotSimState.getMotorVoltage());
-    pivotSim.update(0.02);
-    pivotSimState.setRawRotorPosition(Units.radiansToRotations(pivotSim.getAngleRads()) * 100);
-    pivotSimState.setRotorVelocity(Units.radiansToRotations(pivotSim.getVelocityRadPerSec()) * 100);
+    double leftRot = positiionSignal.getValue();
+
+    inputs.angleDegrees = Units.rotationsToDegrees(leftRot);
+    inputs.closedLoopError = Units.rotationsToDegrees(leftErrorSignal.getValue());
+
+    inputs.leftVelocityDps = Units.rotationsToDegrees(leftVelocitySignal.getValue());
+    inputs.leftAccelDpsSq = Units.rotationsToDegrees(leftAccelSignal.getValue());
+    inputs.leftMotorTemp = leftMotorTempSignal.getValue();
+    inputs.leftMotorSupplyCurrent = leftMotorSupplyCurrentSignal.getValue();
+    inputs.leftMotorStatorCurrent = leftMotorStatorCurrentSignal.getValue();
+    inputs.leftMotorVoltage = leftMotorVoltageSignal.getValue();
+    inputs.leftMotorSupplyVoltage = leftMotorSupplyVoltage.getValue();
+
+    inputs.rightVelocityDps = Units.rotationsToDegrees(rightVelocitySignal.getValue());
+    inputs.rightAccelDpsSq = Units.rotationsToDegrees(rightAccelSignal.getValue());
+    inputs.rightMotorTemp = rightMotorTempSignal.getValue();
+    inputs.rightMotorSupplyCurrent = rightMotorSupplyCurrentSignal.getValue();
+    inputs.rightMotorStatorCurrent = rightMotorStatorCurrentSignal.getValue();
+    inputs.rightMotorVoltage = rightMotorVoltageSignal.getValue();
+    inputs.rightMotorSupplyVoltage = rightMotorSupplyVoltage.getValue();
+
     BaseStatusSignal.refreshAll(
-        jointPositiionSignal,
-        jointVelocitySignal,
-        jointAccelSignal,
-        jointErrorSignal,
-        jointMotorTempSignal,
-        jointMotorSupplyCurrentSignal,
-        jointMotorStatorCurrentSignal);
+        positiionSignal,
+        leftVelocitySignal,
+        leftAccelSignal,
+        leftErrorSignal,
+        leftMotorTempSignal,
+        leftMotorSupplyCurrentSignal,
+        leftMotorStatorCurrentSignal,
+        leftMotorVoltageSignal,
+        leftMotorSupplyVoltage,
+        rightVelocitySignal,
+        rightAccelSignal,
+        rightErrorSignal,
+        rightMotorTempSignal,
+        rightMotorSupplyCurrentSignal,
+        rightMotorStatorCurrentSignal,
+        rightMotorVoltageSignal,
+        rightMotorSupplyVoltage);
+  }
+
+  /**
+   * Set the target angle for the arm
+   *
+   * @param angle Target arm angle
+   */
+  @Override
+  public void setTargetAngle(Rotation2d angle) {
+    leftMotor.setControl(
+        positionRequest.withPosition(angle.getRotations()).withVelocity(1.1).withAcceleration(2.1));
+    rightMotor.setControl(
+        positionRequest.withPosition(angle.getRotations()).withVelocity(1.1).withAcceleration(2.1));
+  }
+
+  @Override
+  public void setTargetAngle(Rotation2d angle, double maxVel, double maxAccel) {
+    leftMotor.setControl(
+        positionRequest
+            .withPosition(angle.getRotations())
+            .withVelocity(maxVel)
+            .withAcceleration(maxAccel));
+  }
+
+  /**
+   * Set the voltage output to the arm left motors
+   *
+   * @param volts Voltage to output
+   */
+  @Override
+  public void setVoltage(double volts) {
+    leftMotor.setControl(voltageRequest.withOutput(volts));
+    rightMotor.setControl(voltageRequest.withOutput(volts));
   }
 }

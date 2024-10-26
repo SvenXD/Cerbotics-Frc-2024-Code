@@ -10,7 +10,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,9 +28,6 @@ import frc.robot.Commands.AutoCommands.Paths.TestAuto;
 import frc.robot.Commands.SwerveCommands.DriveCommands;
 import frc.robot.Commands.SwerveCommands.NoteAlignCommand;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.Subsystems.JointRanger.ArmIOTest;
-import frc.robot.Subsystems.JointRanger.RangerIO;
-import frc.robot.Subsystems.JointRanger.RangerSubsystem;
 import frc.robot.Subsystems.Swerve.Drive;
 import frc.robot.Subsystems.Swerve.GyroIO;
 import frc.robot.Subsystems.Swerve.GyroIOPigeon2;
@@ -53,8 +49,8 @@ public class RobotContainer {
 
   public static Drive drive;
 
-  public static RangerIO armIO = new ArmIOTest();
-  public static RangerSubsystem m_arm = new RangerSubsystem(armIO);
+  /*public static ArmIO armIO = new ArmIOKraken();
+  public static RangerSubsystem m_arm = new RangerSubsystem(armIO);*/
 
   public RobotContainer() {
     /** Options for the current mode of the robot */
@@ -154,8 +150,11 @@ public class RobotContainer {
 
     chassisDriver.y().onTrue(new InstantCommand(() -> drive.changeIntakeAssist()));
 
-    subsystemsDriver.y().onTrue(m_arm.setTargetAngleCommand(Rotation2d.fromDegrees(140)));
+    /*subsystemsDriver.y().onTrue(m_arm.setTargetAngleCommand(Rotation2d.fromDegrees(140)));
     subsystemsDriver.a().onTrue(m_arm.setTargetAngleCommand(Rotation2d.fromDegrees(100)));
+
+    subsystemsDriver.rightBumper().whileTrue(m_arm.setVolt(1)).whileFalse(m_arm.setVolt(0));
+    subsystemsDriver.leftBumper().whileTrue(m_arm.setVolt(-1)).whileFalse(m_arm.setVolt(0));*/
   }
 
   private Command controllerRumbleCommand() {

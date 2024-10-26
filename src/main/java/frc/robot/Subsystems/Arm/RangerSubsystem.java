@@ -1,4 +1,4 @@
-package frc.robot.Subsystems.JointRanger;
+package frc.robot.Subsystems.Arm;
 
 import static edu.wpi.first.units.Units.Volts;
 
@@ -14,16 +14,16 @@ import frc.robot.Robot;
 import org.littletonrobotics.junction.Logger;
 
 public class RangerSubsystem extends SubsystemBase {
-  private final RangerIO io;
-  private final ArmJointInputsAutoLogged inputs;
+  private final ArmIO io;
+  private final ArmInputsAutoLogged inputs;
 
   private final SysIdRoutine sysIdRoutine;
 
   private Rotation2d targetRotation = Rotation2d.fromDegrees(90);
 
-  public RangerSubsystem(RangerIO io) {
+  public RangerSubsystem(ArmIO io) {
     this.io = io;
-    this.inputs = new ArmJointInputsAutoLogged();
+    this.inputs = new ArmInputsAutoLogged();
 
     sysIdRoutine =
         new SysIdRoutine(
@@ -76,7 +76,7 @@ public class RangerSubsystem extends SubsystemBase {
    * @return Current angle
    */
   public Rotation2d getAngle() {
-    return Rotation2d.fromDegrees(inputs.jointAngleDegrees);
+    return Rotation2d.fromDegrees(inputs.angleDegrees);
   }
 
   /**
@@ -85,7 +85,7 @@ public class RangerSubsystem extends SubsystemBase {
    * @return Velocity, in degrees per seconds
    */
   public double getVelocityDps() {
-    return inputs.jointVelocityDps;
+    return inputs.leftVelocityDps;
   }
 
   /**
@@ -101,8 +101,8 @@ public class RangerSubsystem extends SubsystemBase {
     return run(() -> setTargetAngle(angle));
   }
 
-  public Command setTargetAngleCommand(Rotation2d angle, double maxVel, double maxAccel) {
-    return run(() -> setTargetAngle(angle, maxVel, maxAccel));
+  public Command setVolt(double voltage) {
+    return run(() -> setVoltage(voltage));
   }
 
   public Command sysIDQuasistatic(SysIdRoutine.Direction direction) {
