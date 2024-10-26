@@ -95,7 +95,7 @@ public class ArmIOKraken implements ArmIO {
     leftConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
     leftConfig.Feedback.FeedbackRemoteSensorID = armEncoder.getDeviceID();
     leftConfig.Feedback.RotorToSensorRatio = 70;
-    leftConfig.Slot0.kP = 200;
+    leftConfig.Slot0.kP = 0.1;
     leftConfig.Slot0.kI = 0.0;
     leftConfig.Slot0.kD = 0.0;
     leftConfig.Slot0.kS = 0.81888;

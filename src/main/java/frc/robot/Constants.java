@@ -39,7 +39,7 @@ public class Constants {
 
   public static class DriveConstants {
 
-    public static final double kDriveGearRatio = 4.59;
+    public static final double kDriveGearRatio = 5.5;
     public static final double kTurnGearRatio = 10.29;
 
     // Distance between left and right wheels
@@ -48,11 +48,11 @@ public class Constants {
     public static final double kWheelBase = 0.635;
 
     public static final double MaxAngularRate = 1.5 * Math.PI;
-    public static final double MaxLinearSpeed = 22.80184;
+    public static final double MaxLinearSpeed = 18.01;
 
     public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
 
-    public static final double kTeleDriveMaxSpeedMetersPerSecond = 5.56;
+    public static final double kTeleDriveMaxSpeedMetersPerSecond = Units.feetToMeters(18.01) * 0.80;
     public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond =
         kPhysicalMaxAngularSpeedRadiansPerSecond / 3;
     public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
@@ -155,25 +155,25 @@ public class Constants {
 
     public static final byte kFrontLeftSteerMotorId = 2;
     public static final byte kFrontLeftEncoderId = 3;
-    public static final double kFrontLeftEncoderOffset = -2.15;
+    public static final double kFrontLeftEncoderOffset = 0.5;
     /** Front Right module 1 * */
     public static final byte kFrontRightDriveMotorId = 4;
 
     public static final byte kFrontRightSteerMotorId = 5;
     public static final byte kFrontRightEncoderId = 6;
-    public static final double kFrontRightEncoderOffset = -2.9;
+    public static final double kFrontRightEncoderOffset = 0;
     /** Back Left module 2 * */
     public static final byte kBackLeftDriveMotorId = 10;
 
     public static final byte kBackLeftSteerMotorId = 11;
     public static final byte kBackLeftEncoderId = 12;
-    public static final double kBackLeftEncoderOffset = 1.82;
+    public static final double kBackLeftEncoderOffset = 0;
     /** Back Right module 3 * */
     public static final byte kBackRightDriveMotorId = 7;
 
     public static final byte kBackRightSteerMotorId = 8;
     public static final byte kBackRightEncoderId = 9;
-    public static final double kBackRightEncoderOffset = -2.085;
+    public static final double kBackRightEncoderOffset = 0.6;
 
     /** To change offsets easily * */
     // Minus  = Counterclockwise
