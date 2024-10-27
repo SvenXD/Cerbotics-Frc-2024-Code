@@ -6,6 +6,9 @@ import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,6 +24,11 @@ public class RangerSubsystem extends SubsystemBase {
 
   private Rotation2d targetRotation = Rotation2d.fromDegrees(90);
 
+  /*Variables */
+  private SendableChooser<String> armModeChooser = new SendableChooser<>();
+  private String currentModeSelection;
+  private final String[] modeNames = {"BRAKE", "COAST"};
+
   public RangerSubsystem(ArmIO io) {
     this.io = io;
     this.inputs = new ArmInputsAutoLogged();
@@ -30,7 +38,13 @@ public class RangerSubsystem extends SubsystemBase {
             new SysIdRoutine.Config(
                 null, null, null, state -> SignalLogger.writeString("state", state.toString())),
             new SysIdRoutine.Mechanism(
-                (Measure<Voltage> volts) -> setVoltage(volts.in(Volts)), null, this));
+                (Measure<Voltage> volts) -> setManual(volts.in(Volts)), null, this));
+
+    armModeChooser.setDefaultOption("Brake Mode", modeNames[0]);
+    armModeChooser.addOption("Brake Mode", modeNames[0]);
+    armModeChooser.addOption("Coast Mode", modeNames[1]);
+
+    SmartDashboard.putData("Arm Mode", armModeChooser);
   }
 
   @Override
@@ -44,6 +58,21 @@ public class RangerSubsystem extends SubsystemBase {
 
     double runtimeMS = (Logger.getRealTimestamp() - startTime) / 1000.0;
     Logger.recordOutput("ArmJoint/PeriodicRuntimeMS", runtimeMS);
+
+    if (DriverStation.isDisabled()) {
+      currentModeSelection = armModeChooser.getSelected();
+      switch (currentModeSelection) {
+        case "BRAKE":
+          io.enableBreak(true);
+          break;
+
+        case "COAST":
+          io.enableBreak(false);
+          break;
+      }
+    } else {
+      io.enableBreak(false);
+    }
   }
 
   /**
@@ -66,7 +95,7 @@ public class RangerSubsystem extends SubsystemBase {
    *
    * @param volts Voltage to output
    */
-  public void setVoltage(double volts) {
+  public void setManual(double volts) {
     io.setVoltage(volts);
   }
 
@@ -102,7 +131,7 @@ public class RangerSubsystem extends SubsystemBase {
   }
 
   public Command setVolt(double voltage) {
-    return run(() -> setVoltage(voltage));
+    return run(() -> setManual(voltage));
   }
 
   public Command sysIDQuasistatic(SysIdRoutine.Direction direction) {

@@ -92,7 +92,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledInit() {
-    RobotContainer.getSwerveSubsystem().enableDisableIntakeAssist(false);
+    // RobotContainer.getSwerveSubsystem().enableDisableIntakeAssist(false);
   }
 
   @Override

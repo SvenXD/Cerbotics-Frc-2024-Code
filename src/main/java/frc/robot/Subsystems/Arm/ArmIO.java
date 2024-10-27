@@ -65,4 +65,6 @@ public interface ArmIO {
   default List<ParentDevice> getOrchestraDevices() {
     return Collections.emptyList();
   }
+
+  public default void enableBreak(boolean enable) {}
 }

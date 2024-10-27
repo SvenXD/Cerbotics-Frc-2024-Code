@@ -6,7 +6,9 @@ package frc.robot;
 
 import static frc.robot.Constants.Arm.*;
 
-import com.pathplanner.lib.auto.NamedCommands;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.ForwardReference;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,25 +17,17 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
-import frc.Util.Logging.LoggedDashboardChooser;
-import frc.robot.Commands.AutoCommands.AutoCommand;
-import frc.robot.Commands.AutoCommands.Paths.ChangeTest;
-import frc.robot.Commands.AutoCommands.Paths.ComplementPath;
-import frc.robot.Commands.AutoCommands.Paths.FiveNoteAutoPath;
-import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
-import frc.robot.Commands.AutoCommands.Paths.TestAuto;
-import frc.robot.Commands.SwerveCommands.DriveCommands;
-import frc.robot.Commands.SwerveCommands.NoteAlignCommand;
-import frc.robot.Constants.FieldConstants;
-import frc.robot.Subsystems.Swerve.Drive;
-import frc.robot.Subsystems.Swerve.GyroIO;
-import frc.robot.Subsystems.Swerve.GyroIOPigeon2;
-import frc.robot.Subsystems.Swerve.ModuleIO;
-import frc.robot.Subsystems.Swerve.ModuleIOSim;
-import frc.robot.Subsystems.Swerve.ModuleIOTalonFX;
+import frc.robot.Commands.SwerveCommands.FieldCentricDrive;
+import frc.robot.Subsystems.Intake.IntakeIO;
+import frc.robot.Subsystems.Intake.IntakeIOKraken;
+import frc.robot.Subsystems.Intake.IntakeSubsystem;
+import frc.robot.Subsystems.Shooter.ShooterIO;
+import frc.robot.Subsystems.Shooter.ShooterIOTalon;
+import frc.robot.Subsystems.Shooter.ShooterSubsystem;
+import frc.robot.Subsystems.Swerve.CTRESwerve.CommandSwerveDrivetrain;
+import frc.robot.Subsystems.Swerve.CTRESwerve.TunerConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -43,18 +37,34 @@ public class RobotContainer {
   private static final CommandXboxController chassisDriver = new CommandXboxController(0);
   private static final CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
-  private static LoggedDashboardChooser<AutoCommand> autoChooser;
+  // private static LoggedDashboardChooser<AutoCommand> autoChooser;
 
   public static Field2d autoPreviewField = new Field2d();
 
-  public static Drive drive;
+  // public static Drive drive;
 
   /*public static ArmIO armIO = new ArmIOKraken();
-  public static RangerSubsystem m_arm = new RangerSubsystem(armIO);*/
+    public static RangerSubsystem m_arm = new RangerSubsystem(armIO);
+  */
+  public static IntakeIO intakeIO = new IntakeIOKraken();
+  public static IntakeSubsystem m_intake = new IntakeSubsystem(intakeIO);
+
+  public static ShooterIO shooterIO = new ShooterIOTalon();
+  public static ShooterSubsystem m_shooter = new ShooterSubsystem(shooterIO);
+
+  private final CommandSwerveDrivetrain m_drive = TunerConstants.DriveTrain;
+
+  SwerveRequest.FieldCentricFacingAngle m_head =
+      new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
 
   public RobotContainer() {
+
+    m_head.ForwardReference = ForwardReference.RedAlliance;
+    m_head.HeadingController.setPID(8, 0, 0);
+    m_head.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
+
     /** Options for the current mode of the robot */
-    switch (Constants.currentMode) {
+    /*switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         drive =
@@ -93,21 +103,21 @@ public class RobotContainer {
         // --------------------------------------------
     }
 
-    registerNamedCommands();
+    // registerNamedCommands();
     /** Visualisation of the current auto selected * */
-    autoChooser = new LoggedDashboardChooser<>("Auto Mode");
+    /*autoChooser = new LoggedDashboardChooser<>("Auto Mode");
 
     autoChooser.onChange(
         auto -> {
           autoPreviewField.getObject("path").setPoses(auto.getAllPathPoses());
         });
 
-    /** Auto options */
+    /** Auto options *
     autoChooser.addDefaultOption("None", new NoneAuto());
     autoChooser.addOption("Complement auto", new ComplementPath());
     autoChooser.addOption("Six Note Auto", new FiveNoteAutoPath());
-    autoChooser.addOption("Test Of Change", new ChangeTest(drive));
-    autoChooser.addOption("5 note auto align", new TestAuto());
+    // autoChooser.addOption("Test Of Change", new ChangeTest(drive));
+    autoChooser.addOption("5 note auto align", new TestAuto()); */
 
     PathPlannerLogging.setLogActivePathCallback(
         (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));
@@ -129,12 +139,12 @@ public class RobotContainer {
 
     /* Control 1 commands */
     // Chassis commands
-    drive.setDefaultCommand(
+    /*drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
             () -> -chassisDriver.getLeftY(),
             () -> -chassisDriver.getLeftX(),
-            () -> -chassisDriver.getRightX()));
+            () -> -chassisDriver.getRightX() * 0.5));
 
     // Lock modules
     chassisDriver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -142,19 +152,35 @@ public class RobotContainer {
     // Set field centric
     chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
 
-    chassisDriver.povDown().toggleOnTrue(pathfindAndAlignAmp());
+    chassisDriver.leftBumper().whileTrue(new NoteAlignCommand(drive));*/
 
-    chassisDriver.povLeft().toggleOnTrue(pathfindAndAlignSource());
+    m_drive.setDefaultCommand(
+        new FieldCentricDrive(
+            m_drive,
+            () -> -chassisDriver.getLeftY(),
+            () -> -chassisDriver.getLeftX(),
+            () -> -chassisDriver.getRightX()));
 
-    chassisDriver.leftBumper().whileTrue(new NoteAlignCommand(drive));
+    //    chassisDriver.y().onTrue(new InstantCommand(() -> drive.changeIntakeAssist()));
+    /*
+           subsystemsDriver.y().onTrue(m_arm.setTargetAngleCommand(Rotation2d.fromDegrees(140)));
+           subsystemsDriver.a().onTrue(m_arm.setTargetAngleCommand(Rotation2d.fromDegrees(100)));
 
-    chassisDriver.y().onTrue(new InstantCommand(() -> drive.changeIntakeAssist()));
+           subsystemsDriver.rightBumper().whileTrue(m_arm.setVolt(1)).whileFalse(m_arm.setVolt(0));
+           subsystemsDriver.leftBumper().whileTrue(m_arm.setVolt(-1)).whileFalse(m_arm.setVolt(0));
+    */
+    /*subsystemsDriver
+        .b()
+        .whileTrue(m_intake.setlowerIntakeVoltage(0.3))
+        .whileFalse(m_intake.setlowerIntakeVoltage(0));
 
-    /*subsystemsDriver.y().onTrue(m_arm.setTargetAngleCommand(Rotation2d.fromDegrees(140)));
-    subsystemsDriver.a().onTrue(m_arm.setTargetAngleCommand(Rotation2d.fromDegrees(100)));
+    subsystemsDriver
+        .a()
+        .whileTrue(m_intake.setlowerIntakeVoltage(-0.3))
+        .whileFalse(m_intake.setlowerIntakeVoltage(0));*/
 
-    subsystemsDriver.rightBumper().whileTrue(m_arm.setVolt(1)).whileFalse(m_arm.setVolt(0));
-    subsystemsDriver.leftBumper().whileTrue(m_arm.setVolt(-1)).whileFalse(m_arm.setVolt(0));*/
+    subsystemsDriver.x().whileTrue(m_shooter.setRpms(100, 100)).whileFalse(m_shooter.stop());
+    subsystemsDriver.b().whileTrue(m_shooter.setPower()).whileFalse(m_shooter.stop());
   }
 
   private Command controllerRumbleCommand() {
@@ -167,38 +193,39 @@ public class RobotContainer {
         });
   }
 
-  public static Command pathfindAndAlignAmp() {
-    return Commands.either(
-        drive
-            .goToPose(FieldConstants.redAmpPose)
-            .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
-        drive
-            .goToPose(FieldConstants.blueAmpPose)
-            .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
-        Robot::isRedAlliance);
-  }
+  /*public static Command pathfindAndAlignAmp() {
+      return Commands.either(
+          drive
+              .goToPose(FieldConstants.redAmpPose)
+              .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
+          drive
+              .goToPose(FieldConstants.blueAmpPose)
+              .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
+          Robot::isRedAlliance);
+    }
 
-  public static Command pathfindAndAlignSource() {
-    return Commands.either(
-        drive
-            .goToPose(FieldConstants.redPickupPose)
-            .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
-        drive
-            .goToPose(FieldConstants.bluePickupPose)
-            .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
-        Robot::isRedAlliance);
-  }
+    public static Command pathfindAndAlignSource() {
+      return Commands.either(
+          drive
+              .goToPose(FieldConstants.redPickupPose)
+              .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
+          drive
+              .goToPose(FieldConstants.bluePickupPose)
+              .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
+          Robot::isRedAlliance);
+    }
 
-  public void registerNamedCommands() {
-    NamedCommands.registerCommand(
-        "ActivateIntakeAssist", new InstantCommand(() -> drive.changeIntakeAssist()));
-  }
-
+    public void registerNamedCommands() {
+      NamedCommands.registerCommand(
+          "ActivateIntakeAssist", new InstantCommand(() -> drive.changeIntakeAssist()));
+    }
+  */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return null;
   }
 
+  /*
   public static Drive getSwerveSubsystem() {
     return drive;
-  }
+  }*/
 }

@@ -39,8 +39,8 @@ public class Constants {
 
   public static class DriveConstants {
 
-    public static final double kDriveGearRatio = 5.5;
-    public static final double kTurnGearRatio = 10.29;
+    public static final double kDriveGearRatio = 4.59;
+    public static final double kTurnGearRatio = 13.3714;
 
     // Distance between left and right wheels
     public static final double kTrackWidth = 0.6096;
@@ -48,11 +48,12 @@ public class Constants {
     public static final double kWheelBase = 0.635;
 
     public static final double MaxAngularRate = 1.5 * Math.PI;
-    public static final double MaxLinearSpeed = 18.01;
+    public static final double MaxLinearSpeed = 22.102;
 
     public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
 
-    public static final double kTeleDriveMaxSpeedMetersPerSecond = Units.feetToMeters(18.01) * 0.80;
+    public static final double kTeleDriveMaxSpeedMetersPerSecond =
+        Units.feetToMeters(22.102) * 0.80;
     public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond =
         kPhysicalMaxAngularSpeedRadiansPerSecond / 3;
     public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
@@ -155,25 +156,25 @@ public class Constants {
 
     public static final byte kFrontLeftSteerMotorId = 2;
     public static final byte kFrontLeftEncoderId = 3;
-    public static final double kFrontLeftEncoderOffset = 0.5;
+    public static final double kFrontLeftEncoderOffset = 1.4;
     /** Front Right module 1 * */
     public static final byte kFrontRightDriveMotorId = 4;
 
     public static final byte kFrontRightSteerMotorId = 5;
     public static final byte kFrontRightEncoderId = 6;
-    public static final double kFrontRightEncoderOffset = 0;
+    public static final double kFrontRightEncoderOffset = 0.2;
     /** Back Left module 2 * */
     public static final byte kBackLeftDriveMotorId = 10;
 
     public static final byte kBackLeftSteerMotorId = 11;
     public static final byte kBackLeftEncoderId = 12;
-    public static final double kBackLeftEncoderOffset = 0;
+    public static final double kBackLeftEncoderOffset = 0.3;
     /** Back Right module 3 * */
     public static final byte kBackRightDriveMotorId = 7;
 
     public static final byte kBackRightSteerMotorId = 8;
     public static final byte kBackRightEncoderId = 9;
-    public static final double kBackRightEncoderOffset = 0.6;
+    public static final double kBackRightEncoderOffset = 0.4;
 
     /** To change offsets easily * */
     // Minus  = Counterclockwise
@@ -183,8 +184,8 @@ public class Constants {
   public static class Shooter {
     /* IDs */
 
-    public static final int UPPER_SHOOTER_ID = 13;
-    public static final int LOWER_SHOOTER_ID = 14;
+    public static final int UPPER_SHOOTER_ID = 53;
+    public static final int LOWER_SHOOTER_ID = 50;
 
     /* SetPoints and Threesholds */
 
@@ -212,18 +213,18 @@ public class Constants {
 
     /* PID */
 
-    public static double ukP = 1.4,
+    public static double ukP = 0.7,
         ukI = 0,
-        ukD = 0.025,
-        ukS = 0.50189,
-        ukV = 0.0016926,
-        ukA = 0.00059492,
-        lkP = 1.4,
+        ukD = 0,
+        ukS = 0,
+        ukV = 0,
+        ukA = 0.0,
+        lkP = 0.7,
         lkI = 0,
-        lkD = 0.025,
-        lkS = 0.50189,
-        lkV = 0.0016926,
-        lkA = 0.00059492;
+        lkD = 0.0,
+        lkS = 0.0,
+        lkV = 0.0,
+        lkA = 0.0;
   }
 
   public static class Intake {

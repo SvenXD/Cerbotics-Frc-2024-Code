@@ -83,6 +83,7 @@ public class ModuleIOTalonFX implements ModuleIO {
         turnTalon = new TalonFX(kFrontRightSteerMotorId, CANBUS_STRING);
         cancoder = new CANcoder(kFrontRightEncoderId, CANBUS_STRING);
         absoluteEncoderOffset = new Rotation2d(kFrontRightEncoderOffset);
+
         break;
       case 2:
         driveTalon = new TalonFX(kBackLeftDriveMotorId, CANBUS_STRING);
@@ -144,10 +145,14 @@ public class ModuleIOTalonFX implements ModuleIO {
         turnCurrent);
     driveTalon.optimizeBusUtilization();
     turnTalon.optimizeBusUtilization();
+
+    driveTalon.setPosition(0);
+    cancoder.setPosition(turnAbsolutePosition.getValueAsDouble());
   }
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
+
     BaseStatusSignal.refreshAll(
         drivePosition,
         driveVelocity,

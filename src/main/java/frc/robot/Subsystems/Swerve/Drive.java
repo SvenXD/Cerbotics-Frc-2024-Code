@@ -24,7 +24,6 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -36,9 +35,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -51,15 +48,12 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
-  private static final double MAX_LINEAR_SPEED = Units.feetToMeters(18.01);
+  private static final double MAX_LINEAR_SPEED = Units.feetToMeters(MaxLinearSpeed);
   private static final double TRACK_WIDTH_X = kWheelBase;
   private static final double TRACK_WIDTH_Y = kTrackWidth;
   private static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
-  private static double kP = 1;
-
-  private boolean shouldUseIntakeAssist = false;
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
@@ -68,15 +62,6 @@ public class Drive extends SubsystemBase {
   private final SysIdRoutine sysId;
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
-
-  private final BuiltInAccelerometer accelerometer =
-      new BuiltInAccelerometer(); // To detect colitions
-  private final LinearFilter xAccelFilter = LinearFilter.movingAverage(10);
-  private final LinearFilter yAccelFilter = LinearFilter.movingAverage(10);
-
-  private double lastXAccel = 0.0;
-  private double lastYAccel = 0.0;
-
   private Rotation2d rawGyroRotation = new Rotation2d();
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
@@ -107,7 +92,7 @@ public class Drive extends SubsystemBase {
     AutoBuilder.configureHolonomic(
         this::getPose,
         this::setPose,
-        () -> kinematics.toChassisSpeeds(getModuleStates()), // Chassis speeds generation
+        () -> kinematics.toChassisSpeeds(getModuleStates()),
         this::runVelocity,
         new HolonomicPathFollowerConfig(
             new PIDConstants(DriveConstants.traslationP, DriveConstants.traslationD),
@@ -153,12 +138,7 @@ public class Drive extends SubsystemBase {
                 this));
   }
 
-  @Override
   public void periodic() {
-
-    SmartDashboard.putBoolean("Intake assist activated", shouldUseIntakeAssist);
-    SmartDashboard.putBoolean("Detected Collision", detectCollision());
-
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     for (var module : modules) {
@@ -222,15 +202,7 @@ public class Drive extends SubsystemBase {
    */
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
-    ChassisSpeeds discreteSpeeds;
-
-    // Checks if the robot is in autonomous and
-    if (DriverStation.isAutonomous()) {
-      discreteSpeeds = ChassisSpeeds.discretize(getModifiedChassisSpeeds(speeds), 0.02);
-    } else {
-      discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
-    }
-
+    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
 
@@ -246,28 +218,14 @@ public class Drive extends SubsystemBase {
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
   }
 
-  private ChassisSpeeds getModifiedChassisSpeeds(ChassisSpeeds speedtest) {
-
-    double modifiedXSpeed = speedtest.vxMetersPerSecond;
-    double modifiedYSpeed = 0;
-    double modifiedOmega = speedtest.omegaRadiansPerSecond;
-    changePID();
-    if (shouldUseIntakeAssist) {
-      modifiedYSpeed = kP;
-    } else {
-      modifiedYSpeed = speedtest.vyMetersPerSecond;
-    }
-    return new ChassisSpeeds(modifiedXSpeed, modifiedYSpeed, modifiedOmega);
-  }
-
   /** Stops the drive. */
   public void stop() {
     runVelocity(new ChassisSpeeds());
   }
 
   /**
-   * ksStops the drive and turns the modules to an X arrangement to resist movement. The modules
-   * will return to their normal orientations the next time a nonzero velocity is requested.
+   * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
+   * return to their normal orientations the next time a nonzero velocity is requested.
    */
   public void stopWithX() {
     Rotation2d[] headings = new Rotation2d[4];
@@ -320,8 +278,7 @@ public class Drive extends SubsystemBase {
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
-    poseEstimator.resetPosition(
-        rawGyroRotation.minus(new Rotation2d(Math.PI)), getModulePositions(), pose);
+    poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
   /**
@@ -380,60 +337,5 @@ public class Drive extends SubsystemBase {
 
   public void zeroHeading() {
     gyroIO.zeroHeading();
-  }
-
-  /**
-   * Runs the drive at the desired velocity.
-   *
-   * @param speeds Speeds in meters/sec
-   */
-  public void runTest(ChassisSpeeds speeds) {
-    // Calculate module setpoints
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
-    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
-
-    // Send setpoints to modules
-    SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
-    for (int i = 0; i < 4; i++) {
-      // The module returns the optimized state, useful for logging
-      optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
-    }
-
-    // Log setpoint states
-    Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
-    Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
-  }
-
-  public void changeIntakeAssist() {
-    this.shouldUseIntakeAssist = !shouldUseIntakeAssist;
-  }
-
-  public void enableDisableIntakeAssist(boolean bool) {
-    shouldUseIntakeAssist = bool;
-  }
-
-  private static void changePID() {}
-
-  public boolean detectCollision() {
-    // Get the current filtered X and Y acceleration
-    double filteredXAccel = xAccelFilter.calculate(accelerometer.getX());
-    double filteredYAccel = yAccelFilter.calculate(accelerometer.getY());
-
-    // Calculate the change in acceleration (delta)
-    double deltaXAccel = Math.abs(filteredXAccel - lastXAccel);
-    double deltaYAccel = Math.abs(filteredYAccel - lastYAccel);
-
-    // Store current acceleration for next loop
-    lastXAccel = filteredXAccel;
-    lastYAccel = filteredYAccel;
-
-    // Check if the change in acceleration exceeds the threshold
-    if (deltaXAccel > 1.5 || deltaYAccel > 1.5) {
-      // Collision detected
-      return true;
-    } else {
-      return false;
-    }
   }
 }

@@ -3,7 +3,6 @@ package frc.robot.Subsystems.Intake;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -11,9 +10,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 public class IntakeIOKraken implements IntakeIO {
 
   /* Hardware */
-  private final TalonFX intakeMotor = new TalonFX(40, "rio");
-  private final TalonFX lUpMotor = new TalonFX(41, "rio");
-  private final TalonFX lDownMotor = new TalonFX(42, "rio");
+  private final TalonFX intakeMotor = new TalonFX(52, "rio");
+  private final TalonFX lUpMotor = new TalonFX(17, "rio");
+  private final TalonFX lDownMotor = new TalonFX(18, "rio");
 
   /* Configurators */
   private TalonFXConfiguration intakeConfig;
@@ -23,6 +22,9 @@ public class IntakeIOKraken implements IntakeIO {
   private StatusSignal<Double> supply;
 
   public IntakeIOKraken() {
+
+    lUpMotor.setInverted(true);
+    lDownMotor.setInverted(true);
 
     intakeConfig = new TalonFXConfiguration();
 
@@ -51,13 +53,12 @@ public class IntakeIOKraken implements IntakeIO {
   }
 
   @Override
-  public void setVoltage(double armVolt) {
-    intakeMotor.setControl(new VoltageOut(armVolt));
-  }
+  public void setVoltage(double armVolt) {}
 
   @Override
   public void lowerIntakeSet(double voltage) {
-    lUpMotor.setControl(new VoltageOut(voltage));
-    lDownMotor.setControl(new VoltageOut(voltage));
+    lDownMotor.set(voltage);
+    lUpMotor.set(voltage);
+    intakeMotor.set(-voltage);
   }
 }

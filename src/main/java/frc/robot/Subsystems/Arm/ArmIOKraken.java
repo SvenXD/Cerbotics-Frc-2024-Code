@@ -14,7 +14,6 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Robot;
@@ -55,19 +54,19 @@ public class ArmIOKraken implements ArmIO {
   private final StatusSignal<Double> rightMotorSupplyVoltage;
   private final StatusSignal<Double> rightMotorVoltageSignal;
 
-  private final DynamicMotionMagicVoltage positionRequest =
-      new DynamicMotionMagicVoltage(0.0, 1.1, 1.1, 100);
-  private final VoltageOut voltageRequest = new VoltageOut(0.0);
+  /*  private final DynamicMotionMagicVoltage positionRequest =
+  new DynamicMotionMagicVoltage(0.0, 1.1, 1.1, 100);*/
+  private final DutyCycleOut voltageRequest = new DutyCycleOut(0.0);
   private final StaticBrake brakeRequest = new StaticBrake();
 
   private final SingleJointedArmSim leftSim;
 
   public ArmIOKraken() {
 
-    leftMotor = new TalonFX(42, "Swerve_Canivore");
-    rightMotor = new TalonFX(42, "*");
+    leftMotor = new TalonFX(14, "rio");
+    rightMotor = new TalonFX(13, "rio");
 
-    armEncoder = new CANcoder(1, "*");
+    armEncoder = new CANcoder(16, "Swerve_Canivore");
     // Load the config from the encoder so we don't overwrite the offset
     CANcoderConfiguration encoderConfig = new CANcoderConfiguration();
     StatusCode refreshStatus = armEncoder.getConfigurator().refresh(encoderConfig, 2.0);
@@ -78,11 +77,6 @@ public class ArmIOKraken implements ArmIO {
     // Phoenix has a hardcoded offset in sim
     if (Robot.isSimulation()) {
       encoderConfig.MagnetSensor.MagnetOffset = 0.25;
-    } else if (refreshStatus != StatusCode.OK || encoderConfig.MagnetSensor.MagnetOffset == 0) {
-      encoderConfig.MagnetSensor.MagnetOffset =
-          Preferences.getDouble("ArmleftEncoderOffset", encoderConfig.MagnetSensor.MagnetOffset);
-    } else {
-      Preferences.setDouble("ArmleftEncoderOffset", encoderConfig.MagnetSensor.MagnetOffset);
     }
 
     armEncoder.getConfigurator().apply(encoderConfig);
@@ -124,7 +118,7 @@ public class ArmIOKraken implements ArmIO {
     rightConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
     rightConfig.Feedback.FeedbackRemoteSensorID = armEncoder.getDeviceID();
     rightConfig.Feedback.RotorToSensorRatio = 70;
-    rightConfig.Slot0.kP = 200;
+    rightConfig.Slot0.kP = 0.1;
     rightConfig.Slot0.kI = 0.0;
     rightConfig.Slot0.kD = 0.0;
     rightConfig.Slot0.kS = 0.81888;
@@ -178,6 +172,26 @@ public class ArmIOKraken implements ArmIO {
     leftMotorSim = leftMotor.getSimState();
     rightMotorSim = rightMotor.getSimState();
     encoderSim = armEncoder.getSimState();
+
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        50.0,
+        positiionSignal,
+        leftVelocitySignal,
+        leftAccelSignal,
+        leftErrorSignal,
+        leftMotorTempSignal,
+        leftMotorSupplyCurrentSignal,
+        leftMotorStatorCurrentSignal,
+        leftMotorVoltageSignal,
+        leftMotorSupplyVoltage,
+        rightVelocitySignal,
+        rightAccelSignal,
+        rightErrorSignal,
+        rightMotorTempSignal,
+        rightMotorSupplyCurrentSignal,
+        rightMotorStatorCurrentSignal,
+        rightMotorVoltageSignal,
+        rightMotorSupplyVoltage);
   }
 
   /**
@@ -206,7 +220,7 @@ public class ArmIOKraken implements ArmIO {
 
     double leftRot = positiionSignal.getValue();
 
-    inputs.angleDegrees = Units.rotationsToDegrees(leftRot);
+    inputs.angleDegrees = getAngleOfArm();
     inputs.closedLoopError = Units.rotationsToDegrees(leftErrorSignal.getValue());
 
     inputs.leftVelocityDps = Units.rotationsToDegrees(leftVelocitySignal.getValue());
@@ -214,7 +228,7 @@ public class ArmIOKraken implements ArmIO {
     inputs.leftMotorTemp = leftMotorTempSignal.getValue();
     inputs.leftMotorSupplyCurrent = leftMotorSupplyCurrentSignal.getValue();
     inputs.leftMotorStatorCurrent = leftMotorStatorCurrentSignal.getValue();
-    inputs.leftMotorVoltage = leftMotorVoltageSignal.getValue();
+    inputs.leftMotorVoltage = leftMotor.getMotorVoltage().getValueAsDouble();
     inputs.leftMotorSupplyVoltage = leftMotorSupplyVoltage.getValue();
 
     inputs.rightVelocityDps = Units.rotationsToDegrees(rightVelocitySignal.getValue());
@@ -222,27 +236,31 @@ public class ArmIOKraken implements ArmIO {
     inputs.rightMotorTemp = rightMotorTempSignal.getValue();
     inputs.rightMotorSupplyCurrent = rightMotorSupplyCurrentSignal.getValue();
     inputs.rightMotorStatorCurrent = rightMotorStatorCurrentSignal.getValue();
-    inputs.rightMotorVoltage = rightMotorVoltageSignal.getValue();
+    inputs.rightMotorVoltage = rightMotor.getMotorVoltage().getValueAsDouble();
     inputs.rightMotorSupplyVoltage = rightMotorSupplyVoltage.getValue();
 
-    BaseStatusSignal.refreshAll(
-        positiionSignal,
-        leftVelocitySignal,
-        leftAccelSignal,
-        leftErrorSignal,
-        leftMotorTempSignal,
-        leftMotorSupplyCurrentSignal,
-        leftMotorStatorCurrentSignal,
-        leftMotorVoltageSignal,
-        leftMotorSupplyVoltage,
-        rightVelocitySignal,
-        rightAccelSignal,
-        rightErrorSignal,
-        rightMotorTempSignal,
-        rightMotorSupplyCurrentSignal,
-        rightMotorStatorCurrentSignal,
-        rightMotorVoltageSignal,
-        rightMotorSupplyVoltage);
+    /*BaseStatusSignal.refreshAll(
+    positiionSignal,
+    leftVelocitySignal,
+    leftAccelSignal,
+    leftErrorSignal,
+    leftMotorTempSignal,
+    leftMotorSupplyCurrentSignal,
+    leftMotorStatorCurrentSignal,
+    leftMotorVoltageSignal,
+    leftMotorSupplyVoltage,
+    rightVelocitySignal,
+    rightAccelSignal,
+    rightErrorSignal,
+    rightMotorTempSignal,
+    rightMotorSupplyCurrentSignal,
+    rightMotorStatorCurrentSignal,
+    rightMotorVoltageSignal,
+    rightMotorSupplyVoltage);*/
+  }
+
+  public double getAngleOfArm() {
+    return Units.rotationsToDegrees(armEncoder.getAbsolutePosition().getValueAsDouble()) + 84;
   }
 
   /**
@@ -252,19 +270,19 @@ public class ArmIOKraken implements ArmIO {
    */
   @Override
   public void setTargetAngle(Rotation2d angle) {
-    leftMotor.setControl(
+    /*leftMotor.setControl(
         positionRequest.withPosition(angle.getRotations()).withVelocity(1.1).withAcceleration(2.1));
     rightMotor.setControl(
-        positionRequest.withPosition(angle.getRotations()).withVelocity(1.1).withAcceleration(2.1));
+        positionRequest.withPosition(angle.getRotations()).withVelocity(1.1).withAcceleration(2.1));*/
   }
 
   @Override
   public void setTargetAngle(Rotation2d angle, double maxVel, double maxAccel) {
-    leftMotor.setControl(
-        positionRequest
-            .withPosition(angle.getRotations())
-            .withVelocity(maxVel)
-            .withAcceleration(maxAccel));
+    /*leftMotor.setControl(
+    positionRequest
+        .withPosition(angle.getRotations())
+        .withVelocity(maxVel)
+        .withAcceleration(maxAccel));*/
   }
 
   /**
@@ -274,7 +292,20 @@ public class ArmIOKraken implements ArmIO {
    */
   @Override
   public void setVoltage(double volts) {
-    leftMotor.setControl(voltageRequest.withOutput(volts));
-    rightMotor.setControl(voltageRequest.withOutput(volts));
+    leftMotor.set(volts);
+    rightMotor.set(volts);
+  }
+
+  @Override
+  public void enableBreak(boolean enable) {
+    rightConfig.MotorOutput.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+    if (rightConfig.MotorOutput.NeutralMode == leftConfig.MotorOutput.NeutralMode) {
+
+    } else {
+      leftConfig.MotorOutput.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+
+      leftMotor.getConfigurator().apply(leftConfig);
+      rightMotor.getConfigurator().apply(rightConfig);
+    }
   }
 }
