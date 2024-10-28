@@ -6,6 +6,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.Constants;
 
 public class IntakeIOKraken implements IntakeIO {
 
@@ -13,6 +15,7 @@ public class IntakeIOKraken implements IntakeIO {
   private final TalonFX intakeMotor = new TalonFX(52, "rio");
   private final TalonFX lUpMotor = new TalonFX(17, "rio");
   private final TalonFX lDownMotor = new TalonFX(18, "rio");
+  private final DigitalInput intakeSensor = new DigitalInput(Constants.Intake.INTAKE_SENSOR_ID);
 
   /* Configurators */
   private TalonFXConfiguration intakeConfig;
@@ -50,10 +53,13 @@ public class IntakeIOKraken implements IntakeIO {
 
     inputs.appliedVolts = supply.getValueAsDouble();
     inputs.tempCelcius = temperature.getValueAsDouble();
+    inputs.sensor = !intakeSensor.get();
   }
 
   @Override
-  public void setVoltage(double armVolt) {}
+  public void setVoltage(double armVolt) {
+    intakeMotor.set(-armVolt);
+  }
 
   @Override
   public void lowerIntakeSet(double voltage) {

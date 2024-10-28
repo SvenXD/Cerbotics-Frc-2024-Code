@@ -19,7 +19,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
+import frc.robot.Commands.IntakeCommands.IntakeWithSensor;
 import frc.robot.Commands.SwerveCommands.FieldCentricDrive;
+import frc.robot.Subsystems.Arm.ArmIO;
+import frc.robot.Subsystems.Arm.ArmIOKraken;
+import frc.robot.Subsystems.Arm.ArmSubsystem;
 import frc.robot.Subsystems.Intake.IntakeIO;
 import frc.robot.Subsystems.Intake.IntakeIOKraken;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
@@ -43,9 +47,9 @@ public class RobotContainer {
 
   // public static Drive drive;
 
-  /*public static ArmIO armIO = new ArmIOKraken();
-    public static RangerSubsystem m_arm = new RangerSubsystem(armIO);
-  */
+  public static ArmIO armIO = new ArmIOKraken();
+  public static ArmSubsystem m_arm = new ArmSubsystem(armIO);
+
   public static IntakeIO intakeIO = new IntakeIOKraken();
   public static IntakeSubsystem m_intake = new IntakeSubsystem(intakeIO);
 
@@ -162,25 +166,26 @@ public class RobotContainer {
             () -> -chassisDriver.getRightX()));
 
     //    chassisDriver.y().onTrue(new InstantCommand(() -> drive.changeIntakeAssist()));
-    /*
-           subsystemsDriver.y().onTrue(m_arm.setTargetAngleCommand(Rotation2d.fromDegrees(140)));
-           subsystemsDriver.a().onTrue(m_arm.setTargetAngleCommand(Rotation2d.fromDegrees(100)));
 
-           subsystemsDriver.rightBumper().whileTrue(m_arm.setVolt(1)).whileFalse(m_arm.setVolt(0));
-           subsystemsDriver.leftBumper().whileTrue(m_arm.setVolt(-1)).whileFalse(m_arm.setVolt(0));
-    */
-    /*subsystemsDriver
+    subsystemsDriver.y().onTrue(m_arm.goToPosition(100));
+    subsystemsDriver.a().onTrue(m_arm.goToPosition(174));
+
+    subsystemsDriver.leftBumper().whileTrue(m_shooter.setRpms(91, 91)).whileFalse(m_shooter.stop());
+    // 1200 rpm
+    subsystemsDriver.rightBumper().whileTrue(new IntakeWithSensor(m_intake));
+
+    subsystemsDriver
         .b()
         .whileTrue(m_intake.setlowerIntakeVoltage(0.3))
         .whileFalse(m_intake.setlowerIntakeVoltage(0));
 
     subsystemsDriver
-        .a()
+        .x()
         .whileTrue(m_intake.setlowerIntakeVoltage(-0.3))
-        .whileFalse(m_intake.setlowerIntakeVoltage(0));*/
+        .whileFalse(m_intake.setlowerIntakeVoltage(0));
 
-    subsystemsDriver.x().whileTrue(m_shooter.setRpms(100, 100)).whileFalse(m_shooter.stop());
-    subsystemsDriver.b().whileTrue(m_shooter.setPower()).whileFalse(m_shooter.stop());
+    /*subsystemsDriver.x().whileTrue(m_shooter.setRpms(100, 100)).whileFalse(m_shooter.stop());
+    subsystemsDriver.b().whileTrue(m_shooter.setPower()).whileFalse(m_shooter.stop());*/
   }
 
   private Command controllerRumbleCommand() {

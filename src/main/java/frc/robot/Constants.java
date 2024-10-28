@@ -208,7 +208,7 @@ public class Constants {
 
     /*Physical Measurements */
 
-    public static InvertedValue UPPER_SHOOTER_INVERSION = InvertedValue.Clockwise_Positive;
+    public static InvertedValue UPPER_SHOOTER_INVERSION = InvertedValue.CounterClockwise_Positive;
     public static InvertedValue LOWER_SHOOTER_INVERSION = InvertedValue.Clockwise_Positive;
 
     /* PID */
@@ -247,16 +247,16 @@ public class Constants {
     public static final double ARM_GEARBOX = 320.0 / 1.0;
 
     /* PID */
-    public static double kP = 0.32,
-        kI = 0.42,
-        kD = 0.0055,
+    public static double kP = 0.05,
+        kI = 0.0,
+        kD = 0.0,
         kFF = 0.0,
         kMaxVelocityRadPerSecond = 1000,
         kMaxAccelerationMetersPerSecondSquared = 1000,
-        kS = 0.013804,
-        kV = 0.00028699,
-        kA = 0.00052411,
-        kG = 0.93532,
+        kS = 0.0,
+        kV = 0.0,
+        kA = 0.0,
+        kG = 0.0,
         kPeriod = 0.02;
 
     /* SetPoints and Threesholds */

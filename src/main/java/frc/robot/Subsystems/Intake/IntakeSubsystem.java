@@ -20,11 +20,15 @@ public class IntakeSubsystem extends SubsystemBase {
     Logger.processInputs("Intake", inputs);
   }
 
-  public Command setVoltage(double voltage) {
-    return run(() -> io.setVoltage(voltage));
+  public void setUpperIntakeVoltage(double voltage) {
+    io.setVoltage(voltage);
   }
 
   public Command setlowerIntakeVoltage(double voltage) {
     return run(() -> io.lowerIntakeSet(voltage));
+  }
+
+  public boolean isNoteInside() {
+    return inputs.sensor;
   }
 }

@@ -17,8 +17,8 @@ import frc.Util.Logging.LoggedTunableNumber;
 public class ShooterIOTalon implements ShooterIO {
 
   /* Hardware */
-  private final TalonFX upperMotor = new TalonFX(UPPER_SHOOTER_ID, "rio");
-  private final TalonFX lowerMotor = new TalonFX(LOWER_SHOOTER_ID, "rio");
+  private final TalonFX upperMotor = new TalonFX(50, "rio");
+  private final TalonFX lowerMotor = new TalonFX(53, "rio");
 
   /* Configurators */
   private TalonFXConfigurator upperConfigurator;
@@ -167,8 +167,8 @@ public class ShooterIOTalon implements ShooterIO {
 
   @Override
   public void setVelocity(double velocityUp, double velocityDown) {
+    lowerMotor.setControl(upperVelocity.withVelocity(velocityUp));
     upperMotor.setControl(upperVelocity.withVelocity(velocityUp));
-    lowerMotor.setControl(lowerVelocity.withVelocity(velocityUp));
   }
 
   @Override

@@ -52,7 +52,7 @@ public interface ArmIO {
    *
    * @param volts Voltage to output
    */
-  void setVoltage(double volts);
+  void setVoltage(double volts, double feedforward);
 
   /** Optimize status signals for running sysID */
   default void optimizeForSysID() {}
