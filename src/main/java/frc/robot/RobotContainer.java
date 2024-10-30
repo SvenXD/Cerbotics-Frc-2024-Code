@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.Arm.*;
-
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.ForwardReference;
@@ -19,11 +17,20 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.LocalADStarAK;
+import frc.Util.Logging.LoggedDashboardChooser;
+import frc.robot.Commands.AutoCommands.AutoCommand;
+import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
+import frc.robot.Commands.AutoCommands.Paths.OLDPATHS.ComplementPath;
+import frc.robot.Commands.AutoCommands.Paths.OLDPATHS.FiveNoteAutoPath;
+import frc.robot.Commands.AutoCommands.Paths.OLDPATHS.TestAuto;
 import frc.robot.Commands.IntakeCommands.IntakeWithSensor;
 import frc.robot.Commands.SwerveCommands.FieldCentricDrive;
 import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOKraken;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
+import frc.robot.Subsystems.Climber.ClimberIO;
+import frc.robot.Subsystems.Climber.ClimberIOKraken;
+import frc.robot.Subsystems.Climber.ClimberSubsystem;
 import frc.robot.Subsystems.Intake.IntakeIO;
 import frc.robot.Subsystems.Intake.IntakeIOKraken;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
@@ -41,7 +48,7 @@ public class RobotContainer {
   private static final CommandXboxController chassisDriver = new CommandXboxController(0);
   private static final CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
-  // private static LoggedDashboardChooser<AutoCommand> autoChooser;
+  private static LoggedDashboardChooser<AutoCommand> autoChooser;
 
   public static Field2d autoPreviewField = new Field2d();
 
@@ -56,7 +63,10 @@ public class RobotContainer {
   public static ShooterIO shooterIO = new ShooterIOTalon();
   public static ShooterSubsystem m_shooter = new ShooterSubsystem(shooterIO);
 
-  private final CommandSwerveDrivetrain m_drive = TunerConstants.DriveTrain;
+  public static ClimberIO climberIO = new ClimberIOKraken();
+  public static ClimberSubsystem m_climber = new ClimberSubsystem(climberIO);
+
+  private static final CommandSwerveDrivetrain m_drive = TunerConstants.DriveTrain;
 
   SwerveRequest.FieldCentricFacingAngle m_head =
       new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
@@ -109,19 +119,19 @@ public class RobotContainer {
 
     // registerNamedCommands();
     /** Visualisation of the current auto selected * */
-    /*autoChooser = new LoggedDashboardChooser<>("Auto Mode");
+    autoChooser = new LoggedDashboardChooser<>("Auto Mode");
 
     autoChooser.onChange(
         auto -> {
           autoPreviewField.getObject("path").setPoses(auto.getAllPathPoses());
         });
 
-    /** Auto options *
+    /* Auto options */
     autoChooser.addDefaultOption("None", new NoneAuto());
     autoChooser.addOption("Complement auto", new ComplementPath());
     autoChooser.addOption("Six Note Auto", new FiveNoteAutoPath());
     // autoChooser.addOption("Test Of Change", new ChangeTest(drive));
-    autoChooser.addOption("5 note auto align", new TestAuto()); */
+    autoChooser.addOption("5 note auto align", new TestAuto());
 
     PathPlannerLogging.setLogActivePathCallback(
         (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));
@@ -141,51 +151,74 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    /* Control 1 commands */
-    // Chassis commands
-    /*drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -chassisDriver.getLeftY(),
-            () -> -chassisDriver.getLeftX(),
-            () -> -chassisDriver.getRightX() * 0.5));
-
-    // Lock modules
-    chassisDriver.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
-    // Set field centric
-    chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
-
-    chassisDriver.leftBumper().whileTrue(new NoteAlignCommand(drive));*/
-
+    /* Driver 1 */
     m_drive.setDefaultCommand(
         new FieldCentricDrive(
             m_drive,
-            () -> -chassisDriver.getLeftY(),
-            () -> -chassisDriver.getLeftX(),
-            () -> -chassisDriver.getRightX()));
+            () -> -chassisDriver.getLeftY() * 0.3,
+            () -> -chassisDriver.getLeftX() * 0.3,
+            () -> -chassisDriver.getRightX() * 0.6));
 
-    //    chassisDriver.y().onTrue(new InstantCommand(() -> drive.changeIntakeAssist()));
+    chassisDriver.a().onTrue(m_drive.runOnce(() -> m_drive.seedFieldRelative()));
 
-    subsystemsDriver.y().onTrue(m_arm.goToPosition(100));
-    subsystemsDriver.a().onTrue(m_arm.goToPosition(174));
+    chassisDriver
+        .rightBumper()
+        .whileTrue(m_arm.goToPosition(173).alongWith(new IntakeWithSensor(m_intake)))
+        .whileFalse(m_arm.goToPosition(173));
 
-    subsystemsDriver.leftBumper().whileTrue(m_shooter.setRpms(91, 91)).whileFalse(m_shooter.stop());
-    // 1200 rpm
-    subsystemsDriver.rightBumper().whileTrue(new IntakeWithSensor(m_intake));
+    chassisDriver
+        .rightBumper()
+        .and(() -> m_intake.isNoteInside())
+        .onTrue(controllerRumbleCommand().withTimeout(1));
+
+    /* Driver 2 */
+    subsystemsDriver.a().onTrue(m_arm.goToPosition(95));
 
     subsystemsDriver
+        .x()
+        .whileTrue(m_shooter.setRpms(90, 90).alongWith(m_arm.goToPosition(160)))
+        .whileFalse(m_arm.goToPosition(173).alongWith(m_shooter.stop()));
+
+    subsystemsDriver
+        .leftBumper()
+        .whileTrue(m_shooter.setRpms(25, 25).alongWith(m_intake.setUpperVoltage(-0.5)))
+        .whileFalse(
+            m_shooter
+                .stop()
+                .alongWith(m_arm.goToPosition(173))
+                .alongWith(m_intake.setUpperVoltage(0)));
+
+    subsystemsDriver
+        .rightBumper()
+        .whileTrue(m_intake.setUpperVoltage(-1))
+        .whileFalse(m_intake.setUpperVoltage(0));
+
+    subsystemsDriver
+        .b()
+        .whileTrue(m_intake.setUpperVoltage(0.5).alongWith(m_shooter.setRpms(-2, -2)))
+        .whileFalse(m_intake.setUpperVoltage(0).alongWith(m_shooter.stop()));
+    // 1200 rpm
+
+    /*subsystemsDriver
         .b()
         .whileTrue(m_intake.setlowerIntakeVoltage(0.3))
         .whileFalse(m_intake.setlowerIntakeVoltage(0));
 
     subsystemsDriver
         .x()
-        .whileTrue(m_intake.setlowerIntakeVoltage(-0.3))
-        .whileFalse(m_intake.setlowerIntakeVoltage(0));
+        .whileTrue(m_intake.setall(-0.7, -0.8)) // Intake
+        .whileFalse(m_intake.setall(0, 0));
+
+    subsystemsDriver
+        .povUp()
+        .whileTrue(m_climber.setClimberVoltage(0.1))
+        .whileFalse(m_climber.setClimberVoltage(0));
 
     /*subsystemsDriver.x().whileTrue(m_shooter.setRpms(100, 100)).whileFalse(m_shooter.stop());
-    subsystemsDriver.b().whileTrue(m_shooter.setPower()).whileFalse(m_shooter.stop());*/
+    subsystemsDriver.b().whileTrue(m_shooter.setPower()).whileFalse(m_shooter.stop());
+
+
+    -0.7 intake for all  0.8 for the one ont he right*/
   }
 
   private Command controllerRumbleCommand() {
@@ -229,8 +262,7 @@ public class RobotContainer {
     return null;
   }
 
-  /*
-  public static Drive getSwerveSubsystem() {
-    return drive;
-  }*/
+  public static CommandSwerveDrivetrain getDrive() {
+    return m_drive;
+  }
 }

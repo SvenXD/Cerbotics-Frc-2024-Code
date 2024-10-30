@@ -65,6 +65,12 @@ public class IntakeIOKraken implements IntakeIO {
   public void lowerIntakeSet(double voltage) {
     lDownMotor.set(voltage);
     lUpMotor.set(voltage);
+  }
+
+  @Override
+  public void setAll(double voltage, double lup) {
+    lDownMotor.set(voltage);
+    lUpMotor.set(lup);
     intakeMotor.set(-voltage);
   }
 }

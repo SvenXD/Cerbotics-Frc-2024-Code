@@ -20,4 +20,6 @@ public interface IntakeIO {
   public default void setVoltage(double armVolt) {}
 
   public default void lowerIntakeSet(double voltage) {}
+
+  public default void setAll(double voltage, double lup) {}
 }

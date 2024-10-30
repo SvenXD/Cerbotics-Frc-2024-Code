@@ -1,29 +1,28 @@
-package frc.robot.Commands.AutoCommands.Paths;
+package frc.robot.Commands.AutoCommands.Paths.OLDPATHS;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Commands.AutoCommands.AutoCommand;
+import frc.robot.Subsystems.Swerve.Drive;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ComplementPath extends AutoCommand {
+public class ChangeTest extends AutoCommand {
 
-  private final PathPlannerPath startToFirst;
+  Drive m_drive;
+  private final PathPlannerPath startToFirst = PathPlannerPath.fromPathFile("Test1");
+  private final PathPlannerPath startToSecond = PathPlannerPath.fromPathFile("Test3");
+  private final PathPlannerPath startToSecondAlt = PathPlannerPath.fromPathFile("Test2");
+  private final PathPlannerPath startToSecondAltAlt = PathPlannerPath.fromPathFile("Test4");
 
-  public ComplementPath() {
-    startToFirst = PathPlannerPath.fromChoreoTrajectory("SamirPath");
+  private final PathPlannerPath idk = PathPlannerPath.fromPathFile("Test5");
 
-    addCommands(
-        Commands.deadline(
-            Commands.sequence(
-                new PathPlannerAuto("Starting pose 1"), AutoBuilder.followPath(startToFirst))));
+  public ChangeTest(Drive m_drive) {
+    this.m_drive = m_drive;
   }
 
   @Override

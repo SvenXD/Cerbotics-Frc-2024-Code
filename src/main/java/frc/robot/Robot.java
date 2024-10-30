@@ -5,6 +5,9 @@
 package frc.robot;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -12,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.Util.LocalADStarAK;
+import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -22,9 +26,15 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   private static RobotContainer m_robotContainer;
+  StructArrayPublisher<SwerveModuleState> measuredStates;
+  StructArrayPublisher<SwerveModuleState> targetStates;
 
   @Override
   public void robotInit() {
+    if (isReal()) {
+      Constants.currentMode = Mode.REAL;
+    }
+
     m_robotContainer = new RobotContainer();
 
     DataLogManager.start("C:\\Users\\Roman\\Documents\\Logs");
@@ -78,6 +88,15 @@ public class Robot extends LoggedRobot {
         break;
     }
 
+    measuredStates =
+        NetworkTableInstance.getDefault()
+            .getStructArrayTopic("Measured Swerve States", SwerveModuleState.struct)
+            .publish();
+
+    targetStates =
+        NetworkTableInstance.getDefault()
+            .getStructArrayTopic("Target Swerve States", SwerveModuleState.struct)
+            .publish();
     Logger.start();
     Logger.disableDeterministicTimestamps();
     Logger.disableConsoleCapture();
@@ -85,15 +104,14 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
-
+    measuredStates.set(RobotContainer.getDrive().getState().ModuleStates);
+    targetStates.set(RobotContainer.getDrive().getState().ModuleTargets);
     CommandScheduler.getInstance().run();
     SmartDashboard.putBoolean("IsRedAlliance", isRedAlliance());
   }
 
   @Override
-  public void disabledInit() {
-    // RobotContainer.getSwerveSubsystem().enableDisableIntakeAssist(false);
-  }
+  public void disabledInit() {}
 
   @Override
   public void disabledPeriodic() {}

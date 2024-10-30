@@ -23,7 +23,7 @@ import edu.wpi.first.math.util.Units;
 
 public class Constants {
 
-  public static final Mode currentMode = Mode.REAL;
+  public static Mode currentMode = Mode.REAL;
   public static final boolean needToLog = true;
 
   public static enum Mode {
@@ -47,10 +47,10 @@ public class Constants {
     // Distance between front and back wheels
     public static final double kWheelBase = 0.635;
 
-    public static final double MaxAngularRate = 1.5 * Math.PI;
+    public static final double MaxAngularRate = 5 * Math.PI;
     public static final double MaxLinearSpeed = 22.102;
 
-    public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
+    public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 3 * 3 * Math.PI;
 
     public static final double kTeleDriveMaxSpeedMetersPerSecond =
         Units.feetToMeters(22.102) * 0.80;

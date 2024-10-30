@@ -18,12 +18,12 @@ public class IntakeWithSensor extends Command {
 
   @Override
   public void execute() {
-    intake.setUpperIntakeVoltage(-0.5);
+    intake.setallVoid(-0.7, -0.8);
   }
 
   @Override
   public void end(boolean interrupted) {
-    intake.setUpperIntakeVoltage(0);
+    intake.setallVoid(0, 0);
   }
 
   @Override

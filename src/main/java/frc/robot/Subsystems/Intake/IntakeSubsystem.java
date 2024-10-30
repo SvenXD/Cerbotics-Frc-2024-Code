@@ -20,12 +20,28 @@ public class IntakeSubsystem extends SubsystemBase {
     Logger.processInputs("Intake", inputs);
   }
 
-  public void setUpperIntakeVoltage(double voltage) {
+  public void setUpperIntakeVoltageVoid(double voltage) {
     io.setVoltage(voltage);
+  }
+
+  public void setLowerIntakeVoltageVoid(double voltage) {
+    io.lowerIntakeSet(voltage);
+  }
+
+  public void setallVoid(double voltage, double lup) {
+    io.setAll(voltage, lup);
   }
 
   public Command setlowerIntakeVoltage(double voltage) {
     return run(() -> io.lowerIntakeSet(voltage));
+  }
+
+  public Command setUpperVoltage(double voltage) {
+    return run(() -> io.setVoltage(voltage));
+  }
+
+  public Command setall(double voltage, double lup) {
+    return run(() -> io.setAll(voltage, lup));
   }
 
   public boolean isNoteInside() {
