@@ -12,7 +12,7 @@
         "y": 7.014791090923124
       },
       "isLocked": false,
-      "linkedName": "Intake4"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Intake6"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -64,7 +64,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Arm150"
+                "name": null
               }
             }
           ]
@@ -81,7 +81,7 @@
             {
               "type": "named",
               "data": {
-                "name": "ShootSim"
+                "name": null
               }
             }
           ]
@@ -98,7 +98,7 @@
             {
               "type": "named",
               "data": {
-                "name": "ActivateIntakeAssist"
+                "name": null
               }
             }
           ]
@@ -124,8 +124,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 6.0,
-    "maxAcceleration": 6.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },

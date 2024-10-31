@@ -16,7 +16,7 @@ public class TunerConstants {
   // The steer motor uses any SwerveModule.SteerRequestType control request with the
   // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
   private static final Slot0Configs steerGains =
-      new Slot0Configs().withKP(10).withKI(0).withKD(0.05).withKS(0.18).withKV(1.5).withKA(0);
+      new Slot0Configs().withKP(100).withKI(0).withKD(0.05).withKS(0.18).withKV(1.5).withKA(0);
   // When using closed-loop control, the drive motor uses the control
   // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
   private static final Slot0Configs driveGains =
@@ -33,8 +33,7 @@ public class TunerConstants {
   private static final ClosedLoopOutputType steerClosedLoopOutput = ClosedLoopOutputType.Voltage;
   // The closed-loop output type to use for the drive motors;
   // This affects the PID/FF gains for the drive motors
-  private static final ClosedLoopOutputType driveClosedLoopOutput =
-      ClosedLoopOutputType.TorqueCurrentFOC;
+  private static final ClosedLoopOutputType driveClosedLoopOutput = ClosedLoopOutputType.Voltage;
 
   // The stator current at which the wheels start to slip;
   // This needs to be tuned to your individual robot
@@ -49,7 +48,7 @@ public class TunerConstants {
   private static final double kCoupleRatio = 2;
 
   private static final double kDriveGearRatio = 4.59;
-  private static final double kSteerGearRatio = 13.3714;
+  private static final double kSteerGearRatio = 10;
   private static final double kWheelRadiusInches = 2;
 
   private static final boolean kSteerMotorReversed = true;

@@ -47,10 +47,10 @@ public class Constants {
     // Distance between front and back wheels
     public static final double kWheelBase = 0.635;
 
-    public static final double MaxAngularRate = 5 * Math.PI;
-    public static final double MaxLinearSpeed = 22.102;
+    public static final double MaxAngularRate = 2 * Math.PI;
+    public static final double MaxLinearSpeed = 18.102;
 
-    public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 3 * 3 * Math.PI;
+    public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
 
     public static final double kTeleDriveMaxSpeedMetersPerSecond =
         Units.feetToMeters(22.102) * 0.80;

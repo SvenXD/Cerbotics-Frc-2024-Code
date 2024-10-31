@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 2.8,
+        "y": 4.05
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7310308543584263,
-        "y": 6.323851734722014
+        "x": 1.9711768038920692,
+        "y": 4.947891795783591
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "4NoteAuto3"
     },
     {
       "anchor": {
-        "x": 7.391943799579468,
-        "y": 7.424670370025476
+        "x": 1.2943279732713326,
+        "y": 5.61429045935015
       },
       "prevControl": {
-        "x": 6.391943799579468,
-        "y": 7.424670370025476
+        "x": 1.9948809128387501,
+        "y": 4.923604462593541
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "4NoteAuto4"
     }
   ],
   "rotationTargets": [],
@@ -39,11 +39,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 0.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Grabage idik",
+  "folder": "ProbandoAutonomos",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

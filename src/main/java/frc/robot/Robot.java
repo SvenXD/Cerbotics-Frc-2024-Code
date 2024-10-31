@@ -25,6 +25,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
+  private Command stopShooter;
   private static RobotContainer m_robotContainer;
   StructArrayPublisher<SwerveModuleState> measuredStates;
   StructArrayPublisher<SwerveModuleState> targetStates;
@@ -137,6 +138,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    stopShooter = RobotContainer.getShooter().stop();
+    stopShooter.schedule();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

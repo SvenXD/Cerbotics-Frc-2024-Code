@@ -12,7 +12,7 @@
         "y": 6.581490138729208
       },
       "isLocked": false,
-      "linkedName": "Intake6"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Arm150"
+                "name": null
               }
             }
           ]
@@ -50,8 +50,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 6.0,
-    "maxAcceleration": 6.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },

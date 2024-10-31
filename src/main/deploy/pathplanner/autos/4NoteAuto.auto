@@ -1,0 +1,118 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.284461030460524,
+      "y": 5.564955745296107
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "FirstShoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "4NoteAuto1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4NoteAuto2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeToShoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "4NoteAuto5"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4NoteAuto6"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeToShoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "4NoteAuto5"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4NoteAuto6"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeToShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4NoteAuto7"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "ProbandoAutonomos",
+  "choreoAuto": false
+}

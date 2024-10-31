@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.ForwardReference;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,17 +21,13 @@ import frc.Util.LocalADStarAK;
 import frc.Util.Logging.LoggedDashboardChooser;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
-import frc.robot.Commands.AutoCommands.Paths.OLDPATHS.ComplementPath;
-import frc.robot.Commands.AutoCommands.Paths.OLDPATHS.FiveNoteAutoPath;
-import frc.robot.Commands.AutoCommands.Paths.OLDPATHS.TestAuto;
+import frc.robot.Commands.AutoCommands.Paths.RegionalPaths.MoveTest;
 import frc.robot.Commands.IntakeCommands.IntakeWithSensor;
+import frc.robot.Commands.ShooterCommands.ShooterCommand;
 import frc.robot.Commands.SwerveCommands.FieldCentricDrive;
 import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOKraken;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
-import frc.robot.Subsystems.Climber.ClimberIO;
-import frc.robot.Subsystems.Climber.ClimberIOKraken;
-import frc.robot.Subsystems.Climber.ClimberSubsystem;
 import frc.robot.Subsystems.Intake.IntakeIO;
 import frc.robot.Subsystems.Intake.IntakeIOKraken;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
@@ -63,8 +60,8 @@ public class RobotContainer {
   public static ShooterIO shooterIO = new ShooterIOTalon();
   public static ShooterSubsystem m_shooter = new ShooterSubsystem(shooterIO);
 
-  public static ClimberIO climberIO = new ClimberIOKraken();
-  public static ClimberSubsystem m_climber = new ClimberSubsystem(climberIO);
+  // public static ClimberIO climberIO = new ClimberIOKraken();
+  // public static ClimberSubsystem m_climber = new ClimberSubsystem(climberIO);
 
   private static final CommandSwerveDrivetrain m_drive = TunerConstants.DriveTrain;
 
@@ -79,45 +76,45 @@ public class RobotContainer {
 
     /** Options for the current mode of the robot */
     /*switch (Constants.currentMode) {
-      case REAL:
-        // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(true),
-                new ModuleIOTalonFX(0),
-                new ModuleIOTalonFX(1),
-                new ModuleIOTalonFX(2),
-                new ModuleIOTalonFX(3));
+          case REAL:
+            // Real robot, instantiate hardware IO implementations
+            drive =
+                new Drive(
+                    new GyroIOPigeon2(true),
+                    new ModuleIOTalonFX(0),
+                    new ModuleIOTalonFX(1),
+                    new ModuleIOTalonFX(2),
+                    new ModuleIOTalonFX(3));
 
-        break;
-        // --------------------------------------------
-      case SIM:
-        // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
+            break;
+            // --------------------------------------------
+          case SIM:
+            // Sim robot, instantiate physics sim IO implementations
+            drive =
+                new Drive(
+                    new GyroIO() {},
+                    new ModuleIOSim(),
+                    new ModuleIOSim(),
+                    new ModuleIOSim(),
+                    new ModuleIOSim());
 
-        break;
-        // --------------------------------------------
-      default:
-        // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
+            break;
+            // --------------------------------------------
+          default:
+            // Replayed robot, disable IO implementations
+            drive =
+                new Drive(
+                    new GyroIO() {},
+                    new ModuleIO() {},
+                    new ModuleIO() {},
+                    new ModuleIO() {},
+                    new ModuleIO() {});
 
-        break;
-        // --------------------------------------------
-    }
-
-    // registerNamedCommands();
+            break;
+            // --------------------------------------------
+        }
+    */
+    registerNamedCommands();
     /** Visualisation of the current auto selected * */
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
 
@@ -128,10 +125,7 @@ public class RobotContainer {
 
     /* Auto options */
     autoChooser.addDefaultOption("None", new NoneAuto());
-    autoChooser.addOption("Complement auto", new ComplementPath());
-    autoChooser.addOption("Six Note Auto", new FiveNoteAutoPath());
-    // autoChooser.addOption("Test Of Change", new ChangeTest(drive));
-    autoChooser.addOption("5 note auto align", new TestAuto());
+    autoChooser.addOption("4 Note Auto", new MoveTest());
 
     PathPlannerLogging.setLogActivePathCallback(
         (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));
@@ -172,16 +166,21 @@ public class RobotContainer {
         .onTrue(controllerRumbleCommand().withTimeout(1));
 
     /* Driver 2 */
-    subsystemsDriver.a().onTrue(m_arm.goToPosition(95));
+    subsystemsDriver
+        .a()
+        .onTrue(
+            m_arm
+                .goToPosition(95)
+                .alongWith(m_shooter.setRpms(70, 70).onlyIf((() -> m_arm.getArmAngle() < 180))));
 
     subsystemsDriver
         .x()
-        .whileTrue(m_shooter.setRpms(90, 90).alongWith(m_arm.goToPosition(160)))
+        .whileTrue(m_shooter.setRpms(90, 90).alongWith(m_arm.goToPosition(173)))
         .whileFalse(m_arm.goToPosition(173).alongWith(m_shooter.stop()));
 
     subsystemsDriver
         .leftBumper()
-        .whileTrue(m_shooter.setRpms(25, 25).alongWith(m_intake.setUpperVoltage(-0.5)))
+        .whileTrue(m_intake.setUpperVoltage(-1))
         .whileFalse(
             m_shooter
                 .stop()
@@ -195,8 +194,8 @@ public class RobotContainer {
 
     subsystemsDriver
         .b()
-        .whileTrue(m_intake.setUpperVoltage(0.5).alongWith(m_shooter.setRpms(-2, -2)))
-        .whileFalse(m_intake.setUpperVoltage(0).alongWith(m_shooter.stop()));
+        .whileTrue(m_intake.setall(0.5, 0.5).alongWith(m_shooter.setRpms(-2, -2)))
+        .whileFalse(m_intake.setall(0, 0).alongWith(m_shooter.stop()));
     // 1200 rpm
 
     /*subsystemsDriver
@@ -225,44 +224,60 @@ public class RobotContainer {
     return Commands.startEnd(
         () -> {
           chassisDriver.getHID().setRumble(RumbleType.kBothRumble, 1.0);
+          subsystemsDriver.getHID().setRumble(RumbleType.kBothRumble, 1.0);
         },
         () -> {
           chassisDriver.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+          subsystemsDriver.getHID().setRumble(RumbleType.kBothRumble, 0.0);
         });
   }
 
   /*public static Command pathfindAndAlignAmp() {
-      return Commands.either(
-          drive
-              .goToPose(FieldConstants.redAmpPose)
-              .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
-          drive
-              .goToPose(FieldConstants.blueAmpPose)
-              .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
-          Robot::isRedAlliance);
-    }
+        return Commands.either(
+            drive
+                .goToPose(FieldConstants.redAmpPose)
+                .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
+            drive
+                .goToPose(FieldConstants.blueAmpPose)
+                .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
+            Robot::isRedAlliance);
+      }
 
-    public static Command pathfindAndAlignSource() {
-      return Commands.either(
-          drive
-              .goToPose(FieldConstants.redPickupPose)
-              .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
-          drive
-              .goToPose(FieldConstants.bluePickupPose)
-              .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
-          Robot::isRedAlliance);
-    }
-
-    public void registerNamedCommands() {
-      NamedCommands.registerCommand(
-          "ActivateIntakeAssist", new InstantCommand(() -> drive.changeIntakeAssist()));
-    }
+      public static Command pathfindAndAlignSource() {
+        return Commands.either(
+            drive
+                .goToPose(FieldConstants.redPickupPose)
+                .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
+            drive
+                .goToPose(FieldConstants.bluePickupPose)
+                .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
+            Robot::isRedAlliance);
+      }
   */
+  public void registerNamedCommands() {
+    NamedCommands.registerCommand("Arm160", m_arm.goToPosition(160));
+    NamedCommands.registerCommand("FirstShoot", new ShooterCommand(m_shooter, m_intake));
+    NamedCommands.registerCommand(
+        "Intake", new IntakeWithSensor(m_intake).alongWith(m_arm.goToPosition(174)));
+    NamedCommands.registerCommand(
+        "PrepareShoot", m_shooter.setRpms(90, 90).until(() -> !m_intake.isNoteInside()));
+    NamedCommands.registerCommand(
+        "IntakeToShoot", m_intake.setall(-0.9, -1).until(() -> !m_intake.isNoteInside()));
+  }
+
   public Command getAutonomousCommand() {
-    return null;
+    return autoChooser.get();
   }
 
   public static CommandSwerveDrivetrain getDrive() {
     return m_drive;
+  }
+
+  public static ArmSubsystem getArm() {
+    return m_arm;
+  }
+
+  public static ShooterSubsystem getShooter() {
+    return m_shooter;
   }
 }

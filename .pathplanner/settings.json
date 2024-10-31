@@ -1,20 +1,21 @@
 {
-  "robotWidth": 0.6096,
-  "robotLength": 0.635,
+  "robotWidth": 0.625,
+  "robotLength": 0.79,
   "holonomicMode": true,
   "pathFolders": [
     "5Note",
     "Intake Assist",
     "Main Auto",
-    "ProbandoAutonomos",
+    "Grabage idik",
     "New New Folder",
+    "ProbandoAutonomos",
     "Test"
   ],
   "autoFolders": [
     "ProbandoAutonomos"
   ],
-  "defaultMaxVel": 6.0,
-  "defaultMaxAccel": 6.0,
+  "defaultMaxVel": 3.0,
+  "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
   "maxModuleSpeed": 4.72

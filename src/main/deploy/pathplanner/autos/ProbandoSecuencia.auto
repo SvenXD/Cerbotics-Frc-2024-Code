@@ -2,24 +2,24 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.17,
-      "y": 5.55
+      "x": 1.9932481519741916,
+      "y": 6.0
     },
-    "rotation": 0.6359352666938819
+    "rotation": 0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": null
+            "pathName": "ProbandoAutonomos"
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "ProbandoAutonomos",
   "choreoAuto": false
 }

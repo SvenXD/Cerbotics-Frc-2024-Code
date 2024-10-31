@@ -12,7 +12,7 @@
         "y": 6.323851734722014
       },
       "isLocked": false,
-      "linkedName": "MainStartPoint"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "ShootSim"
+                "name": null
               }
             }
           ]
@@ -50,8 +50,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 6.0,
-    "maxAcceleration": 6.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },

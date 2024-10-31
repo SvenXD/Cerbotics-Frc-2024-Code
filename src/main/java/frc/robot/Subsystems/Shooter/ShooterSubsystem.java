@@ -21,8 +21,16 @@ public class ShooterSubsystem extends SubsystemBase {
     Logger.processInputs("Shooter", inputs);
   }
 
+  public double getRPM() {
+    return inputs.upperShooterVelocityRpm;
+  }
+
   public Command setRpms(double upperRpm, double downRpm) {
     return run(() -> io.setVelocity(upperRpm, downRpm));
+  }
+
+  public void setRpmsVoid(double upperRpm, double downRpm) {
+    io.setVelocity(upperRpm, downRpm);
   }
 
   public Command stop() {
