@@ -130,6 +130,12 @@ public class ArmSubsystem extends SubsystemBase {
     return ejecutable;
   }
 
+  public void goToPositionVoid(double position) {
+    getController().reset(inputs.angleDegrees);
+    m_controller.setGoal(position);
+    enable = true;
+  }
+
   public double getAngleForDistance(double distance) {
     return kDistanceToArmAngle.getInterpolated(
             new InterpolatingDouble(Math.max(Math.min(distance, 4.35), 1.66)))

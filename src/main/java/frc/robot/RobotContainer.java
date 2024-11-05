@@ -28,6 +28,9 @@ import frc.robot.Commands.SwerveCommands.FieldCentricDrive;
 import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOKraken;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
+import frc.robot.Subsystems.Climber.ClimberIO;
+import frc.robot.Subsystems.Climber.ClimberIOKraken;
+import frc.robot.Subsystems.Climber.ClimberSubsystem;
 import frc.robot.Subsystems.Intake.IntakeIO;
 import frc.robot.Subsystems.Intake.IntakeIOKraken;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
@@ -42,8 +45,8 @@ public class RobotContainer {
 
   // nopublic static SimDefenseBot defenseBot = new SimDefenseBot(2);
 
-  private static final CommandXboxController chassisDriver = new CommandXboxController(0);
-  private static final CommandXboxController subsystemsDriver = new CommandXboxController(1);
+  public static final CommandXboxController chassisDriver = new CommandXboxController(0);
+  public static final CommandXboxController subsystemsDriver = new CommandXboxController(1);
 
   private static LoggedDashboardChooser<AutoCommand> autoChooser;
 
@@ -60,8 +63,8 @@ public class RobotContainer {
   public static ShooterIO shooterIO = new ShooterIOTalon();
   public static ShooterSubsystem m_shooter = new ShooterSubsystem(shooterIO);
 
-  // public static ClimberIO climberIO = new ClimberIOKraken();
-  // public static ClimberSubsystem m_climber = new ClimberSubsystem(climberIO);
+  public static ClimberIO climberIO = new ClimberIOKraken();
+  public static ClimberSubsystem m_climber = new ClimberSubsystem(climberIO);
 
   private static final CommandSwerveDrivetrain m_drive = TunerConstants.DriveTrain;
 
@@ -157,13 +160,18 @@ public class RobotContainer {
 
     chassisDriver
         .rightBumper()
-        .whileTrue(m_arm.goToPosition(173).alongWith(new IntakeWithSensor(m_intake)))
-        .whileFalse(m_arm.goToPosition(173));
+        .whileTrue(m_arm.goToPosition(172).alongWith(new IntakeWithSensor(m_intake)))
+        .whileFalse(m_arm.goToPosition(172));
 
     chassisDriver
         .rightBumper()
         .and(() -> m_intake.isNoteInside())
         .onTrue(controllerRumbleCommand().withTimeout(1));
+
+    chassisDriver
+        .b()
+        .whileTrue(m_shooter.setRpms(-10, -10).alongWith(m_intake.setall(0.5, 0.5)))
+        .whileFalse(m_intake.setall(0, 0).alongWith(m_shooter.stop()));
 
     /* Driver 2 */
     subsystemsDriver
@@ -171,12 +179,17 @@ public class RobotContainer {
         .onTrue(
             m_arm
                 .goToPosition(95)
-                .alongWith(m_shooter.setRpms(70, 70).onlyIf((() -> m_arm.getArmAngle() < 180))));
+                .alongWith(m_shooter.setRpms(11, 11).onlyIf((() -> m_arm.getArmAngle() < 180))));
 
     subsystemsDriver
         .x()
-        .whileTrue(m_shooter.setRpms(90, 90).alongWith(m_arm.goToPosition(173)))
-        .whileFalse(m_arm.goToPosition(173).alongWith(m_shooter.stop()));
+        .whileTrue(m_shooter.setRpms(90, 90).alongWith(m_arm.goToPosition(167)))
+        .whileFalse(m_arm.goToPosition(172).alongWith(m_shooter.stop()));
+
+    subsystemsDriver
+        .b()
+        .whileTrue(m_shooter.setRpms(90, 90).alongWith(m_arm.goToPosition(115)))
+        .whileFalse(m_arm.goToPosition(172).alongWith(m_shooter.stop()));
 
     subsystemsDriver
         .leftBumper()
@@ -184,7 +197,7 @@ public class RobotContainer {
         .whileFalse(
             m_shooter
                 .stop()
-                .alongWith(m_arm.goToPosition(173))
+                .alongWith(m_arm.goToPosition(172))
                 .alongWith(m_intake.setUpperVoltage(0)));
 
     subsystemsDriver
@@ -192,10 +205,17 @@ public class RobotContainer {
         .whileTrue(m_intake.setUpperVoltage(-1))
         .whileFalse(m_intake.setUpperVoltage(0));
 
-    subsystemsDriver
-        .b()
+    chassisDriver
+        .leftBumper()
         .whileTrue(m_intake.setall(0.5, 0.5).alongWith(m_shooter.setRpms(-2, -2)))
         .whileFalse(m_intake.setall(0, 0).alongWith(m_shooter.stop()));
+
+    subsystemsDriver
+        .povDown()
+        .whileTrue(m_climber.setClimberVoltage(1))
+        .whileFalse(m_climber.setClimberVoltage(0));
+
+    subsystemsDriver.povUp().onTrue(m_climber.setPosition(111));
     // 1200 rpm
 
     /*subsystemsDriver
@@ -208,10 +228,7 @@ public class RobotContainer {
         .whileTrue(m_intake.setall(-0.7, -0.8)) // Intake
         .whileFalse(m_intake.setall(0, 0));
 
-    subsystemsDriver
-        .povUp()
-        .whileTrue(m_climber.setClimberVoltage(0.1))
-        .whileFalse(m_climber.setClimberVoltage(0));
+
 
     /*subsystemsDriver.x().whileTrue(m_shooter.setRpms(100, 100)).whileFalse(m_shooter.stop());
     subsystemsDriver.b().whileTrue(m_shooter.setPower()).whileFalse(m_shooter.stop());
@@ -255,10 +272,13 @@ public class RobotContainer {
       }
   */
   public void registerNamedCommands() {
-    NamedCommands.registerCommand("Arm160", m_arm.goToPosition(160));
-    NamedCommands.registerCommand("FirstShoot", new ShooterCommand(m_shooter, m_intake));
+    NamedCommands.registerCommand("Arm169", m_arm.goToPosition(167));
     NamedCommands.registerCommand(
-        "Intake", new IntakeWithSensor(m_intake).alongWith(m_arm.goToPosition(174)));
+        "FirstShoot", new ShooterCommand(m_shooter, m_intake).alongWith(m_arm.goToPosition(169)));
+
+    NamedCommands.registerCommand(
+        "Intake", new IntakeWithSensor(m_intake).alongWith(m_arm.goToPosition(172)));
+
     NamedCommands.registerCommand(
         "PrepareShoot", m_shooter.setRpms(90, 90).until(() -> !m_intake.isNoteInside()));
     NamedCommands.registerCommand(

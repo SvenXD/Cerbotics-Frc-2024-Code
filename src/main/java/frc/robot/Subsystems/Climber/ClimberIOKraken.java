@@ -13,7 +13,7 @@ public class ClimberIOKraken implements ClimberIO {
 
   /* Be able to switch which control request to use based on a button press */
   /* Start at position 0, use slot 0 */
-  private final PositionVoltage m_positionVoltage = new PositionVoltage(0).withSlot(0);
+  private final PositionVoltage m_positionVoltage = new PositionVoltage(0);
 
   public ClimberIOKraken() {
     climberConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -21,14 +21,21 @@ public class ClimberIOKraken implements ClimberIO {
     climberConfig.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
     climberConfig.MotorOutput.withNeutralMode(NeutralModeValue.Brake);
 
+    climberConfig.Slot0.kP = 5;
+
     climberMotor.setPosition(0);
 
     climberMotor.getConfigurator().apply(climberConfig);
-  }
+  } // 112
 
   @Override
   public void setVoltage(double voltage) {
     climberMotor.set(voltage);
+  }
+
+  @Override
+  public void setPosition(double position) {
+    climberMotor.setControl(m_positionVoltage.withPosition(position));
   }
 
   @Override

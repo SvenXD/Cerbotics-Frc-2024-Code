@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.9932481519741916,
-        "y": 6.0
+        "x": 0.761513061487663,
+        "y": 4.519059807350385
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.993248151974192,
-        "y": 6.0
+        "x": 1.4127312870010371,
+        "y": 4.262519294269358
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 6.0
+        "x": 4.747757957054377,
+        "y": 0.9570934526484439
       },
       "prevControl": {
-        "x": 3.0,
-        "y": 6.0
+        "x": 3.747757957054377,
+        "y": 0.9570934526484439
       },
       "nextControl": null,
       "isLocked": false,
@@ -57,7 +57,7 @@
   "reversed": false,
   "folder": "ProbandoAutonomos",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": -58.73626830562264,
     "velocity": 0
   },
   "useDefaultConstraints": true

@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.7,
+        "x": 2.88,
         "y": 5.56
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3743908872433126,
+        "x": 2.5543908872433123,
         "y": 5.550133057189191
       },
       "isLocked": false,
@@ -42,6 +42,12 @@
               "type": "named",
               "data": {
                 "name": "PrepareShoot"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "Arm169"
               }
             }
           ]

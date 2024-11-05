@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -37,8 +38,6 @@ public class Robot extends LoggedRobot {
     }
 
     m_robotContainer = new RobotContainer();
-
-    DataLogManager.start("C:\\Users\\Roman\\Documents\\Logs");
 
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -86,6 +85,8 @@ public class Robot extends LoggedRobot {
         String logPath = LogFileUtil.findReplayLog();
         Logger.setReplaySource(new WPILOGReader(logPath));
         Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        SmartDashboard.putString("test", logPath);
+
         break;
     }
 
@@ -134,7 +135,9 @@ public class Robot extends LoggedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+    CommandScheduler.getInstance().cancelAll();
+  }
 
   @Override
   public void teleopInit() {
@@ -143,12 +146,15 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    CommandScheduler.getInstance().cancelAll();
   }
 
   @Override
   public void teleopPeriodic() {
+    Logger.recordOutput("SwervePose", RobotContainer.getDrive().getState().Pose);
 
-    SmartDashboard.putNumber("MatchTime", DriverStation.getMatchTime());
+    SmartDashboard.putNumber("MatchTime", Timer.getMatchTime());
   }
 
   @Override

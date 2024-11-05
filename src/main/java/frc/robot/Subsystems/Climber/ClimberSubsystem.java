@@ -27,4 +27,8 @@ public class ClimberSubsystem extends SubsystemBase {
   public Command setClimberVoltage(double voltage) {
     return run(() -> io.setVoltage(voltage));
   }
+
+  public Command setPosition(double position) {
+    return run(() -> io.setPosition(position));
+  }
 }

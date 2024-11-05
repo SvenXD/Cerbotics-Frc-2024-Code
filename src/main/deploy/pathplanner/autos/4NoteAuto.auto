@@ -26,12 +26,6 @@
                 "data": {
                   "pathName": "4NoteAuto1"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake"
-                }
               }
             ]
           }
@@ -55,13 +49,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "4NoteAuto5"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake"
+                  "pathName": "4NoteAuto3"
                 }
               }
             ]
@@ -70,7 +58,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "4NoteAuto6"
+            "pathName": "4NoteAuto4"
           }
         },
         {
@@ -105,9 +93,16 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "4NoteAuto7"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "4NoteAuto7"
+                }
+              }
+            ]
           }
         }
       ]

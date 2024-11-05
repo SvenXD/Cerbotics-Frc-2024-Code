@@ -14,24 +14,36 @@ import java.util.stream.Stream;
 
 public class MoveTest extends AutoCommand {
 
-  private final PathPlannerPath startToFirst;
+  private final PathPlannerPath first = PathPlannerPath.fromPathFile("4NoteAuto1");
+  private final PathPlannerPath second = PathPlannerPath.fromPathFile("4NoteAuto2");
+  private final PathPlannerPath third = PathPlannerPath.fromPathFile("4NoteAuto3");
+  private final PathPlannerPath fourth = PathPlannerPath.fromPathFile("4NoteAuto4");
+  private final PathPlannerPath fifth = PathPlannerPath.fromPathFile("4NoteAuto5");
+  private final PathPlannerPath sixth = PathPlannerPath.fromPathFile("4NoteAuto6");
+  private final PathPlannerPath seventh = PathPlannerPath.fromPathFile("4NoteAuto7");
 
   public MoveTest() {
-    startToFirst = PathPlannerPath.fromPathFile("ProbandoAutonomos");
 
     addCommands(Commands.deadline(Commands.sequence(new PathPlannerAuto("4NoteAuto"))));
   }
 
   @Override
   public List<Pose2d> getAllPathPoses() {
-    return Stream.of(startToFirst.getPathPoses())
+    return Stream.of(
+            first.getPathPoses(),
+            second.getPathPoses(),
+            third.getPathPoses(),
+            fourth.getPathPoses(),
+            fifth.getPathPoses(),
+            sixth.getPathPoses(),
+            seventh.getPathPoses())
         .flatMap(Collection::stream)
         .collect(Collectors.toList());
   }
 
   @Override
   public Pose2d getStartingPose() {
-    return startToFirst
+    return first
         .getTrajectory(new ChassisSpeeds(), new Rotation2d())
         .getInitialTargetHolonomicPose();
   }

@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 2.8,
-        "y": 4.05
+        "y": 3.94
       },
       "prevControl": null,
       "nextControl": {
         "x": 1.9711768038920692,
-        "y": 4.947891795783591
+        "y": 4.837891795783593
       },
       "isLocked": false,
       "linkedName": "4NoteAuto3"
@@ -30,7 +30,25 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.3,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Arm169"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,

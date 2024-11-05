@@ -1,0 +1,25 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3041949160821413,
+      "y": 5.4860202028096365
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "FirstShoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "ProbandoAutonomos",
+  "choreoAuto": false
+}
