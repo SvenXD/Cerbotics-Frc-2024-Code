@@ -157,7 +157,6 @@ public class RobotContainer {
             () -> -chassisDriver.getRightX() * 0.6));
 
     chassisDriver.a().onTrue(m_drive.runOnce(() -> m_drive.seedFieldRelative()));
-
     chassisDriver
         .rightBumper()
         .whileTrue(m_arm.goToPosition(172).alongWith(new IntakeWithSensor(m_intake)))

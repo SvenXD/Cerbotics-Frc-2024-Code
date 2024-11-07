@@ -80,6 +80,14 @@ public class Constants {
   }
 
   public class FieldConstants {
+
+    public static final double fieldBorderMargin = 0.25;
+    public static final double zMargin = 0.5;
+
+
+    public static final double ambiguityThreshold = 0.15;
+    public static final Translation2d fieldSize = new Translation2d(16.54, 8.21);
+
     public static double fieldLength = Units.inchesToMeters(651.223);
     public static double fieldWidth = Units.inchesToMeters(323.277);
     public static double wingX = Units.inchesToMeters(229.201);
