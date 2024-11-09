@@ -5,9 +5,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -28,8 +25,6 @@ public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   private Command stopShooter;
   private static RobotContainer m_robotContainer;
-  StructArrayPublisher<SwerveModuleState> measuredStates;
-  StructArrayPublisher<SwerveModuleState> targetStates;
 
   @Override
   public void robotInit() {
@@ -90,15 +85,6 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    measuredStates =
-        NetworkTableInstance.getDefault()
-            .getStructArrayTopic("Measured Swerve States", SwerveModuleState.struct)
-            .publish();
-
-    targetStates =
-        NetworkTableInstance.getDefault()
-            .getStructArrayTopic("Target Swerve States", SwerveModuleState.struct)
-            .publish();
     Logger.start();
     Logger.disableDeterministicTimestamps();
     Logger.disableConsoleCapture();
@@ -106,8 +92,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
-    measuredStates.set(RobotContainer.getDrive().getState().ModuleStates);
-    targetStates.set(RobotContainer.getDrive().getState().ModuleTargets);
     CommandScheduler.getInstance().run();
     SmartDashboard.putBoolean("IsRedAlliance", isRedAlliance());
   }
@@ -152,7 +136,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
-    Logger.recordOutput("SwervePose", RobotContainer.getDrive().getState().Pose);
 
     SmartDashboard.putNumber("MatchTime", Timer.getMatchTime());
   }

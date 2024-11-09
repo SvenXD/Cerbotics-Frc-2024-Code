@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.ForwardReference;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -24,7 +21,7 @@ import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
 import frc.robot.Commands.AutoCommands.Paths.RegionalPaths.MoveTest;
 import frc.robot.Commands.IntakeCommands.IntakeWithSensor;
 import frc.robot.Commands.ShooterCommands.ShooterCommand;
-import frc.robot.Commands.SwerveCommands.FieldCentricDrive;
+import frc.robot.Commands.SwerveCommands.DriveCommands;
 import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOKraken;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
@@ -37,8 +34,12 @@ import frc.robot.Subsystems.Intake.IntakeSubsystem;
 import frc.robot.Subsystems.Shooter.ShooterIO;
 import frc.robot.Subsystems.Shooter.ShooterIOTalon;
 import frc.robot.Subsystems.Shooter.ShooterSubsystem;
-import frc.robot.Subsystems.Swerve.CTRESwerve.CommandSwerveDrivetrain;
-import frc.robot.Subsystems.Swerve.CTRESwerve.TunerConstants;
+import frc.robot.Subsystems.Swerve.Drive;
+import frc.robot.Subsystems.Swerve.GyroIO;
+import frc.robot.Subsystems.Swerve.GyroIOPigeon2;
+import frc.robot.Subsystems.Swerve.ModuleIO;
+import frc.robot.Subsystems.Swerve.ModuleIOSim;
+import frc.robot.Subsystems.Swerve.ModuleIOTalonFX;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -52,7 +53,7 @@ public class RobotContainer {
 
   public static Field2d autoPreviewField = new Field2d();
 
-  // public static Drive drive;
+  public static Drive drive;
 
   public static ArmIO armIO = new ArmIOKraken();
   public static ArmSubsystem m_arm = new ArmSubsystem(armIO);
@@ -66,57 +67,57 @@ public class RobotContainer {
   public static ClimberIO climberIO = new ClimberIOKraken();
   public static ClimberSubsystem m_climber = new ClimberSubsystem(climberIO);
 
-  private static final CommandSwerveDrivetrain m_drive = TunerConstants.DriveTrain;
+  // private static final CommandSwerveDrivetrain m_drive = TunerConstants.DriveTrain;
 
-  SwerveRequest.FieldCentricFacingAngle m_head =
-      new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
+  /*  SwerveRequest.FieldCentricFacingAngle m_head =
+  new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);*/
 
   public RobotContainer() {
 
-    m_head.ForwardReference = ForwardReference.RedAlliance;
-    m_head.HeadingController.setPID(8, 0, 0);
-    m_head.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
+    // m_head.ForwardReference = ForwardReference.RedAlliance;
+    // m_head.HeadingController.setPID(8, 0, 0);
+    // m_head.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
 
     /** Options for the current mode of the robot */
-    /*switch (Constants.currentMode) {
-          case REAL:
-            // Real robot, instantiate hardware IO implementations
-            drive =
-                new Drive(
-                    new GyroIOPigeon2(true),
-                    new ModuleIOTalonFX(0),
-                    new ModuleIOTalonFX(1),
-                    new ModuleIOTalonFX(2),
-                    new ModuleIOTalonFX(3));
+    switch (Constants.currentMode) {
+      case REAL:
+        // Real robot, instantiate hardware IO implementations
+        drive =
+            new Drive(
+                new GyroIOPigeon2(true),
+                new ModuleIOTalonFX(0),
+                new ModuleIOTalonFX(1),
+                new ModuleIOTalonFX(2),
+                new ModuleIOTalonFX(3));
 
-            break;
-            // --------------------------------------------
-          case SIM:
-            // Sim robot, instantiate physics sim IO implementations
-            drive =
-                new Drive(
-                    new GyroIO() {},
-                    new ModuleIOSim(),
-                    new ModuleIOSim(),
-                    new ModuleIOSim(),
-                    new ModuleIOSim());
+        break;
+        // --------------------------------------------
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim());
 
-            break;
-            // --------------------------------------------
-          default:
-            // Replayed robot, disable IO implementations
-            drive =
-                new Drive(
-                    new GyroIO() {},
-                    new ModuleIO() {},
-                    new ModuleIO() {},
-                    new ModuleIO() {},
-                    new ModuleIO() {});
+        break;
+        // --------------------------------------------
+      default:
+        // Replayed robot, disable IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
 
-            break;
-            // --------------------------------------------
-        }
-    */
+        break;
+        // --------------------------------------------
+    }
+
     registerNamedCommands();
     /** Visualisation of the current auto selected * */
     autoChooser = new LoggedDashboardChooser<>("Auto Mode");
@@ -149,14 +150,23 @@ public class RobotContainer {
   private void configureBindings() {
 
     /* Driver 1 */
-    m_drive.setDefaultCommand(
+    /*m_drive.setDefaultCommand(
         new FieldCentricDrive(
             m_drive,
             () -> -chassisDriver.getLeftY() * 0.3,
             () -> -chassisDriver.getLeftX() * 0.3,
             () -> -chassisDriver.getRightX() * 0.6));
 
-    chassisDriver.a().onTrue(m_drive.runOnce(() -> m_drive.seedFieldRelative()));
+    chassisDriver.a().onTrue(m_drive.runOnce(() -> m_drive.seedFieldRelative()));*/
+
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -chassisDriver.getLeftY() * 0.5,
+            () -> -chassisDriver.getLeftX() * 0.5,
+            () -> -chassisDriver.getRightX() * 0.6));
+    chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
+
     chassisDriver
         .rightBumper()
         .whileTrue(m_arm.goToPosition(172).alongWith(new IntakeWithSensor(m_intake)))
@@ -288,8 +298,8 @@ public class RobotContainer {
     return autoChooser.get();
   }
 
-  public static CommandSwerveDrivetrain getDrive() {
-    return m_drive;
+  public static Drive getDrive() {
+    return drive;
   }
 
   public static ArmSubsystem getArm() {

@@ -46,12 +46,12 @@ public class AprilTagLocalizationIOLimelight implements AprilTagLocalizationIO {
         tagIDs[i] = (int) Math.round(results.targets_Fiducials[i].fiducialID);
         averageTagDistance +=
             results.targets_Fiducials[i].getTargetPose_CameraSpace().getTranslation().getNorm();
-      } 
+      }
       averageTagDistance /= tagIDs.length;
 
       validResults.add(
           new AprilTagPoseEstimate(
               botPoseBlue, 0.0, averageTagDistance, null, 0.0, 0.0, timestamp, tagIDs));
     }
-    }
+  }
 }
