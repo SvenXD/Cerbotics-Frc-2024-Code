@@ -4,11 +4,11 @@
 
 package frc.robot.Commands.SwerveCommands;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.Util.CTRE.swerve.SwerveModule.DriveRequestType;
+import frc.Util.CTRE.swerve.SwerveRequest;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Subsystems.Swerve.CTRESwerve.CommandSwerveDrivetrain;
 import java.util.function.Supplier;
@@ -20,7 +20,7 @@ public class FieldCentricDrive extends Command {
   private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
 
   private final SwerveRequest.FieldCentric drive =
-        new SwerveRequest.FieldCentric()
+      new SwerveRequest.FieldCentric()
           .withDeadband(DriveConstants.MaxLinearSpeed * 0.1)
           .withRotationalDeadband(DriveConstants.MaxAngularRate * 0.1)
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);

@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.Util.CTRE.swerve.SwerveModule.DriveRequestType;
+import frc.Util.CTRE.swerve.SwerveRequest;
 import frc.Util.LocalADStarAK;
 import frc.Util.Logging.LoggedDashboardChooser;
 import frc.robot.Commands.AutoCommands.AutoCommand;
@@ -21,7 +23,7 @@ import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
 import frc.robot.Commands.AutoCommands.Paths.RegionalPaths.MoveTest;
 import frc.robot.Commands.IntakeCommands.IntakeWithSensor;
 import frc.robot.Commands.ShooterCommands.ShooterCommand;
-import frc.robot.Commands.SwerveCommands.DriveCommands;
+import frc.robot.Commands.SwerveCommands.FieldCentricDrive;
 import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOKraken;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
@@ -34,12 +36,8 @@ import frc.robot.Subsystems.Intake.IntakeSubsystem;
 import frc.robot.Subsystems.Shooter.ShooterIO;
 import frc.robot.Subsystems.Shooter.ShooterIOTalon;
 import frc.robot.Subsystems.Shooter.ShooterSubsystem;
-import frc.robot.Subsystems.Swerve.Drive;
-import frc.robot.Subsystems.Swerve.GyroIO;
-import frc.robot.Subsystems.Swerve.GyroIOPigeon2;
-import frc.robot.Subsystems.Swerve.ModuleIO;
-import frc.robot.Subsystems.Swerve.ModuleIOSim;
-import frc.robot.Subsystems.Swerve.ModuleIOTalonFX;
+import frc.robot.Subsystems.Swerve.CTRESwerve.CommandSwerveDrivetrain;
+import frc.robot.Subsystems.Swerve.CTRESwerve.TunerConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -53,7 +51,7 @@ public class RobotContainer {
 
   public static Field2d autoPreviewField = new Field2d();
 
-  public static Drive drive;
+  // public static Drive drive;
 
   public static ArmIO armIO = new ArmIOKraken();
   public static ArmSubsystem m_arm = new ArmSubsystem(armIO);
@@ -67,10 +65,10 @@ public class RobotContainer {
   public static ClimberIO climberIO = new ClimberIOKraken();
   public static ClimberSubsystem m_climber = new ClimberSubsystem(climberIO);
 
-  // private static final CommandSwerveDrivetrain m_drive = TunerConstants.DriveTrain;
+  private static final CommandSwerveDrivetrain m_drive = TunerConstants.DriveTrain;
 
-  /*  SwerveRequest.FieldCentricFacingAngle m_head =
-  new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);*/
+  SwerveRequest.FieldCentricFacingAngle m_head =
+      new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
 
   public RobotContainer() {
 
@@ -79,7 +77,7 @@ public class RobotContainer {
     // m_head.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
 
     /** Options for the current mode of the robot */
-    switch (Constants.currentMode) {
+    /*switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         drive =
@@ -150,22 +148,22 @@ public class RobotContainer {
   private void configureBindings() {
 
     /* Driver 1 */
-    /*m_drive.setDefaultCommand(
+    m_drive.setDefaultCommand(
         new FieldCentricDrive(
             m_drive,
             () -> -chassisDriver.getLeftY() * 0.3,
             () -> -chassisDriver.getLeftX() * 0.3,
             () -> -chassisDriver.getRightX() * 0.6));
 
-    chassisDriver.a().onTrue(m_drive.runOnce(() -> m_drive.seedFieldRelative()));*/
+    chassisDriver.a().onTrue(m_drive.runOnce(() -> m_drive.seedFieldRelative()));
 
-    drive.setDefaultCommand(
+    /*drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
             () -> -chassisDriver.getLeftY() * 0.5,
             () -> -chassisDriver.getLeftX() * 0.5,
             () -> -chassisDriver.getRightX() * 0.6));
-    chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));
+    chassisDriver.a().onTrue(drive.runOnce(() -> drive.zeroHeading()));*/
 
     chassisDriver
         .rightBumper()
@@ -296,10 +294,6 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
-  }
-
-  public static Drive getDrive() {
-    return drive;
   }
 
   public static ArmSubsystem getArm() {
