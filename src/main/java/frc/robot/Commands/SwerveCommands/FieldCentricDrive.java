@@ -20,7 +20,7 @@ public class FieldCentricDrive extends Command {
   private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
 
   private final SwerveRequest.FieldCentric drive =
-      new SwerveRequest.FieldCentric()
+        new SwerveRequest.FieldCentric()
           .withDeadband(DriveConstants.MaxLinearSpeed * 0.1)
           .withRotationalDeadband(DriveConstants.MaxAngularRate * 0.1)
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);

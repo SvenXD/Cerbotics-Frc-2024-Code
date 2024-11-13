@@ -276,6 +276,11 @@ public class Drive extends SubsystemBase {
     return getPose().getRotation();
   }
 
+  public Pose2d getCorrectedPose(double correctionRatio) {
+    Pose2d estimatedPose = poseEstimator.getEstimatedPosition();
+    return estimatedPose.times(correctionRatio);
+}
+
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
