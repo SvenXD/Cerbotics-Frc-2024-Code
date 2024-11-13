@@ -21,6 +21,7 @@ import frc.Util.Logging.LoggedDashboardChooser;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
 import frc.robot.Commands.AutoCommands.Paths.RegionalPaths.MoveTest;
+import frc.robot.Commands.AutoCommands.Paths.RegionalPaths.RaulPath;
 import frc.robot.Commands.IntakeCommands.IntakeWithSensor;
 import frc.robot.Commands.ShooterCommands.ShooterCommand;
 import frc.robot.Commands.SwerveCommands.FieldCentricDrive;
@@ -127,7 +128,8 @@ public class RobotContainer {
 
     /* Auto options */
     autoChooser.addDefaultOption("None", new NoneAuto());
-    autoChooser.addOption("4 Note Auto", new MoveTest());
+    //autoChooser.addOption("4 Note Auto", new MoveTest());
+    autoChooser.addOption("Raul test", new RaulPath());
 
     PathPlannerLogging.setLogActivePathCallback(
         (poses -> Logger.recordOutput("Swerve/ActivePath", poses.toArray(new Pose2d[0]))));
