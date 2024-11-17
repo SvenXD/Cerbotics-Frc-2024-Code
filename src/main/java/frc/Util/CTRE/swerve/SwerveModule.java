@@ -354,14 +354,16 @@ public class SwerveModule {
         /* But we do care about the backout due to coupling, so we keep it in */
         velocityToSet /= m_driveRotationsPerMeter;
         m_driveMotor.setControl(
-            m_voltageOpenLoopSetter.withOutput(velocityToSet / m_speedAt12VoltsMps * 12.0).withEnableFOC(true));
+            m_voltageOpenLoopSetter
+                .withOutput(velocityToSet / m_speedAt12VoltsMps * 12.0)
+                .withEnableFOC(false)); //TODO ESTE ES EL DEL SWERVE, SIEMPRE TIENE QUE IR EN FALSO EL ENABLEFOC
         break;
 
       case Velocity:
         switch (m_driveClosedLoopOutput) {
           case Voltage:
             m_driveMotor.setControl(
-                m_velocityVoltageSetter.withVelocity(velocityToSet).withEnableFOC(true));
+                m_velocityVoltageSetter.withVelocity(velocityToSet).withEnableFOC(false));
             break;
 
           case TorqueCurrentFOC:
@@ -386,7 +388,8 @@ public class SwerveModule {
     /* Use the configured closed loop output mode */
     switch (m_steerClosedLoopOutput) {
       case Voltage:
-        m_steerMotor.setControl(m_angleVoltageSetter.withPosition(angleToSetDeg).withEnableFOC(true));
+        m_steerMotor.setControl(
+            m_angleVoltageSetter.withPosition(angleToSetDeg).withEnableFOC(true));
         break;
 
       case TorqueCurrentFOC:

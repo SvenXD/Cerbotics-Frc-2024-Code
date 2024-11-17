@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class RaulPath extends AutoCommand {
-    private final PathPlannerPath first = PathPlannerPath.fromPathFile("New New Path");
+  private final PathPlannerPath first = PathPlannerPath.fromPathFile("New New Path");
 
   public RaulPath() {
 
@@ -22,11 +22,7 @@ public class RaulPath extends AutoCommand {
 
   @Override
   public List<Pose2d> getAllPathPoses() {
-    return Stream.of(
-        first.getPathPoses()
-    )
-        .flatMap(Collection::stream)
-        .collect(Collectors.toList());
+    return Stream.of(first.getPathPoses()).flatMap(Collection::stream).collect(Collectors.toList());
   }
 
   @Override
