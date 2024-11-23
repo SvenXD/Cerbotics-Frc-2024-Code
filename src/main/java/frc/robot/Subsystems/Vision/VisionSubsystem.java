@@ -5,16 +5,18 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Util.LimelightHelpers;
 import frc.robot.Constants;
-import frc.robot.Subsystems.Swerve.Drive;
+import frc.robot.Subsystems.Swerve.CTRESwerve.CommandSwerveDrivetrain;
+import org.littletonrobotics.junction.Logger;
 
 public class VisionSubsystem extends SubsystemBase {
 
-  private final Drive m_drive;
+  private final CommandSwerveDrivetrain m_drive;
   private final Field2d m_field = new Field2d();
   private String[] limelightNames;
   private double averageTagDistance = 0.0;
+  private static boolean doRejectUpdate = false;
 
-  public VisionSubsystem(Drive m_drive, String... limelightNames) {
+  public VisionSubsystem(CommandSwerveDrivetrain m_drive, String... limelightNames) {
     this.m_drive = m_drive;
     this.limelightNames = limelightNames;
   }
@@ -52,26 +54,34 @@ public class VisionSubsystem extends SubsystemBase {
 
       double xyStdDev =
           Constants.VisionConstants.xyStdDevCoefficient
-              * Math.pow(averageTagDistance, 2)
-              / tagIDs.length;
+                      * Math.pow(averageTagDistance, 2)
+                      / tagIDs.length
+                  == 0
+              ? 0.1
+              : tagIDs.length;
       double thetaStdDev =
           Constants.VisionConstants.thetaStdDevCoefficient
-              * Math.pow(averageTagDistance, 2)
-              / tagIDs.length;
+                      * Math.pow(averageTagDistance, 2)
+                      / tagIDs.length
+                  == 0
+              ? 0.1
+              : tagIDs.length;
 
       odometryWithVision(limelightNames[instanceIndex], xyStdDev, thetaStdDev);
     }
+    Logger.recordOutput("Vision/Tag Distance", averageTagDistance);
+    Logger.recordOutput("Vision/Rejected Update", doRejectUpdate);
   }
 
   public void odometryWithVision(String limelightName, double xySTD, double thetaSTD) {
 
     if (LimelightHelpers.getTV(limelightName)) {
-      boolean doRejectUpdate = false;
+      doRejectUpdate = false;
       LimelightHelpers.SetRobotOrientation(
           limelightName, m_drive.getRotation().getDegrees(), 0, 0, 0, 0, 0);
       LimelightHelpers.PoseEstimate mt2 =
           LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
-      if (Math.abs(m_drive.getangle())
+      if (Math.abs(m_drive.getState().Pose.getRotation().getDegrees())
           > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision
       // updates
       {
@@ -93,6 +103,6 @@ public class VisionSubsystem extends SubsystemBase {
       }
     }
 
-    m_field.getObject(limelightName).setPose(m_drive.getPose());
+    m_field.getObject(limelightName).setPose(m_drive.getState().Pose);
   }
 }

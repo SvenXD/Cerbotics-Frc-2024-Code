@@ -23,7 +23,7 @@ import edu.wpi.first.math.util.Units;
 
 public class Constants {
 
-  public static Mode currentMode = Mode.REAL;
+  public static Mode currentMode = Mode.SIM;
   public static final boolean needToLog = true;
 
   public static enum Mode {

@@ -356,7 +356,9 @@ public class SwerveModule {
         m_driveMotor.setControl(
             m_voltageOpenLoopSetter
                 .withOutput(velocityToSet / m_speedAt12VoltsMps * 12.0)
-                .withEnableFOC(false)); //TODO ESTE ES EL DEL SWERVE, SIEMPRE TIENE QUE IR EN FALSO EL ENABLEFOC
+                .withEnableFOC(
+                    true)); // TODO ESTE ES EL DEL SWERVE, SIEMPRE TIENE QUE IR EN FALSO EL
+        // ENABLEFOC
         break;
 
       case Velocity:

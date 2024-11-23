@@ -72,5 +72,6 @@ public class IntakeIOKraken implements IntakeIO {
     lDownMotor.set(voltage);
     lUpMotor.set(lup);
     intakeMotor.set(-voltage);
+    //    -0.7 intake for all  0.8 for the one ont he right
   }
 }

@@ -33,6 +33,8 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import frc.Util.CTRE.swerve.SwerveRequest.SwerveControlRequestParameters;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
@@ -63,7 +65,7 @@ public class SwerveDrivetrain {
   protected final StatusSignal<Double> m_angularVelocity;
 
   protected SwerveDriveKinematics m_kinematics;
-  protected SwerveDrivePoseEstimator m_odometry;
+  protected SwerveDrivePoseEstimator m_odometry; // ee
   protected SwerveModulePosition[] m_modulePositions;
   protected SwerveModuleState[] m_moduleStates;
   protected Translation2d[] m_moduleLocations;
@@ -78,6 +80,9 @@ public class SwerveDrivetrain {
   protected final ReadWriteLock m_stateLock = new ReentrantReadWriteLock();
 
   protected final SimSwerveDrivetrain m_simDrive;
+
+  private final TreeMap<Double, Pose2d> poseHistory = new TreeMap<>();
+  private static final double HISTORY_DURATION = 1.0;
 
   /**
    * Plain-Old-Data class holding the state of the swerve drivetrain. This encapsulates most data
@@ -99,6 +104,8 @@ public class SwerveDrivetrain {
     /** The measured odometry update period, in seconds */
     public double OdometryPeriod;
 
+    public double Timestamp; // TODO: THIS IS NEW, CHANGE IF IT DOENST WORK
+
     public SwerveDriveState clone() {
       SwerveDriveState other = new SwerveDriveState();
       other.SuccessfulDaqs = this.SuccessfulDaqs;
@@ -108,6 +115,8 @@ public class SwerveDrivetrain {
       other.ModuleStates = this.ModuleStates;
       other.ModuleTargets = this.ModuleTargets;
       other.OdometryPeriod = this.OdometryPeriod;
+      other.Timestamp = this.Timestamp; // Clone timestamp
+
       return other;
     }
   }
@@ -210,6 +219,7 @@ public class SwerveDrivetrain {
 
           lastTime = currentTime;
           currentTime = Utils.getCurrentTimeSeconds();
+          m_cachedState.Timestamp = currentTime;
           /*
            * We don't care about the peaks, as they correspond to GC events, and we want
            * the period generally low passed
@@ -255,6 +265,11 @@ public class SwerveDrivetrain {
           m_cachedState.Pose = m_odometry.getEstimatedPosition();
           m_cachedState.speeds = speeds;
           m_cachedState.OdometryPeriod = averageLoopTime;
+
+          poseHistory.put(currentTime, m_cachedState.Pose);
+
+          // Remove old history entries beyond HISTORY_DURATION
+          poseHistory.headMap(currentTime - HISTORY_DURATION).clear();
 
           if (m_cachedState.ModuleStates == null) {
             m_cachedState.ModuleStates = new SwerveModuleState[Modules.length];
@@ -698,4 +713,13 @@ public class SwerveDrivetrain {
   public Pigeon2 getPigeon2() {
     return m_pigeon2;
   }
+
+  public Optional<Pose2d> getPoseAtTime(double timestamp) {
+    if (poseHistory.containsKey(timestamp)) {
+      return Optional.of(poseHistory.get(timestamp));
+    }
+    // If exact timestamp doesn't exist, find the closest one
+    var entry = poseHistory.floorEntry(timestamp);
+    return entry != null ? Optional.of(entry.getValue()) : null;
+  } // TODO: TESTING TIMESTAMP
 }
