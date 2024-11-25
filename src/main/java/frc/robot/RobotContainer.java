@@ -69,7 +69,8 @@ public class RobotContainer {
   SwerveRequest.FieldCentricFacingAngle m_head =
       new SwerveRequest.FieldCentricFacingAngle().withDriveRequestType(DriveRequestType.Velocity);
 
-  private static final VisionSubsystem m_vision = new VisionSubsystem(m_drive, "1");
+  private static final VisionSubsystem m_vision =
+      new VisionSubsystem(m_drive, Constants.VisionConstants.tagLimelightName);
 
   private final Telemetry logger = new Telemetry(DriveConstants.kTeleDriveMaxSpeedMetersPerSecond);
 
@@ -154,8 +155,8 @@ public class RobotContainer {
     m_drive.setDefaultCommand(
         new FieldCentricDrive(
             m_drive,
-            () -> -chassisDriver.getLeftY() * filterSpeed(),
-            () -> -chassisDriver.getLeftX() * filterSpeed(),
+            () -> -chassisDriver.getLeftY(),
+            () -> -chassisDriver.getLeftX(),
             () -> -chassisDriver.getRightX()));
 
     chassisDriver.a().onTrue(m_drive.runOnce(() -> m_drive.seedFieldRelative()));
@@ -199,11 +200,13 @@ public class RobotContainer {
         .whileFalse(m_intake.setUpperVoltage(0));
 
     subsystemsDriver
-        .leftBumper()
-        .whileTrue(m_intake.setall(0.5, 0.5).alongWith(m_shooter.setRpms(-2, -2)))
+        .rightBumper()
+        .whileTrue(m_intake.setUpperVoltage(-1))
         .whileFalse(
-            m_intake.setall(0, 0).alongWith(m_shooter.stop()).alongWith(m_arm.goToPosition(172)));
-
+            m_intake
+                .setUpperVoltage(0)
+                .alongWith(m_arm.goToPosition(172))
+                .alongWith(m_shooter.stop()));
     subsystemsDriver
         .povDown()
         .whileTrue(m_climber.setClimberVoltage(1))
