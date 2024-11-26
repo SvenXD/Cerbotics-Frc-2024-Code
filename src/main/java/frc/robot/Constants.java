@@ -339,8 +339,8 @@ public class Constants {
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(1500, 1500, 1400);
     public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(1000, 1000, 1400);
 
-    public static double xyStdDevCoefficient = 0.02;
-    public static double thetaStdDevCoefficient = 0.04;
+    public static double xyStdDevCoefficient = 0.2;
+    public static double thetaStdDevCoefficient = 0.4;
   }
 
   /*   _________

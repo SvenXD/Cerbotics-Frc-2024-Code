@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Util.LimelightHelpers;
 import frc.robot.Constants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.Subsystems.Swerve.CTRESwerve.CommandSwerveDrivetrain;
-import org.littletonrobotics.junction.Logger;
 
 public class VisionSubsystem extends SubsystemBase {
 
@@ -23,46 +23,24 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    odometryWithVision(limelightNames, 0, 0);
+    int tagsDetected = LimelightHelpers.getTargetCount(limelightNames);
 
-    int[] tagIDs =
-        new int[LimelightHelpers.getLatestResults(limelightNames).targets_Fiducials.length];
-
-    for (int i = 0;
-        i < LimelightHelpers.getLatestResults(limelightNames).targets_Fiducials.length;
-        i++) {
-      tagIDs[i] =
-          (int)
-              Math.round(
-                  LimelightHelpers.getLatestResults(limelightNames)
-                      .targets_Fiducials[i]
-                      .fiducialID);
-      averageTagDistance +=
-          LimelightHelpers.getLatestResults(limelightNames)
-              .targets_Fiducials[i]
-              .getTargetPose_CameraSpace()
-              .getTranslation()
-              .getNorm();
-    }
-    averageTagDistance /= tagIDs.length;
+    averageTagDistance = LimelightHelpers.getTargetPose3d_CameraSpace(limelightNames).getZ();
 
     double xyStdDev =
         Constants.VisionConstants.xyStdDevCoefficient
-                    * Math.pow(averageTagDistance, 2)
-                    / tagIDs.length
-                == 0
-            ? 0.1
-            : tagIDs.length;
+            * Math.pow(averageTagDistance, 2)
+            / (tagsDetected == 0 ? 100 : tagsDetected);
     double thetaStdDev =
         Constants.VisionConstants.thetaStdDevCoefficient
-                    * Math.pow(averageTagDistance, 2)
-                    / tagIDs.length
-                == 0
-            ? 0.1
-            : tagIDs.length;
+            * Math.pow(averageTagDistance, 2)
+            / (tagsDetected == 0 ? 100 : tagsDetected);
 
-    Logger.recordOutput("Vision/Tag Distance", averageTagDistance);
-    SmartDashboard.putBoolean("tesrtvision", LimelightHelpers.getTV(limelightNames));
+    odometryWithVision(VisionConstants.tagLimelightName, xyStdDev, thetaStdDev);
+
+    SmartDashboard.putNumber("Distance", averageTagDistance);
+    SmartDashboard.putNumber("xy STD", xyStdDev);
+    SmartDashboard.putNumber("theta STD", thetaStdDev);
 
     SmartDashboard.putData(m_field);
   }
@@ -70,8 +48,8 @@ public class VisionSubsystem extends SubsystemBase {
   public void odometryWithVision(String limelightName, double xySTD, double thetaSTD) {
 
     boolean doRejectUpdate = false;
-    LimelightHelpers.SetRobotOrientation(
-        limelightName, m_drive.getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    /*LimelightHelpers.SetRobotOrientation(
+    limelightName, m_drive.getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);*/
     LimelightHelpers.PoseEstimate mt2 =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
     /*if (Math.abs(m_drive.getState().Pose.getRotation().getDegrees())
@@ -94,7 +72,7 @@ public class VisionSubsystem extends SubsystemBase {
       doRejectUpdate = false;
     }*/
     if (!doRejectUpdate) {
-      m_drive.setVisionMeasurementStdDevs(VecBuilder.fill(0.1, 0.1, 0.1));
+      m_drive.setVisionMeasurementStdDevs(VecBuilder.fill(xySTD, xySTD, thetaSTD));
       m_drive.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
     }
     m_field.getObject(limelightName).setPose(mt2.pose);
