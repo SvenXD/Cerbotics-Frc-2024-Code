@@ -29,9 +29,6 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOKraken;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
-import frc.robot.Subsystems.Climber.ClimberIO;
-import frc.robot.Subsystems.Climber.ClimberIOKraken;
-import frc.robot.Subsystems.Climber.ClimberSubsystem;
 import frc.robot.Subsystems.Intake.IntakeIO;
 import frc.robot.Subsystems.Intake.IntakeIOKraken;
 import frc.robot.Subsystems.Intake.IntakeSubsystem;
@@ -61,8 +58,8 @@ public class RobotContainer {
   public static ShooterIO shooterIO = new ShooterIOTalon();
   public static ShooterSubsystem m_shooter = new ShooterSubsystem(shooterIO);
 
-  public static ClimberIO climberIO = new ClimberIOKraken();
-  public static ClimberSubsystem m_climber = new ClimberSubsystem(climberIO);
+  // public static ClimberIO climberIO = new ClimberIOKraken();
+  // public static ClimberSubsystem m_climber = new ClimberSubsystem(climberIO);
 
   private static final CommandSwerveDrivetrain m_drive = TunerConstants.DriveTrain;
 
@@ -155,9 +152,9 @@ public class RobotContainer {
     m_drive.setDefaultCommand(
         new FieldCentricDrive(
             m_drive,
-            () -> -chassisDriver.getLeftY(),
-            () -> -chassisDriver.getLeftX(),
-            () -> -chassisDriver.getRightX()));
+            () -> chassisDriver.getLeftY(),
+            () -> chassisDriver.getLeftX(),
+            () -> chassisDriver.getRightX()));
 
     chassisDriver.a().onTrue(m_drive.runOnce(() -> m_drive.seedFieldRelative()));
 
@@ -207,12 +204,12 @@ public class RobotContainer {
                 .setUpperVoltage(0)
                 .alongWith(m_arm.goToPosition(172))
                 .alongWith(m_shooter.stop()));
-    subsystemsDriver
+    /*subsystemsDriver
         .povDown()
         .whileTrue(m_climber.setClimberVoltage(1))
         .whileFalse(m_climber.setClimberVoltage(0));
 
-    subsystemsDriver.povUp().onTrue(m_climber.setPosition(111));
+    subsystemsDriver.povUp().onTrue(m_climber.setPosition(111));*/
   }
 
   private Command controllerRumbleCommand() {

@@ -15,17 +15,27 @@ public class VisionSubsystem extends SubsystemBase {
   private final Field2d m_field = new Field2d();
   private String limelightNames;
   private double averageTagDistance = 0.0;
+  private static LimelightHelpers.PoseEstimate mt2;
+
+  public static enum reasonForRejectUpdate {
+    outOfTheField,
+    noTag,
+    overThreshold;
+  }
+
+  private reasonForRejectUpdate systemStates = reasonForRejectUpdate.noTag;
 
   public VisionSubsystem(CommandSwerveDrivetrain m_drive, String limelightNames) {
     this.m_drive = m_drive;
     this.limelightNames = limelightNames;
+    mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightNames);
   }
 
   @Override
   public void periodic() {
     int tagsDetected = LimelightHelpers.getTargetCount(limelightNames);
 
-    averageTagDistance = LimelightHelpers.getTargetPose3d_CameraSpace(limelightNames).getZ();
+    averageTagDistance = mt2.avgTagDist;
 
     double xyStdDev =
         Constants.VisionConstants.xyStdDevCoefficient
@@ -38,45 +48,46 @@ public class VisionSubsystem extends SubsystemBase {
 
     odometryWithVision(VisionConstants.tagLimelightName, xyStdDev, thetaStdDev);
 
-    SmartDashboard.putNumber("Distance", averageTagDistance);
-    SmartDashboard.putNumber("xy STD", xyStdDev);
-    SmartDashboard.putNumber("theta STD", thetaStdDev);
-
+    SmartDashboard.putNumber("Distance from tag", averageTagDistance);
+    SmartDashboard.putNumber("XY STD", xyStdDev);
+    SmartDashboard.putNumber("Theta STD", thetaStdDev);
+    SmartDashboard.putString("Reason for rejected vision", systemStates.toString());
     SmartDashboard.putData(m_field);
   }
 
   public void odometryWithVision(String limelightName, double xySTD, double thetaSTD) {
-
+    LimelightHelpers.PoseEstimate oldMt = mt2;
     boolean doRejectUpdate = false;
-    /*LimelightHelpers.SetRobotOrientation(
-    limelightName, m_drive.getState().Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);*/
-    LimelightHelpers.PoseEstimate mt2 =
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
-    /*if (Math.abs(m_drive.getState().Pose.getRotation().getDegrees())
-        > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision
-    // updates
-    {
-      doRejectUpdate = true;
-    }
-    if (mt2.tagCount == 0) {
-      doRejectUpdate = true;
-    }
-    /*if (mt2.pose.getX() < -Constants.FieldConstants.fieldBorderMargin
+    mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+    double timeDiff = (mt2.timestampSeconds - oldMt.timestampSeconds) * 20;
+
+    if (mt2.pose.getX() < -Constants.FieldConstants.fieldBorderMargin
         || mt2.pose.getX()
-            > Constants.FieldConstants.fieldSize.getX()
-                + Constants.FieldConstants.fieldBorderMargin
+            > Constants.FieldConstants.fieldSize.getX() + Constants.FieldConstants.fieldBorderMargin
         || mt2.pose.getY() < -Constants.FieldConstants.fieldBorderMargin
         || mt2.pose.getY()
             > Constants.FieldConstants.fieldSize.getY()
                 + Constants.FieldConstants.fieldBorderMargin) {
-      doRejectUpdate = false;
-    }*/
+      doRejectUpdate = true;
+      systemStates = reasonForRejectUpdate.outOfTheField;
+    }
+
+    if (mt2.tagCount == 0) {
+      doRejectUpdate = true;
+      systemStates = reasonForRejectUpdate.noTag;
+    }
+
+    if (Math.abs(oldMt.pose.getX() - mt2.pose.getX()) > timeDiff
+        || Math.abs(oldMt.pose.getY() - mt2.pose.getY()) > timeDiff) {
+      doRejectUpdate = true;
+    }
+
     if (!doRejectUpdate) {
       m_drive.setVisionMeasurementStdDevs(VecBuilder.fill(xySTD, xySTD, thetaSTD));
       m_drive.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
     }
-    m_field.getObject(limelightName).setPose(mt2.pose);
+    m_field.getObject(limelightName).setPose(m_drive.getState().Pose);
 
-    SmartDashboard.putBoolean(limelightName, LimelightHelpers.getTV(limelightName));
+    SmartDashboard.putNumber("Difference of times", timeDiff);
   }
 }

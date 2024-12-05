@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -38,6 +40,8 @@ import java.util.function.Supplier;
  * in command-based projects easily.
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
+  private static final PathConstraints constraints =
+      new PathConstraints(3.0, 3.0, 2 * 3.14, 4 * 3.14);
   private static final double kSimLoopPeriod = 0.005; // 5 ms
   private Notifier m_simNotifier = null;
   private double m_lastSimTime;
@@ -141,6 +145,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     return run(() -> this.setControl(requestSupplier.get()));
   }
 
+  public Command goToPose(Pose2d pose) {
+    return AutoBuilder.pathfindToPose(pose, constraints);
+  }
+
   public ChassisSpeeds getCurrentRobotChassisSpeeds() {
     return m_kinematics.toChassisSpeeds(getState().ModuleStates);
   }
@@ -228,6 +236,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 hasAppliedOperatorPerspective = true;
               });
     }
+    SmartDashboard.putNumber("TestVel", this.getState().speeds.vxMetersPerSecond);
   }
 
   public Command driveToIntakeRing() {

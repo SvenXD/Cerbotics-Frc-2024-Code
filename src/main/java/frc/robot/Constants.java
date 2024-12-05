@@ -48,7 +48,7 @@ public class Constants {
     public static final double kWheelBase = 0.635; // 20.25
 
     public static final double MaxAngularRate = 2 * Math.PI;
-    public static final double MaxLinearSpeed = 22.8;
+    public static final double MaxLinearSpeed = 9.8; // 22.8
 
     public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
 
