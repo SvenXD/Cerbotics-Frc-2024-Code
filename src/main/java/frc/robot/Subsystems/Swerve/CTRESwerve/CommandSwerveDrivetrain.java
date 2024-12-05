@@ -40,8 +40,7 @@ import java.util.function.Supplier;
  * in command-based projects easily.
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
-  private static final PathConstraints constraints =
-      new PathConstraints(3.0, 3.0, 2 * 3.14, 4 * 3.14);
+  private static final PathConstraints constraints = new PathConstraints(1.0, 1.0, 0, 0);
   private static final double kSimLoopPeriod = 0.005; // 5 ms
   private Notifier m_simNotifier = null;
   private double m_lastSimTime;
@@ -146,7 +145,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   }
 
   public Command goToPose(Pose2d pose) {
-    return AutoBuilder.pathfindToPose(pose, constraints);
+    return AutoBuilder.pathfindToPose(pose, constraints, 0.0, 0.0);
   }
 
   public ChassisSpeeds getCurrentRobotChassisSpeeds() {

@@ -33,6 +33,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import frc.Util.CTRE.swerve.SwerveRequest.SwerveControlRequestParameters;
+import frc.Util.LimelightHelpers;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -262,7 +263,10 @@ public class SwerveDrivetrain {
           /* Update our cached state with the newly updated data */
           m_cachedState.FailedDaqs = FailedDaqs;
           m_cachedState.SuccessfulDaqs = SuccessfulDaqs;
-          m_cachedState.Pose = m_odometry.getEstimatedPosition();
+          m_cachedState.Pose =
+              m_odometry
+                  .getEstimatedPosition()
+                  .times(LimelightHelpers.getTV("limelight-tags") ? 1 : 7/6.3);  //Checar cual afecta si era verdadero, pq se me olvido xd
           m_cachedState.speeds = speeds;
           m_cachedState.OdometryPeriod = averageLoopTime;
 

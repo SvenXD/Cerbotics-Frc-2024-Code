@@ -97,8 +97,7 @@ public class Constants {
     public static Pose2d bluePickupPose = new Pose2d(15.331, 1, Rotation2d.fromDegrees(-60));
     public static Pose2d redPickupPose =
         GeometryUtil.flipFieldPose(new Pose2d(15.331, 1, Rotation2d.fromDegrees(-60)));
-    public static Pose2d redAmpPose =
-        GeometryUtil.flipFieldPose(new Pose2d(1.8, 7.62, Rotation2d.fromDegrees(90)));
+    public static Pose2d redAmpPose = new Pose2d(14.75, 7.82, Rotation2d.fromDegrees(0));
 
     /*For note simulation */
     public static final Translation3d blueSpeaker = new Translation3d(0.225, 5.55, 2.1);

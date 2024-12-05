@@ -26,6 +26,7 @@ import frc.robot.Commands.IntakeCommands.IntakeWithSensor;
 import frc.robot.Commands.ShooterCommands.ShooterCommand;
 import frc.robot.Commands.SwerveCommands.FieldCentricDrive;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Subsystems.Arm.ArmIO;
 import frc.robot.Subsystems.Arm.ArmIOKraken;
 import frc.robot.Subsystems.Arm.ArmSubsystem;
@@ -172,6 +173,13 @@ public class RobotContainer {
         .b()
         .whileTrue(m_shooter.setRpms(-10, -10).alongWith(m_intake.setall(0.5, 0.5)))
         .whileFalse(m_intake.setall(0, 0).alongWith(m_shooter.stop()));
+
+    chassisDriver
+        .y()
+        .onTrue(
+            m_drive
+                .goToPose(FieldConstants.redAmpPose)
+                .until(chassisDriver.axisGreaterThan(1, 0.1)));
 
     /* Driver 2 */
     subsystemsDriver
