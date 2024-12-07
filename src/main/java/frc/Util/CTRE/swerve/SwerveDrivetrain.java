@@ -266,7 +266,10 @@ public class SwerveDrivetrain {
           m_cachedState.Pose =
               m_odometry
                   .getEstimatedPosition()
-                  .times(LimelightHelpers.getTV("limelight-tags") ? 1 : 7/6.3);  //Checar cual afecta si era verdadero, pq se me olvido xd
+                  .times(
+                      LimelightHelpers.getTV("limelight-tags")
+                          ? 1
+                          : 1); // Checar cual afecta si era verdadero, pq se me olvido xd
           m_cachedState.speeds = speeds;
           m_cachedState.OdometryPeriod = averageLoopTime;
 

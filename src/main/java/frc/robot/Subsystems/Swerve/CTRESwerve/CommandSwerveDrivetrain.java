@@ -40,7 +40,8 @@ import java.util.function.Supplier;
  * in command-based projects easily.
  */
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
-  private static final PathConstraints constraints = new PathConstraints(1.0, 1.0, 0, 0);
+  private static final PathConstraints constraints =
+      new PathConstraints(3.0, 3.0, Units.degreesToRadians(270.0), Units.degreesToRadians(270.0));
   private static final double kSimLoopPeriod = 0.005; // 5 ms
   private Notifier m_simNotifier = null;
   private double m_lastSimTime;

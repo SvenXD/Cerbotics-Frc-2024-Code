@@ -3,14 +3,18 @@ package frc.robot.Subsystems.Vision;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.Util.LimelightHelpers;
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Subsystems.Swerve.CTRESwerve.CommandSwerveDrivetrain;
+import org.littletonrobotics.junction.Logger;
 
 public class VisionSubsystem extends SubsystemBase {
 
+  public boolean useVision = true;
   private final CommandSwerveDrivetrain m_drive;
   private final Field2d m_field = new Field2d();
   private String limelightNames;
@@ -41,11 +45,12 @@ public class VisionSubsystem extends SubsystemBase {
 
     odometryWithVision(VisionConstants.tagLimelightName, xyStdDev, thetaStdDev);
 
-    SmartDashboard.putNumber("Distance from tag", averageTagDistance);
-    SmartDashboard.putNumber("XY STD", xyStdDev);
-    SmartDashboard.putNumber("Theta STD", thetaStdDev);
+    Logger.recordOutput("Vision/Distance from tag", averageTagDistance);
+    Logger.recordOutput("Vision/XY STD", xyStdDev);
+    Logger.recordOutput("Vision/Theta STD", thetaStdDev);
     SmartDashboard.putData(m_field);
-    SmartDashboard.putNumber("Rejected for distance", test);
+    Logger.recordOutput("Vision/Rejected for distance", test);
+    Logger.recordOutput("Vision/Using Vision", useVision);
   }
 
   public void odometryWithVision(String limelightName, double xySTD, double thetaSTD) {
@@ -90,5 +95,25 @@ public class VisionSubsystem extends SubsystemBase {
       m_field.getObject(limelightName).setPose(m_drive.getState().Pose);
       SmartDashboard.putBoolean("Rejected Update", doRejectUpdate);
     }
+  }
+
+  public Command changeVision() {
+    Command ejecutable =
+        Commands.runOnce(
+            () -> {
+              this.useVision = !useVision;
+            },
+            this);
+    return ejecutable;
+  }
+
+  public Command setVisionTrue() {
+    Command ejecutable =
+        Commands.runOnce(
+            () -> {
+              this.useVision = true;
+            },
+            this);
+    return ejecutable;
   }
 }

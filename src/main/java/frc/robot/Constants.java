@@ -58,9 +58,9 @@ public class Constants {
     public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
     public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 3;
 
-    public static final double traslationP = 5.0,
-        traslationD = 0.0,
-        rotationP = 5.0,
+    public static final double traslationP = 0.0,
+        traslationD = 0.2,
+        rotationP = 0.4,
         rotationD = 0.0;
 
     public static final String CANBUS_STRING = "Swerve_Canivore";
@@ -97,7 +97,7 @@ public class Constants {
     public static Pose2d bluePickupPose = new Pose2d(15.331, 1, Rotation2d.fromDegrees(-60));
     public static Pose2d redPickupPose =
         GeometryUtil.flipFieldPose(new Pose2d(15.331, 1, Rotation2d.fromDegrees(-60)));
-    public static Pose2d redAmpPose = new Pose2d(14.75, 7.82, Rotation2d.fromDegrees(0));
+    public static Pose2d redAmpPose = new Pose2d(14.75, 8, Rotation2d.fromDegrees(270));
 
     /*For note simulation */
     public static final Translation3d blueSpeaker = new Translation3d(0.225, 5.55, 2.1);
@@ -138,7 +138,7 @@ public class Constants {
     /*
      *                   F
      *   ┌───────┬─────────────────┬───────┐
-     *   │       │                 │       │
+     *   │       │       intake    │       │
      *   │ Mod 0 │                 │ Mod 1 │
      *   │       │                 │       │
      *   ├───────┘                 └───────┤
@@ -161,25 +161,25 @@ public class Constants {
 
     public static final byte kFrontLeftSteerMotorId = 2;
     public static final byte kFrontLeftEncoderId = 3;
-    public static final double kFrontLeftEncoderOffset = 0.0;
+    public static final double kFrontLeftEncoderOffset = -0.143798828125;
     /** Front Right module 1 * */
     public static final byte kFrontRightDriveMotorId = 4;
 
     public static final byte kFrontRightSteerMotorId = 5;
     public static final byte kFrontRightEncoderId = 6;
-    public static final double kFrontRightEncoderOffset = 0.0;
+    public static final double kFrontRightEncoderOffset = 0.4609375;
     /** Back Left module 2 * */
     public static final byte kBackLeftDriveMotorId = 10;
 
     public static final byte kBackLeftSteerMotorId = 11;
     public static final byte kBackLeftEncoderId = 12;
-    public static final double kBackLeftEncoderOffset = 0.0;
+    public static final double kBackLeftEncoderOffset = -0.06396484375;
     /** Back Right module 3 * */
     public static final byte kBackRightDriveMotorId = 7;
 
     public static final byte kBackRightSteerMotorId = 8;
     public static final byte kBackRightEncoderId = 9;
-    public static final double kBackRightEncoderOffset = 0.0;
+    public static final double kBackRightEncoderOffset = 0.40673828125;
 
     /** To change offsets easily * */
     // Minus  = Counterclockwise

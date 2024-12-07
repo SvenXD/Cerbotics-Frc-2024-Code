@@ -4,15 +4,23 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.CTRE.swerve.SwerveModule.DriveRequestType;
 import frc.Util.CTRE.swerve.SwerveRequest;
@@ -39,6 +47,7 @@ import frc.robot.Subsystems.Shooter.ShooterSubsystem;
 import frc.robot.Subsystems.Swerve.CTRESwerve.CommandSwerveDrivetrain;
 import frc.robot.Subsystems.Swerve.CTRESwerve.TunerConstants;
 import frc.robot.Subsystems.Vision.VisionSubsystem;
+import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -177,9 +186,12 @@ public class RobotContainer {
     chassisDriver
         .y()
         .onTrue(
-            m_drive
-                .goToPose(FieldConstants.redAmpPose)
-                .until(chassisDriver.axisGreaterThan(1, 0.1)));
+            pathfindAndAlignAmp()
+                .until(
+                    chassisDriver
+                        .axisGreaterThan(1, 0.1)
+                        .or(chassisDriver.axisGreaterThan(0, 0.1))
+                        .onTrue(m_vision.setVisionTrue())));
 
     /* Driver 2 */
     subsystemsDriver
@@ -232,25 +244,80 @@ public class RobotContainer {
         });
   }
 
-  private double filterSpeed() {
-    double val = 1;
-    if (chassisDriver.getRightX() > 5) {
-      val = 0.1;
-    }
-    return val;
+  public static Command pathfindAndAlignAmp() {
+    return Commands.sequence(
+        m_vision.changeVision(),
+        Commands.either(
+                m_drive
+                    .goToPose(FieldConstants.redAmpPose)
+                    .until(
+                        () ->
+                            m_drive
+                                    .getState()
+                                    .Pose
+                                    .getTranslation()
+                                    .getDistance(FieldConstants.redAmpPose.getTranslation())
+                                <= 3)
+                    .unless(
+                        chassisDriver
+                            .axisGreaterThan(0, 0.1)
+                            .or(chassisDriver.axisGreaterThan(1, 0.1))
+                            .onTrue(m_vision.changeVision())),
+                m_drive
+                    .goToPose(FieldConstants.blueAmpPose)
+                    .until(
+                        () ->
+                            m_drive
+                                    .getState()
+                                    .Pose
+                                    .getTranslation()
+                                    .getDistance(FieldConstants.blueAmpPose.getTranslation())
+                                <= 3)
+                    .unless(
+                        chassisDriver
+                            .axisGreaterThan(0, 0.1)
+                            .or(chassisDriver.axisGreaterThan(1, 0.1))
+                            .onTrue(m_vision.changeVision()))
+                    .andThen(m_vision.changeVision()),
+                Robot::isRedAlliance)
+            .andThen(
+                new DeferredCommand(
+                    () -> {
+                      Pose2d currentPose = m_drive.getState().Pose;
+                      ChassisSpeeds currentSpeeds =
+                          ChassisSpeeds.fromRobotRelativeSpeeds(
+                              m_drive.getCurrentFieldChassisSpeeds(), currentPose.getRotation());
+
+                      Rotation2d heading =
+                          new Rotation2d(
+                              currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond);
+
+                      Pose2d targetPose =
+                          Robot.isRedAlliance()
+                              ? FieldConstants.redAmpPose
+                              : FieldConstants.blueAmpPose;
+
+                      var bezierPoints =
+                          PathPlannerPath.bezierFromPoses(
+                              new Pose2d(currentPose.getTranslation(), heading), targetPose);
+                      PathPlannerPath path =
+                          new PathPlannerPath(
+                              bezierPoints,
+                              new PathConstraints(
+                                  2.0,
+                                  3.0,
+                                  Units.degreesToRadians(360),
+                                  Units.degreesToRadians(360)),
+                              new GoalEndState(0.0, targetPose.getRotation(), true));
+                      path.preventFlipping = true;
+
+                      return AutoBuilder.followPath(path);
+                    },
+                    Set.of(m_drive)),
+                m_arm.goToPosition(95))
+            .andThen(m_vision.changeVision()));
   }
-
-  /*public static Command pathfindAndAlignAmp() {
-        return Commands.either(
-            drive
-                .goToPose(FieldConstants.redAmpPose)
-                .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
-            drive
-                .goToPose(FieldConstants.blueAmpPose)
-                .until(() -> Math.abs(chassisDriver.getRawAxis(1)) > 0.1),
-            Robot::isRedAlliance);
-      }
-
+  /*
       public static Command pathfindAndAlignSource() {
         return Commands.either(
             drive
@@ -280,7 +347,7 @@ public class RobotContainer {
     return autoChooser.get();
   }
 
-  public CommandSwerveDrivetrain getDrive() {
+  public static CommandSwerveDrivetrain getDrive() {
     return m_drive;
   }
 
