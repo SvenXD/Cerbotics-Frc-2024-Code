@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -71,6 +72,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
       new SwerveRequest.SysIdSwerveRotation();
   private final SwerveRequest.SysIdSwerveSteerGains SteerCharacterization =
       new SwerveRequest.SysIdSwerveSteerGains();
+
+  public static enum driveMethod {
+    JOYSTICK,
+    SELF
+  }
+
+  public driveMethod driveState = driveMethod.JOYSTICK;
 
   private SysIdRoutine SysIdRoutineTranslation =
       new SysIdRoutine(
@@ -153,6 +161,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     return m_kinematics.toChassisSpeeds(getState().ModuleStates);
   }
 
+  public SwerveDriveKinematics getKinematics() {
+    return m_kinematics;
+  }
+
   public ChassisSpeeds getCurrentFieldChassisSpeeds() {
     var state = getState();
     var robotAngle = state.Pose.getRotation();
@@ -215,6 +227,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
   public double getMeasurementTimestamp() {
     return Timer.getFPGATimestamp() - LimelightHelpers.getLatency_Pipeline("null");
+  }
+
+  public void changeDriveMethod(driveMethod state) {
+    driveState = state;
   }
 
   @Override

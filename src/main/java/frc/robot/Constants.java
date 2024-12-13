@@ -65,6 +65,8 @@ public class Constants {
 
     public static final String CANBUS_STRING = "Swerve_Canivore";
     public static final int PIGEON_ID = 15;
+
+    public static final double driveOdometryRatio = 7 / 6.3;
   }
 
   public static class AutoConstants {
@@ -84,7 +86,7 @@ public class Constants {
     public static final double zMargin = 0.5;
 
     public static final double ambiguityThreshold = 0.15;
-    public static final Translation2d fieldSize = new Translation2d(16.54, 8.21);
+    public static final Translation2d fieldSize = new Translation2d(16.54, 7.9);
 
     public static double fieldLength = Units.inchesToMeters(651.223);
     public static double fieldWidth = Units.inchesToMeters(323.277);

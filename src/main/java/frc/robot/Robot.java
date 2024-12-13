@@ -15,10 +15,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.Util.LimelightHelpers;
 import frc.Util.LocalADStarAK;
 import frc.robot.Constants.Mode;
-import frc.robot.Constants.VisionConstants;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -109,9 +107,8 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     SmartDashboard.putBoolean("IsRedAlliance", isRedAlliance());
-    measuredStates.set(m_robotContainer.getDrive().getState().ModuleStates);
-    targetStates.set(m_robotContainer.getDrive().getState().ModuleTargets);
-    SmartDashboard.putNumber("pen", LimelightHelpers.getTX(VisionConstants.tagLimelightName));
+    measuredStates.set(RobotContainer.getDrive().getState().ModuleStates);
+    targetStates.set(RobotContainer.getDrive().getState().ModuleTargets);
   }
 
   @Override

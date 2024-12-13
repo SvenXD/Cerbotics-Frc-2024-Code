@@ -30,6 +30,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
     int tagsDetected = LimelightHelpers.getTargetCount(limelightNames);
 
     averageTagDistance = mt2.avgTagDist;
@@ -42,7 +43,7 @@ public class VisionSubsystem extends SubsystemBase {
         Constants.VisionConstants.thetaStdDevCoefficient
             * Math.pow(averageTagDistance, 2)
             / (tagsDetected == 0 ? 100 : tagsDetected);
-
+    m_drive.filterOutOfFieldData();
     odometryWithVision(VisionConstants.tagLimelightName, xyStdDev, thetaStdDev);
 
     Logger.recordOutput("Vision/Distance from tag", averageTagDistance);
@@ -89,8 +90,10 @@ public class VisionSubsystem extends SubsystemBase {
       }
 
       if (!doRejectUpdate) {
+
         m_drive.setVisionMeasurementStdDevs(VecBuilder.fill(xySTD, xySTD, thetaSTD));
-        m_drive.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
+        m_drive.addVisionMeasurement(
+            mt2.pose.div(Constants.DriveConstants.driveOdometryRatio), mt2.timestampSeconds);
       }
       m_field.getObject(limelightName).setPose(m_drive.getState().Pose);
       SmartDashboard.putBoolean("Rejected Update", doRejectUpdate);

@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.Util.CTRE.swerve.SwerveModule.DriveRequestType;
 import frc.Util.CTRE.swerve.SwerveRequest;
@@ -30,6 +31,7 @@ import frc.Util.Logging.LoggedDashboardChooser;
 import frc.robot.Commands.AutoCommands.AutoCommand;
 import frc.robot.Commands.AutoCommands.Paths.NoneAuto;
 import frc.robot.Commands.AutoCommands.Paths.RegionalPaths.MoveTest;
+import frc.robot.Commands.CommandThatDoesNothingCommand;
 import frc.robot.Commands.IntakeCommands.IntakeWithSensor;
 import frc.robot.Commands.ShooterCommands.ShooterCommand;
 import frc.robot.Commands.SwerveCommands.FieldCentricDrive;
@@ -45,6 +47,7 @@ import frc.robot.Subsystems.Shooter.ShooterIO;
 import frc.robot.Subsystems.Shooter.ShooterIOTalon;
 import frc.robot.Subsystems.Shooter.ShooterSubsystem;
 import frc.robot.Subsystems.Swerve.CTRESwerve.CommandSwerveDrivetrain;
+import frc.robot.Subsystems.Swerve.CTRESwerve.CommandSwerveDrivetrain.driveMethod;
 import frc.robot.Subsystems.Swerve.CTRESwerve.TunerConstants;
 import frc.robot.Subsystems.Vision.VisionSubsystem;
 import java.util.Set;
@@ -161,16 +164,17 @@ public class RobotContainer {
     /* Driver 1 */
     m_drive.setDefaultCommand(
         new FieldCentricDrive(
-            m_drive,
-            () -> chassisDriver.getLeftY(),
-            () -> chassisDriver.getLeftX(),
-            () -> chassisDriver.getRightX()));
+                m_drive,
+                () -> chassisDriver.getLeftY(),
+                () -> chassisDriver.getLeftX(),
+                () -> chassisDriver.getRightX())
+            .onlyIf(() -> m_drive.driveState == driveMethod.JOYSTICK));
 
     chassisDriver.a().onTrue(m_drive.runOnce(() -> m_drive.seedFieldRelative()));
 
     chassisDriver
         .rightBumper()
-        .whileTrue(m_arm.goToPosition(172).alongWith(new IntakeWithSensor(m_intake)))
+        .whileTrue(m_arm.goToPosition(175).alongWith(new IntakeWithSensor(m_intake)))
         .whileFalse(m_arm.goToPosition(172));
 
     chassisDriver
@@ -191,7 +195,13 @@ public class RobotContainer {
                     chassisDriver
                         .axisGreaterThan(1, 0.1)
                         .or(chassisDriver.axisGreaterThan(0, 0.1))
-                        .onTrue(m_vision.setVisionTrue())));
+                        .or(chassisDriver.axisGreaterThan(4, 0.1))
+                        .onTrue(
+                            m_vision
+                                .setVisionTrue()
+                                .alongWith(
+                                    new InstantCommand(
+                                        () -> m_drive.changeDriveMethod(driveMethod.JOYSTICK))))));
 
     /* Driver 2 */
     subsystemsDriver
@@ -257,12 +267,7 @@ public class RobotContainer {
                                     .Pose
                                     .getTranslation()
                                     .getDistance(FieldConstants.redAmpPose.getTranslation())
-                                <= 3)
-                    .unless(
-                        chassisDriver
-                            .axisGreaterThan(0, 0.1)
-                            .or(chassisDriver.axisGreaterThan(1, 0.1))
-                            .onTrue(m_vision.changeVision())),
+                                <= 3),
                 m_drive
                     .goToPose(FieldConstants.blueAmpPose)
                     .until(
@@ -272,13 +277,7 @@ public class RobotContainer {
                                     .Pose
                                     .getTranslation()
                                     .getDistance(FieldConstants.blueAmpPose.getTranslation())
-                                <= 3)
-                    .unless(
-                        chassisDriver
-                            .axisGreaterThan(0, 0.1)
-                            .or(chassisDriver.axisGreaterThan(1, 0.1))
-                            .onTrue(m_vision.changeVision()))
-                    .andThen(m_vision.changeVision()),
+                                <= 3),
                 Robot::isRedAlliance)
             .andThen(
                 new DeferredCommand(
@@ -296,7 +295,6 @@ public class RobotContainer {
                           Robot.isRedAlliance()
                               ? FieldConstants.redAmpPose
                               : FieldConstants.blueAmpPose;
-
                       var bezierPoints =
                           PathPlannerPath.bezierFromPoses(
                               new Pose2d(currentPose.getTranslation(), heading), targetPose);
@@ -314,8 +312,7 @@ public class RobotContainer {
                       return AutoBuilder.followPath(path);
                     },
                     Set.of(m_drive)),
-                m_arm.goToPosition(95))
-            .andThen(m_vision.changeVision()));
+                new CommandThatDoesNothingCommand().andThen(m_vision.changeVision())));
   }
   /*
       public static Command pathfindAndAlignSource() {

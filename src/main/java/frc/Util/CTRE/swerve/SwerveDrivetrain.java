@@ -33,7 +33,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import frc.Util.CTRE.swerve.SwerveRequest.SwerveControlRequestParameters;
-import frc.Util.LimelightHelpers;
+import frc.robot.Constants;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -84,6 +84,7 @@ public class SwerveDrivetrain {
 
   private final TreeMap<Double, Pose2d> poseHistory = new TreeMap<>();
   private static final double HISTORY_DURATION = 1.0;
+  private static Pose2d placeHolderPose = new Pose2d();
 
   /**
    * Plain-Old-Data class holding the state of the swerve drivetrain. This encapsulates most data
@@ -264,12 +265,7 @@ public class SwerveDrivetrain {
           m_cachedState.FailedDaqs = FailedDaqs;
           m_cachedState.SuccessfulDaqs = SuccessfulDaqs;
           m_cachedState.Pose =
-              m_odometry
-                  .getEstimatedPosition()
-                  .times(
-                      LimelightHelpers.getTV("limelight-tags")
-                          ? 1
-                          : 1); // Checar cual afecta si era verdadero, pq se me olvido xd
+              m_odometry.getEstimatedPosition().times(Constants.DriveConstants.driveOdometryRatio);
           m_cachedState.speeds = speeds;
           m_cachedState.OdometryPeriod = averageLoopTime;
 
@@ -678,6 +674,43 @@ public class SwerveDrivetrain {
     }
   }
 
+  /**
+   * Sets the pose estimator's trust of global measurements. This might be used to change trust in
+   * vision measurements after the autonomous period, or to change trust as distance to a vision
+   * target increases.
+   *
+   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
+   *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
+   *     theta]ᵀ, with units in meters and radians.
+   */
+  public void filterOutOfFieldData() {
+    Pose2d currentPosition = m_odometry.getEstimatedPosition();
+    try {
+      m_stateLock.writeLock().lock();
+
+      if (currentPosition.getX() < -Constants.FieldConstants.fieldBorderMargin
+          || currentPosition.getX()
+              > Constants.FieldConstants.fieldSize.getX()
+                  + Constants.FieldConstants.fieldBorderMargin
+          || currentPosition.getY() < -Constants.FieldConstants.fieldBorderMargin
+          || currentPosition.getY()
+              > Constants.FieldConstants.fieldSize.getY()
+                  + Constants.FieldConstants.fieldBorderMargin) {
+        placeHolderPose =
+            new Pose2d(
+                Math.max(
+                    0, Math.min(Constants.FieldConstants.fieldSize.getX(), currentPosition.getX())),
+                Math.max(
+                    0, Math.min(Constants.FieldConstants.fieldSize.getY(), currentPosition.getY())),
+                currentPosition.getRotation());
+
+        m_odometry.resetPosition(currentPosition.getRotation(), m_modulePositions, placeHolderPose);
+      }
+
+    } finally {
+      m_stateLock.writeLock().unlock();
+    }
+  }
   /**
    * Updates all the simulation state variables for this drivetrain class. User provides the update
    * variables for the simulation.
