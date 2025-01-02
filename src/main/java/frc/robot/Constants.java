@@ -23,7 +23,7 @@ import edu.wpi.first.math.util.Units;
 
 public class Constants {
 
-  public static Mode currentMode = Mode.SIM;
+  public static Mode currentMode = Mode.REAL;
   public static final boolean needToLog = true;
 
   public static enum Mode {
@@ -100,6 +100,8 @@ public class Constants {
     public static Pose2d redPickupPose =
         GeometryUtil.flipFieldPose(new Pose2d(15.331, 1, Rotation2d.fromDegrees(-60)));
     public static Pose2d redAmpPose = new Pose2d(14.75, 8, Rotation2d.fromDegrees(270));
+    public static Pose2d blueSpeakerPose = new Pose2d(1.325, 5.55, Rotation2d.fromDegrees(0));
+    public static Pose2d redSpeakerPose = new Pose2d(15.117, 5.55, Rotation2d.fromDegrees(180));
 
     /*For note simulation */
     public static final Translation3d blueSpeaker = new Translation3d(0.225, 5.55, 2.1);

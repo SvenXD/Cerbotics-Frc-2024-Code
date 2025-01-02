@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import frc.Util.CTRE.swerve.SwerveRequest.SwerveControlRequestParameters;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -494,7 +495,11 @@ public class SwerveDrivetrain {
     try {
       m_stateLock.writeLock().lock();
 
-      m_fieldRelativeOffset = getState().Pose.getRotation();
+      m_fieldRelativeOffset =
+          getState()
+              .Pose
+              .getRotation()
+              .plus(Robot.isRedAlliance() ? new Rotation2d(160) : new Rotation2d());
     } finally {
       m_stateLock.writeLock().unlock();
     }
@@ -674,15 +679,7 @@ public class SwerveDrivetrain {
     }
   }
 
-  /**
-   * Sets the pose estimator's trust of global measurements. This might be used to change trust in
-   * vision measurements after the autonomous period, or to change trust as distance to a vision
-   * target increases.
-   *
-   * @param visionMeasurementStdDevs Standard deviations of the vision measurements. Increase these
-   *     numbers to trust global measurements from vision less. This matrix is in the form [x, y,
-   *     theta]ᵀ, with units in meters and radians.
-   */
+  /** Changes the Pose estimator so that it rejects values that are out of the field */
   public void filterOutOfFieldData() {
     Pose2d currentPosition = m_odometry.getEstimatedPosition();
     try {

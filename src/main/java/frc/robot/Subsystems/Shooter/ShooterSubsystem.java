@@ -33,6 +33,10 @@ public class ShooterSubsystem extends SubsystemBase {
     io.setVelocity(upperRpm, downRpm);
   }
 
+  public void stopVoid() {
+    io.stop();
+  }
+
   public Command stop() {
     return run(() -> io.stop());
   }

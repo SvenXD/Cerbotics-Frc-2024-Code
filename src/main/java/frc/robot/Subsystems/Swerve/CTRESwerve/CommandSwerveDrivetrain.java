@@ -9,7 +9,6 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -23,7 +22,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.Util.CTRE.swerve.SwerveDrivetrain;
@@ -33,7 +31,6 @@ import frc.Util.CTRE.swerve.SwerveModuleConstants;
 import frc.Util.CTRE.swerve.SwerveRequest;
 import frc.Util.LimelightHelpers;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.RobotContainer;
 import java.util.function.Supplier;
 
 /**
@@ -48,7 +45,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
   private double m_lastSimTime;
 
   /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
-  private final Rotation2d BlueAlliancePerspectiveRotation = Rotation2d.fromDegrees(0);
+  private final Rotation2d BlueAlliancePerspectiveRotation = Rotation2d.fromDegrees(180);
   /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
   // Check how to fix field centric
   private final Rotation2d RedAlliancePerspectiveRotation = Rotation2d.fromDegrees(0);
@@ -255,7 +252,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     SmartDashboard.putNumber("TestVel", this.getState().speeds.vxMetersPerSecond);
   }
 
-  public Command driveToIntakeRing() {
+  /*public Command driveToIntakeRing() {
     PIDController rotationController = new PIDController(4, 0.0, 0.0);
     rotationController.enableContinuousInput(-Math.PI, Math.PI);
     PIDController speedController = new PIDController(0.07, 0.0, 0.0);
@@ -343,5 +340,5 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 })
                 .onlyWhile(() -> LimelightHelpers.getTV("null")))
         .repeatedly();
-  }
+  }*/
 }
