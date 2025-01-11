@@ -1,12 +1,5 @@
 {
-  "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 0.761513061487663,
-      "y": 4.519059807350385
-    },
-    "rotation": -59.03624346792651
-  },
+  "version": "2025.0",
   "command": {
     "type": "sequential",
     "data": {
@@ -26,6 +19,7 @@
       ]
     }
   },
+  "resetOdom": true,
   "folder": "ProbandoAutonomos",
   "choreoAuto": false
 }
